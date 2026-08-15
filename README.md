@@ -19,6 +19,10 @@ Section added after the founders' letter, per client request, showing the real c
 
 `assets/pack-1box.jpg`, `pack-3boxes.jpg`, `pack-10boxes.jpg` are the client's real product renders, extracted from a PDF they uploaded and matched to the correct card by content (single pouch + sachet → 1 Box, 3 pouches → 3 Boxes, 10 pouches → 10 Boxes).
 
+## Ingredient group images
+
+`assets/ingredient-{moringa,turmeric,barley,gojiberry}.jpg` are the client's real infographics, extracted from a second PDF they uploaded. Each one is self-contained (group title + all 5 ingredient photos baked into the image), so the ingredients section now just displays these directly — the separate HTML titles/bullet lists that stood in for them before were removed to avoid duplicating the same info. The groupings/ingredient lists in these images matched our best-effort transcription exactly, confirming that earlier work was accurate.
+
 ## Known limitation: most other photos are still placeholders
 
 This build could not reach `kopify.shop` directly (network egress to that domain, and its related `kopify.ph` / `buy.kopify.ph` domains, was blocked in the build environment). Most of the real copy was instead transcribed from screenshots of the live page the client provided partway through the build. What's real vs. still-uncertain:
@@ -28,7 +32,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - Founders' letter (Randave & CJ), hero callout ("Your coffee is boring..."), benefits/testimonials/ingredients CTA taglines and stats row (5.0★, 10K+ Ratings, 10K+ Sold), and the "It's not just coffee...It's Kopify" benefits list — transcribed from client screenshots.
 - The 20-ingredient list and its 4 groupings (Moringa, Turmeric, Barley, Goji Berry groups) — transcribed and cross-checked against public search results, and confirmed again by the FAQ Q1 screenshot.
 - FAQ Q1 (ingredients) — verbatim from a live-site screenshot. FAQ distributor answer — verbatim from spec.
-- FDA certificate and the 3 pricing pack photos — real files (see above).
+- FDA certificate, the 3 pricing pack photos, and the 4 ingredient group images — real files (see above).
 - Testimonial names (Cathy Lim-Domingo, Ots Jimenez, Mara Gaviola, Direk Paul, Joana Lazaro, Cilebritee Shop) — from spec.
 
 **Needs a final proofread — search for `TODO` in `index.html`:**
@@ -51,4 +55,5 @@ assets/fda-certificate.jpg     — real FDA certificate (manufacturer redacted)
 assets/pack-1box.jpg           — real product photo, 1 Box card
 assets/pack-3boxes.jpg         — real product photo, 3 Boxes card
 assets/pack-10boxes.jpg        — real product photo, 10 Boxes card
+assets/ingredient-*.jpg         — real ingredient group infographics (4 files)
 ```
