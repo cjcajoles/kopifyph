@@ -27,7 +27,7 @@ All in `index.html`:
 
 ## Testimonial photos + corrected quotes
 
-Real photos added for 5 of the 6 testimonials: `assets/testimonial-{cathy,ots,mara,direkpaul,joana}.jpg`. Only Cilebritee Shop's is still a placeholder. The client also corrected two quotes to the real wording — Cathy Lim Domingo's and Direk Paul's are now verbatim as given by the client. Ots's, Mara's, Joana's, and Cilebritee's quotes are still the earlier best-effort transcription (not corrected/confirmed yet).
+Real photos added for all 6 testimonials: `assets/testimonial-{cathy,ots,mara,direkpaul,joana,cilebritee}.jpg`. The client also corrected two quotes to the real wording — Cathy Lim Domingo's and Direk Paul's are now verbatim as given by the client. Ots's, Mara's, Joana's, and Cilebritee's quotes are still the earlier best-effort transcription (not corrected/confirmed yet).
 
 ## Benefits grid photos
 
@@ -50,7 +50,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - Hero callout ("Your coffee is boring..."), benefits/testimonials/ingredients CTA taglines and stats row (5.0★, 10K+ Ratings, 10K+ Sold), and the "It's not just coffee...It's Kopify" benefits list — transcribed from client screenshots.
 - The 20-ingredient list and its 4 groupings (Moringa, Turmeric, Barley, Goji Berry groups) — transcribed and cross-checked against public search results, and confirmed again by the FAQ Q1 screenshot and the real ingredient images.
 - FAQ Q1 (ingredients) — verbatim from a live-site screenshot. FAQ distributor answer — verbatim from spec.
-- FDA certificate, the 3 pricing pack photos, the 4 ingredient group images, the 20-in-1 summary graphic, the testimonial collage, the hero video, and 5 of 6 testimonial photos — real files (see above).
+- FDA certificate, the 3 pricing pack photos, the 4 ingredient group images, the 20-in-1 summary graphic, the testimonial collage, the hero video, and all 6 testimonial photos — real files (see above).
 - Testimonial names (Cathy Lim-Domingo, Ots Jimenez, Mara Gaviola, Direk Paul, Joana Lazaro, Cilebritee Shop) — from spec. Cathy's and Direk Paul's quotes are client-confirmed verbatim.
 
 **Needs a final proofread — search for `TODO` in `index.html`:**
@@ -58,7 +58,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - FAQ answers 2–10 (everything except Q1 and the distributor one) are still best-effort copy in the site's voice, not transcribed from a source.
 
 **Still placeholder:**
-- Product-intro photo, 1 of 6 benefit-grid photos (No Sugar Cravings), and Cilebritee's testimonial photo, are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
+- Product-intro photo and 1 of 6 benefit-grid photos (No Sugar Cravings) are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
 
 ## PWA
 
@@ -86,6 +86,7 @@ assets/benefit-bloating.jpg     — real icon, "No More Bloating" benefit card
 assets/testimonial-collage.jpg — real customer photo collage
 assets/testimonial-direkpaul.jpg — real photo, Direk Paul
 assets/testimonial-joana.jpg    — real photo, Joana Lazaro
+assets/testimonial-cilebritee.jpg — real photo, Cilebritee Shop
 assets/hero-video.mp4           — real hero video, desktop (720x720, H.264)
 assets/hero-video-mobile.mp4    — real hero video, mobile (480x480, H.264)
 assets/hero-video-poster.jpg    — poster frame for the hero video
