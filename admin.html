@@ -10,6 +10,11 @@
     const stored = localStorage.getItem('kopify-admin-theme');
     const wantsDark = stored ? stored === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
     if (wantsDark) document.documentElement.classList.add('dark');
+    // Gate the dashboard behind admin-login.html. This is a client-side placeholder
+    // (see the NOTE in admin-login.html) — swap for real auth before this goes live.
+    if (localStorage.getItem('kopify-admin-authed') !== 'true') {
+      window.location.replace('admin-login.html');
+    }
   })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -537,6 +542,15 @@
               Dark
             </button>
           </div>
+        </div>
+
+        <div class="max-w-xl bg-white rounded-2xl shadow-card border border-coffee-100 p-6 mt-4">
+          <h2 class="font-bold text-coffee-900 mb-1">Account</h2>
+          <p class="text-sm text-coffee-500 mb-4">Signed in as <span id="settings-account-email" class="font-semibold text-coffee-700">&mdash;</span></p>
+          <button id="logout-btn" class="flex items-center gap-2 border border-coffee-100 hover:bg-coffee-50 transition text-sm font-bold text-coffee-700 px-4 py-2.5 rounded-full">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 16l4-4-4-4M19 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Log out
+          </button>
         </div>
       </section>
 
@@ -1098,6 +1112,13 @@ renderRefunds();
 applyPeriod('monthly');
 document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
 document.getElementById('dist-nav-count').textContent = distributors.length;
+
+// ---------- Auth ----------
+document.getElementById('settings-account-email').textContent = localStorage.getItem('kopify-admin-email') || 'admin@kopify.ph';
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('kopify-admin-authed');
+  window.location.href = 'admin-login.html';
+});
 </script>
 </body>
 </html>
