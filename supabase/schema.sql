@@ -128,7 +128,7 @@ create table if not exists public.orders (
   city text,
   barangay text,
   zip_code text,
-  affiliate_code text references public.profiles(affiliate_code),
+  affiliate_code text,
   created_at timestamptz not null default now()
 );
 
