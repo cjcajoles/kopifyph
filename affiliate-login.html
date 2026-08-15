@@ -9,11 +9,10 @@
     const stored = localStorage.getItem('kopify-admin-theme');
     const wantsDark = stored ? stored === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
     if (wantsDark) document.documentElement.classList.add('dark');
-    if (localStorage.getItem('kopify-affiliate-code')) {
-      window.location.replace('affiliate-dashboard.html');
-    }
   })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="./supabase-config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -91,46 +90,66 @@
   </div>
 
   <div class="text-center text-xs text-coffee-400 mt-5 space-y-1">
-    <p>Demo accounts (any password): bea.santos@gmail.com &middot; marco.villareal@gmail.com &middot; jamie.cruz@gmail.com</p>
     <p>&copy; Kopify PH Affiliate Program</p>
   </div>
 </div>
 
 <script>
-  // Same affiliate roster admin.html manages — kept in sync manually until this is backed
-  // by a real database (see README). Only the fields the portal needs are duplicated here.
-  const AFFILIATES = [
-    { name: 'Bea Santos',      email: 'bea.santos@gmail.com',      code: 'BEA10',   status: 'Active' },
-    { name: 'Marco Villareal', email: 'marco.villareal@gmail.com', code: 'MARCO15', status: 'Active' },
-    { name: 'Jamie Cruz',      email: 'jamie.cruz@gmail.com',      code: 'JAMIE5',  status: 'Active' },
-    { name: 'Rhea Domingo',    email: 'rhea.domingo@yahoo.com',    code: 'RHEA20',  status: 'Inactive' },
-  ];
-
   const form = document.getElementById('login-form');
   const errorEl = document.getElementById('login-error');
-  form.addEventListener('submit', (e) => {
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.remove('hidden');
+  }
+
+  // Already have a valid affiliate session? Skip straight to the dashboard.
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+    if (profile?.role === 'affiliate') window.location.replace('affiliate-dashboard.html');
+  })();
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     if (!email || !password) {
-      errorEl.textContent = 'Enter both your email and password.';
-      errorEl.classList.remove('hidden');
+      showError('Enter both your email and password.');
       return;
     }
-    const match = AFFILIATES.find(a => a.email.toLowerCase() === email);
-    if (!match) {
-      errorEl.textContent = "We couldn't find an affiliate account for that email.";
-      errorEl.classList.remove('hidden');
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing in…';
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      showError('Invalid email or password.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In →';
       return;
     }
-    if (match.status !== 'Active') {
-      errorEl.textContent = 'This affiliate account is inactive. Contact Kopify PH for help.';
-      errorEl.classList.remove('hidden');
+
+    const { data: profile } = await sb.from('profiles').select('role, affiliate_code').eq('id', data.user.id).single();
+    if (profile?.role !== 'affiliate') {
+      await sb.auth.signOut();
+      showError("This account isn't set up as an affiliate.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In →';
       return;
     }
-    // NOTE: placeholder gate only — accepts any password for a matching email.
-    // Swap for real auth (e.g. Supabase Auth) before this goes live; see README.
-    localStorage.setItem('kopify-affiliate-code', match.code);
+
+    const { data: affiliate } = await sb.from('affiliates').select('status').eq('code', profile.affiliate_code).single();
+    if (affiliate?.status !== 'Active') {
+      await sb.auth.signOut();
+      showError('This affiliate account is inactive. Contact Kopify PH for help.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In →';
+      return;
+    }
+
     window.location.href = 'affiliate-dashboard.html';
   });
 </script>
