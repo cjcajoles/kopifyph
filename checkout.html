@@ -178,6 +178,7 @@
             <span class="font-bold text-coffee-900">Total</span>
             <span id="summary-total" class="text-2xl font-extrabold text-coffee-900">&#8369;479</span>
           </div>
+          <p id="summary-ref" class="hidden mt-3 text-xs font-semibold text-gold-600 bg-gold-100 rounded-lg px-3 py-2" style="background-color:#FBF0DC"></p>
         </div>
       </div>
 
@@ -194,6 +195,7 @@
     <div class="bg-white rounded-2xl shadow-card p-6 text-left mb-6">
       <div class="flex justify-between text-sm mb-2"><span class="text-coffee-500">Pack</span><span id="confirm-pack" class="font-semibold text-coffee-900">1 x Box</span></div>
       <div class="flex justify-between text-sm mb-2"><span class="text-coffee-500">Payment</span><span id="confirm-payment" class="font-semibold text-coffee-900">GCash</span></div>
+      <div id="confirm-ref-row" class="hidden justify-between text-sm mb-2"><span class="text-coffee-500">Referred by</span><span id="confirm-ref" class="font-semibold text-coffee-900"></span></div>
       <div class="flex justify-between text-sm pt-2 border-t border-coffee-100"><span class="text-coffee-700 font-bold">Total</span><span id="confirm-total" class="font-bold text-coffee-900">&#8369;479</span></div>
     </div>
     <a href="index.html" class="inline-block bg-coffee-800 hover:bg-coffee-700 transition rounded-full text-white font-bold px-8 py-3.5">Back to Kopify</a>
@@ -215,6 +217,12 @@
   const packKey = PACKS[params.get('pack')] ? params.get('pack') : '1';
   const pack = PACKS[packKey];
 
+  // Affiliate referral tracking: ?ref=CODE from an affiliate's link (see affiliate-dashboard.html).
+  // Persisted to localStorage so it survives if the shopper browses the site before checking out.
+  const refCode = params.get('ref');
+  if (refCode) localStorage.setItem('kopify-ref-code', refCode.toUpperCase());
+  const activeRefCode = localStorage.getItem('kopify-ref-code');
+
   document.getElementById('summary-img').src = pack.img;
   document.getElementById('summary-img').alt = pack.label;
   document.getElementById('summary-name').textContent = pack.label;
@@ -223,6 +231,11 @@
   document.getElementById('summary-subtotal').textContent = peso(pack.price);
   document.getElementById('summary-shipping').textContent = peso(SHIPPING_FEE);
   document.getElementById('summary-total').textContent = peso(pack.price + SHIPPING_FEE);
+  if (activeRefCode) {
+    const refEl = document.getElementById('summary-ref');
+    refEl.textContent = `🎉 You were referred by ${activeRefCode}`;
+    refEl.classList.remove('hidden');
+  }
 
   // ===== PH Region / Province / City / Barangay cascading dropdowns =====
   const regionSel = document.getElementById('co-region');
@@ -346,6 +359,11 @@
     document.getElementById('confirm-pack').textContent = pack.label;
     document.getElementById('confirm-payment').textContent = paymentMethod;
     document.getElementById('confirm-total').textContent = peso(pack.price + SHIPPING_FEE);
+    if (activeRefCode) {
+      document.getElementById('confirm-ref').textContent = activeRefCode;
+      document.getElementById('confirm-ref-row').classList.remove('hidden');
+      document.getElementById('confirm-ref-row').classList.add('flex');
+    }
 
     document.getElementById('checkout-form-state').classList.add('hidden');
     document.getElementById('checkout-confirm-state').classList.remove('hidden');
