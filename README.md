@@ -37,6 +37,10 @@ Real photos added for all 6 testimonials: `assets/testimonial-{cathy,ots,mara,di
 
 `assets/hero-video.mp4` (720×720, desktop) and `assets/hero-video-mobile.mp4` (480×480, mobile) replace the hero product placeholder, from a client-uploaded video. The source was **HEVC/H.265 at 1920×1080 with pillarboxing** — HEVC doesn't play in Chrome or Firefox, so it was transcoded to H.264/AAC (universal support), the black bars were cropped out via `cropdetect`, and the portrait content was center-cropped to a square framed on the face/cup. Two renditions are served (`assets/hero-video-poster.jpg` as the shared poster): `index.html`'s inline script picks the mobile file below a 640px viewport via `matchMedia`, so phones don't download the larger desktop file, and calls `video.load()` after inserting the `<source>` (required for a dynamically-added source to actually be picked up). `preload="metadata"` means only the poster + duration load up front — the ~50s video body (4.7MB desktop / 1.9MB mobile) only downloads when the user taps the play button, matching the click-to-play behavior from the live site's reference screenshots (not an autoplay loop, since it has spoken audio). Verified with `ffmpeg -f null` (zero decode errors on both files) rather than a browser — the sandboxed headless Chromium used for building this site has no H.264 decoder at all (`canPlayType` returns `""`), which is a limitation of that specific test browser, not of real Chrome/Edge/Firefox/Safari, which all support H.264/AAC natively.
 
+## Product-intro photo
+
+`assets/product-intro.jpg` replaces the "Product Image" placeholder under the "Experience the perfect cup with Kopify" headline, from a client-supplied PDF — the full marketing hero graphic (pouch + scattered coffee beans + "Not Your Ordinary Coffee" text), used as-is (image dictates its own aspect ratio rather than being force-cropped) since it's a self-contained composite, the same treatment as the ingredient group images and the 20-in-1 summary graphic.
+
 ## Testimonial collage photo
 
 `assets/testimonial-collage.jpg` replaces the collage placeholder under the 5.0★/10K+ Ratings/10K+ Sold stats row, from a client-supplied PDF.
@@ -50,7 +54,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - Hero callout ("Your coffee is boring..."), benefits/testimonials/ingredients CTA taglines and stats row (5.0★, 10K+ Ratings, 10K+ Sold), and the "It's not just coffee...It's Kopify" benefits list — transcribed from client screenshots.
 - The 20-ingredient list and its 4 groupings (Moringa, Turmeric, Barley, Goji Berry groups) — transcribed and cross-checked against public search results, and confirmed again by the FAQ Q1 screenshot and the real ingredient images.
 - FAQ Q1 (ingredients) — verbatim from a live-site screenshot. FAQ distributor answer — verbatim from spec.
-- FDA certificate, the 3 pricing pack photos, the 4 ingredient group images, the 20-in-1 summary graphic, the testimonial collage, the hero video, and all 6 testimonial photos — real files (see above).
+- FDA certificate, the 3 pricing pack photos, the 4 ingredient group images, the 20-in-1 summary graphic, the testimonial collage, the hero video, all 6 testimonial photos, all 6 benefit-grid icons, and the product-intro photo — real files (see above).
 - Testimonial names (Cathy Lim-Domingo, Ots Jimenez, Mara Gaviola, Direk Paul, Joana Lazaro, Cilebritee Shop) — from spec. Cathy's and Direk Paul's quotes are client-confirmed verbatim.
 
 **Needs a final proofread — search for `TODO` in `index.html`:**
@@ -58,7 +62,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - FAQ answers 2–10 (everything except Q1 and the distributor one) are still best-effort copy in the site's voice, not transcribed from a source.
 
 **Still placeholder:**
-- Product-intro photo is a labeled brown/gold placeholder shape (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
+- None of the product/photo content remains placeholder. The Kopify logo is still a hand-recreated SVG, not the source file — if you can share the original logo file (not a screenshot), it can be dropped in directly.
 
 ## PWA
 
@@ -91,4 +95,5 @@ assets/testimonial-cilebritee.jpg — real photo, Cilebritee Shop
 assets/hero-video.mp4           — real hero video, desktop (720x720, H.264)
 assets/hero-video-mobile.mp4    — real hero video, mobile (480x480, H.264)
 assets/hero-video-poster.jpg    — poster frame for the hero video
+assets/product-intro.jpg        — real product hero graphic, "Experience the perfect cup" section
 ```
