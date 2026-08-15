@@ -107,12 +107,21 @@
 <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=REPLACE_ME&ev=PageView&noscript=1" /></noscript>
 
 <!-- ================= NAV / LOGO BAR ================= -->
+<!-- TODO: logo icon below is a hand-recreated SVG approximation of the real Kopify mark (built from a screenshot, not the source file) — swap for the real logo asset if/when you can share it as an uploaded file rather than a pasted image, for a pixel-exact match. -->
 <header class="w-full py-4 px-4 flex justify-center bg-coffee-900">
   <a href="#top" class="flex items-center gap-2.5">
-    <div class="placeholder-img rounded-full w-11 h-11 text-[9px] shrink-0"><!-- TODO: swap for real Kopify logo image -->LOGO</div>
+    <div class="rounded-full w-11 h-11 shrink-0 flex items-center justify-center p-1.5" style="background:#C79A5D">
+      <svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.55"/>
+        <path d="M40 28c-3-4 3-6 0-10M50 26c-3-4 3-6 0-10M60 28c-3-4 3-6 0-10" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M28 40h36v15a18 18 0 0 1-18 18 18 18 0 0 1-18-18V40Z" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M64 44h6.5a7.5 7.5 0 0 1 0 15H64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        <path d="M22 68h48" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
     <span class="text-left leading-tight">
       <span class="block text-xl font-extrabold tracking-tight text-white">Kopify</span>
-      <span class="block text-[10px] uppercase tracking-widest text-gold-400 font-semibold">How coffee should be</span>
+      <span class="block text-[10px] tracking-wide text-gold-300 font-bold">How coffee should be</span>
     </span>
   </a>
 </header>
@@ -758,7 +767,21 @@
 <!-- ================= 10. FOOTER ================= -->
 <footer class="px-4 py-12 bg-coffee-900 text-coffee-100">
   <div class="max-w-4xl mx-auto flex flex-col items-center text-center gap-4">
-    <div class="placeholder-img rounded-full w-12 h-12 text-[9px]">LOGO</div>
+    <div class="flex items-center gap-2.5">
+      <div class="rounded-full w-11 h-11 shrink-0 flex items-center justify-center p-1.5" style="background:#C79A5D">
+        <svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.55"/>
+          <path d="M40 28c-3-4 3-6 0-10M50 26c-3-4 3-6 0-10M60 28c-3-4 3-6 0-10" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M28 40h36v15a18 18 0 0 1-18 18 18 18 0 0 1-18-18V40Z" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M64 44h6.5a7.5 7.5 0 0 1 0 15H64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+          <path d="M22 68h48" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="text-left leading-tight">
+        <span class="block text-xl font-extrabold tracking-tight text-white">Kopify</span>
+        <span class="block text-[10px] tracking-wide text-gold-300 font-bold">How coffee should be</span>
+      </span>
+    </div>
     <p class="text-sm">
       Email: <a href="mailto:support@kopify.ph" class="hover:text-gold-400 transition">support@kopify.ph</a>
     </p>
