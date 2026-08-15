@@ -736,10 +736,11 @@
   });
 
   // ===== Checkout URL configuration =====
-  // Swap these to Xendit payment links later without touching layout/markup.
-  const CHECKOUT_URL_1  = "https://kopify.shop/1-x-box-checkout";
-  const CHECKOUT_URL_3  = "https://kopify.shop/3-boxes-checkout";
-  const CHECKOUT_URL_10 = "https://kopify.shop/10-boxes-checkout";
+  // Points at our own checkout.html (with the PH address form) for now.
+  // Swap these to a real payment gateway's hosted checkout link later without touching layout/markup.
+  const CHECKOUT_URL_1  = "checkout.html?pack=1";
+  const CHECKOUT_URL_3  = "checkout.html?pack=3";
+  const CHECKOUT_URL_10 = "checkout.html?pack=10";
 
   const CHECKOUT_URLS = { "1": CHECKOUT_URL_1, "3": CHECKOUT_URL_3, "10": CHECKOUT_URL_10 };
 

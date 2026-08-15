@@ -104,6 +104,10 @@
         Distributors
         <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center" id="dist-nav-count">2</span>
       </button>
+      <button class="nav-btn" data-view="vouchers">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3.5 9.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v1.2a1.7 1.7 0 0 0 0 3.2v1.6a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-1.6a1.7 1.7 0 0 0 0-3.2V9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14.5 8v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="1.6 1.8"/></svg>
+        Vouchers
+      </button>
     </nav>
 
     <div class="px-3 py-4 border-t border-coffee-100">
@@ -390,6 +394,43 @@
         </div>
       </section>
 
+      <!-- ================= VOUCHERS ================= -->
+      <section id="view-vouchers" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Vouchers &amp; Discounts</h1>
+            <p class="text-coffee-500 text-sm mt-1">Promo codes shoppers can apply at checkout.</p>
+          </div>
+          <button id="voucher-create-btn" class="flex items-center gap-1.5 bg-gold-500 hover:bg-gold-600 transition text-white text-sm font-bold px-4 py-2.5 rounded-full">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Create voucher
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="vouchers-search" type="text" placeholder="Search by code" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="vouchers-status-filter">
+            <button data-status="all" class="voucher-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
+            <button data-status="Active" class="voucher-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Active</button>
+            <button data-status="Scheduled" class="voucher-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Scheduled</button>
+            <button data-status="Expired" class="voucher-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Expired</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="vouchers-table">
+              <thead><tr><th>Code</th><th>Discount</th><th>Min. spend</th><th>Used</th><th>Valid dates</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="vouchers-empty" class="hidden text-center text-sm text-coffee-400 py-10">No vouchers match your search.</p>
+        </div>
+      </section>
+
     </main>
   </div>
 </div>
@@ -497,6 +538,14 @@ const distributors = [
   { name: 'Precious Del Rosario', address: 'Lapu-Lapu City, Cebu',                 email: 'precious.delrosario@gmail.com', mobile: '0919 556 3312', channel: 'TikTok', applied: 'Jul 30, 2026' },
 ];
 
+let vouchers = [
+  { code: 'KOPIFY10',      type: 'Percentage', amount: 10,  minSpend: 500,  used: 84,  limit: 200, validFrom: '2026-08-01', validUntil: '2026-08-31' },
+  { code: 'WELCOME50',     type: 'Fixed',      amount: 50,  minSpend: 399,  used: 312, limit: 500, validFrom: '2026-07-01', validUntil: '2026-12-31' },
+  { code: 'FLASH20',       type: 'Percentage', amount: 20,  minSpend: 0,    used: 0,   limit: 100, validFrom: '2026-08-20', validUntil: '2026-08-22' },
+  { code: 'FAMILYPACK100', type: 'Fixed',      amount: 100, minSpend: 1097, used: 156, limit: 300, validFrom: '2026-06-01', validUntil: '2026-07-31' },
+  { code: 'BOXHOLIC15',    type: 'Percentage', amount: 15,  minSpend: 500,  used: 22,  limit: 150, validFrom: '2026-08-10', validUntil: '2026-09-10' },
+];
+
 // ---------- Helpers ----------
 const peso = n => '₱' + n.toLocaleString('en-PH');
 const statusStyle = {
@@ -505,6 +554,9 @@ const statusStyle = {
   Pending:   { bg: '#FEF3C7', text: '#B45309', dot: '#F59E0B' },
   Shipped:   { bg: '#DBEAFE', text: '#1D4ED8', dot: '#3B82F6' },
   Cancelled: { bg: '#FEE2E2', text: '#B91C1C', dot: '#EF4444' },
+  Active:    { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
+  Scheduled: { bg: '#DBEAFE', text: '#1D4ED8', dot: '#3B82F6' },
+  Expired:   { bg: '#F3E1CC', text: '#6F4423', dot: '#B98247' },
 };
 function statusPill(status) {
   const s = statusStyle[status] || statusStyle.Pending;
@@ -655,6 +707,80 @@ document.querySelectorAll('#distributors-channel-filter .channel-filter-btn').fo
   });
 });
 
+// ---------- Render: vouchers ----------
+function voucherStatus(v) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (today < v.validFrom) return 'Scheduled';
+  if (today > v.validUntil) return 'Expired';
+  return 'Active';
+}
+function fmtDateRange(from, until) {
+  const opts = { month: 'short', day: 'numeric', year: 'numeric' };
+  const f = new Date(from + 'T00:00:00').toLocaleDateString('en-US', opts);
+  const u = new Date(until + 'T00:00:00').toLocaleDateString('en-US', opts);
+  return `${f} &ndash; ${u}`;
+}
+let vouchersStatusFilter = 'all';
+function renderVouchers() {
+  const q = document.getElementById('vouchers-search').value.trim().toLowerCase();
+  const rows = vouchers.filter(v => {
+    const status = voucherStatus(v);
+    return (vouchersStatusFilter === 'all' || status === vouchersStatusFilter) && v.code.toLowerCase().includes(q);
+  });
+  const tbody = document.querySelector('#vouchers-table tbody');
+  tbody.innerHTML = rows.map(v => {
+    const status = voucherStatus(v);
+    const discount = v.type === 'Percentage' ? `${v.amount}% off` : `${peso(v.amount)} off`;
+    return `
+    <tr>
+      <td class="font-mono font-bold text-coffee-900 tracking-wide">${v.code}</td>
+      <td class="text-coffee-700">${discount}</td>
+      <td class="text-coffee-500">${v.minSpend ? peso(v.minSpend) : '&mdash;'}</td>
+      <td class="text-coffee-500">${v.used} / ${v.limit}</td>
+      <td class="text-coffee-500">${fmtDateRange(v.validFrom, v.validUntil)}</td>
+      <td>${statusPill(status)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('vouchers-empty').classList.toggle('hidden', rows.length > 0);
+}
+document.getElementById('vouchers-search').addEventListener('input', renderVouchers);
+document.querySelectorAll('#vouchers-status-filter .voucher-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    vouchersStatusFilter = btn.dataset.status;
+    document.querySelectorAll('#vouchers-status-filter .voucher-filter-btn').forEach(b => {
+      b.classList.remove('bg-coffee-800', 'text-white');
+      b.classList.add('text-coffee-500');
+    });
+    btn.classList.add('bg-coffee-800', 'text-white');
+    btn.classList.remove('text-coffee-500');
+    renderVouchers();
+  });
+});
+
+// ---------- Create voucher (modal, in-memory only) ----------
+document.getElementById('voucher-create-btn').addEventListener('click', () => {
+  const code = prompt('Voucher code (e.g. HOLIDAY15):');
+  if (!code || !code.trim()) return;
+  const amountStr = prompt('Discount amount — a plain number.\nEnter a percent like 15 for 15% off, or a peso amount like 100 for ₱100 off:');
+  const amount = parseFloat(amountStr);
+  if (!amountStr || isNaN(amount) || amount <= 0) { alert('Enter a valid discount amount.'); return; }
+  const isPercent = confirm('Click OK for a Percentage discount, or Cancel for a Fixed ₱ amount off.');
+  const today = new Date().toISOString().slice(0, 10);
+  const untilDate = new Date();
+  untilDate.setDate(untilDate.getDate() + 14);
+  vouchers.unshift({
+    code: code.trim().toUpperCase(),
+    type: isPercent ? 'Percentage' : 'Fixed',
+    amount,
+    minSpend: 0,
+    used: 0,
+    limit: 100,
+    validFrom: today,
+    validUntil: untilDate.toISOString().slice(0, 10),
+  });
+  renderVouchers();
+});
+
 // ---------- Revenue bar chart ----------
 function renderChart(data) {
   const svg = document.getElementById('revenue-chart');
@@ -745,6 +871,7 @@ const views = {
   products: document.getElementById('view-products'),
   customers: document.getElementById('view-customers'),
   distributors: document.getElementById('view-distributors'),
+  vouchers: document.getElementById('view-vouchers'),
 };
 function goToView(name) {
   if (!views[name]) return;
@@ -766,6 +893,7 @@ renderOrders();
 renderProducts();
 renderCustomers();
 renderDistributors();
+renderVouchers();
 applyPeriod('monthly');
 document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
 document.getElementById('dist-nav-count').textContent = distributors.length;
