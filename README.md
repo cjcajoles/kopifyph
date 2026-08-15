@@ -11,29 +11,15 @@ All in `index.html`:
 | Checkout links | `<script>` near bottom, `CHECKOUT_URL_1/3/10` | `https://kopify.shop/...` placeholders — swap for real/Xendit links |
 | Meta Pixel ID | `<head>`, `META_PIXEL_ID` | `"REPLACE_ME"` — pixel snippet is wired (fires `PageView` on load, `InitiateCheckout` on the 3 order buttons) but inert until a real ID is set |
 
-## Known limitation: photos are placeholders; a few text blocks need a final proofread
-
-This build could not reach `kopify.shop` directly (network egress to that domain, and its related `kopify.ph` / `buy.kopify.ph` domains, was blocked in the build environment). Most of the real copy below was instead transcribed from a screenshot of the live page the client provided partway through the build. What's real vs. still-uncertain:
-
-**Real / high confidence:**
-- All hero, product intro, benefits grid, distributor section, and pricing copy — from Spec.md.
-- Founders' letter (Randave & CJ), hero callout ("Your coffee is boring..."), benefits/testimonials/ingredients CTA taglines and stats row (5.0★, 10K+ Ratings, 10K+ Sold), and the "It's not just coffee...It's Kopify" benefits list — transcribed from the client's screenshot.
-- The 20-ingredient list and its 4 groupings (Moringa, Turmeric, Barley, Goji Berry groups) — transcribed from the screenshot and cross-checked against public search results.
-- FAQ distributor answer — verbatim from spec: "Yes. Email us at support@kopify.ph or message our Facebook Page to resell our brand."
-- Testimonial names (Cathy Lim-Domingo, Ots Jimenez, Mara Gaviola, Direk Paul, Joana Lazaro, Cilebritee Shop) — from spec.
-
-**Needs a final proofread — search for `TODO` in `index.html`:**
-- The 6 testimonial quotes were transcribed from small print in the screenshot and may have small wording errors — worth a quick compare against the live page before launch.
-- Most FAQ answers (other than the distributor one) are still best-effort copy in the site's voice, not transcribed from a source — the FAQ wasn't visible in the screenshot.
-
-**Still placeholder:**
-- All product/hero/testimonial/founder/collage/benefit photos are rendered as labeled brown/gold placeholder shapes (per spec's fallback instruction) — screenshots let us recover the *text* and layout, but not usable image files. If you can share the individual image files (not a full-page screenshot), they can be dropped in directly.
-
 ## FDA Approved section
 
-New section added after the founders' letter, per client request, showing the real certificate with an arrow callout. `assets/fda-certificate.jpg` is the actual FDA Certificate of Product Registration (Reg. No. FR-4000015029346, valid 13 Mar 2026 – 13 Mar 2029), rendered from the PDF the client uploaded. The **manufacturer name and address are pixelated out** in the image itself, per the client's instruction that this must not be shown publicly — do not restore it or re-render from the original PDF without re-applying the redaction.
+Section added after the founders' letter, per client request, showing the real certificate with a badge + arrow callout. `assets/fda-certificate.jpg` is the actual FDA Certificate of Product Registration (Reg. No. FR-4000015029346, valid 13 Mar 2026 – 13 Mar 2029), rendered from the PDF the client uploaded. The **manufacturer name and address are pixelated out** in the image itself, per the client's instruction that this must not be shown publicly — do not restore it or re-render from the original PDF without re-applying the redaction.
 
-## Known limitation: most photos are still placeholders
+## Pricing pack photos
+
+`assets/pack-1box.jpg`, `pack-3boxes.jpg`, `pack-10boxes.jpg` are the client's real product renders, extracted from a PDF they uploaded and matched to the correct card by content (single pouch + sachet → 1 Box, 3 pouches → 3 Boxes, 10 pouches → 10 Boxes).
+
+## Known limitation: most other photos are still placeholders
 
 This build could not reach `kopify.shop` directly (network egress to that domain, and its related `kopify.ph` / `buy.kopify.ph` domains, was blocked in the build environment). Most of the real copy was instead transcribed from screenshots of the live page the client provided partway through the build. What's real vs. still-uncertain:
 
@@ -42,7 +28,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - Founders' letter (Randave & CJ), hero callout ("Your coffee is boring..."), benefits/testimonials/ingredients CTA taglines and stats row (5.0★, 10K+ Ratings, 10K+ Sold), and the "It's not just coffee...It's Kopify" benefits list — transcribed from client screenshots.
 - The 20-ingredient list and its 4 groupings (Moringa, Turmeric, Barley, Goji Berry groups) — transcribed and cross-checked against public search results, and confirmed again by the FAQ Q1 screenshot.
 - FAQ Q1 (ingredients) — verbatim from a live-site screenshot. FAQ distributor answer — verbatim from spec.
-- FDA certificate — the real document (see above).
+- FDA certificate and the 3 pricing pack photos — real files (see above).
 - Testimonial names (Cathy Lim-Domingo, Ots Jimenez, Mara Gaviola, Direk Paul, Joana Lazaro, Cilebritee Shop) — from spec.
 
 **Needs a final proofread — search for `TODO` in `index.html`:**
@@ -50,7 +36,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - FAQ answers 2–10 (everything except Q1 and the distributor one) are still best-effort copy in the site's voice, not transcribed from a source.
 
 **Still placeholder:**
-- Hero/product/testimonial/founder/collage/benefit photos are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
+- Hero/product-intro/testimonial/founder/collage/benefit photos are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
 
 ## PWA
 
@@ -62,4 +48,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 index.html                     — entire site (Tailwind via CDN)
 manifest.json                  — PWA manifest
 assets/fda-certificate.jpg     — real FDA certificate (manufacturer redacted)
+assets/pack-1box.jpg           — real product photo, 1 Box card
+assets/pack-3boxes.jpg         — real product photo, 3 Boxes card
+assets/pack-10boxes.jpg        — real product photo, 10 Boxes card
 ```
