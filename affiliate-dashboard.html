@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kopify Affiliate Dashboard</title>
+<script>
+  (function () {
+    const stored = localStorage.getItem('kopify-admin-theme');
+    const wantsDark = stored ? stored === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (wantsDark) document.documentElement.classList.add('dark');
+    if (!localStorage.getItem('kopify-affiliate-code')) {
+      window.location.replace('affiliate-login.html');
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'sans-serif'] },
+        colors: {
+          coffee: {
+            50:  '#FBF3EA', 100: '#F3E1CC', 200: '#E4C79E', 300: '#D2A66B', 400: '#B98247',
+            500: '#8B5A2B', 600: '#6F4423', 700: '#54331C', 800: '#3B2114', 900: '#2A170D'
+          },
+          gold: { 50: '#FDF7EC', 100: '#FBF0DC', 300: '#F1D28C', 400: '#E8B35C', 500: '#D4941F', 600: '#B47A15' }
+        },
+        boxShadow: { card: '0 1px 2px 0 rgba(42, 23, 13, 0.04), 0 1px 6px -2px rgba(42, 23, 13, 0.06)' }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; letter-spacing: -0.01em; }
+  th { font-size:.6875rem; text-transform:uppercase; letter-spacing:.04em; color:#B98247; font-weight:600; text-align:left; padding:.75rem 1rem; }
+  td { padding:1rem; font-size:.875rem; border-top:1px solid #F3E1CC; }
+
+  html.dark body { background:#2A170D; color:#FBF3EA; }
+  html.dark .bg-white { background-color:#3B2114 !important; }
+  html.dark .bg-coffee-50 { background-color:#2A170D !important; }
+  html.dark .bg-coffee-100 { background-color:#54331C !important; }
+  html.dark .border-coffee-100 { border-color:#54331C !important; }
+  html.dark .text-coffee-900 { color:#FBF3EA !important; }
+  html.dark .text-coffee-700 { color:#E4C79E !important; }
+  html.dark .text-coffee-500 { color:#D2A66B !important; }
+  html.dark .text-coffee-400 { color:#B98247 !important; }
+  html.dark th { color:#E8B35C; }
+  html.dark td { border-top-color:#54331C; }
+</style>
+</head>
+<body class="bg-coffee-50 text-coffee-900">
+
+<header class="h-16 bg-white border-b border-coffee-100 flex items-center justify-between px-6 gap-4">
+  <div class="flex items-center gap-2.5">
+    <div class="rounded-full w-9 h-9 shrink-0 flex items-center justify-center p-1.5" style="background:#C79A5D">
+      <svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.55"/>
+        <path d="M40 28c-3-4 3-6 0-10M50 26c-3-4 3-6 0-10M60 28c-3-4 3-6 0-10" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M28 40h36v15a18 18 0 0 1-18 18 18 18 0 0 1-18-18V40Z" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M64 44h6.5a7.5 7.5 0 0 1 0 15H64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        <path d="M22 68h48" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="leading-tight">
+      <span class="block text-base font-extrabold tracking-tight text-coffee-900">Kopify</span>
+      <span class="block text-[10px] tracking-wide text-coffee-400 font-bold uppercase">Affiliate Portal</span>
+    </span>
+  </div>
+  <button id="logout-btn" class="flex items-center gap-2 border border-coffee-100 hover:bg-coffee-50 transition text-sm font-bold text-coffee-700 px-4 py-2 rounded-full">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 16l4-4-4-4M19 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Log out
+  </button>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-extrabold text-coffee-900 mb-1">Hi, <span id="aff-name">there</span>! &#128075;</h1>
+  <p class="text-coffee-500 text-sm mb-6">Here's how your Kopify referrals are doing.</p>
+
+  <!-- Referral link -->
+  <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-6 mb-4">
+    <h2 class="font-bold text-coffee-900 mb-1">Your referral link</h2>
+    <p class="text-sm text-coffee-500 mb-4">Share it anywhere &mdash; you earn &#8369;60 for every box sold through it.</p>
+    <div class="flex flex-wrap items-center gap-3">
+      <span id="aff-link" class="font-mono text-sm bg-coffee-50 text-coffee-800 px-4 py-2.5 rounded-xl flex-1 min-w-[220px] truncate">kopify.ph/?ref=CODE</span>
+      <button id="copy-link-btn" class="flex items-center gap-2 bg-gold-500 hover:bg-gold-600 transition text-white text-sm font-bold px-4 py-2.5 rounded-full shrink-0">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 15H5a1.5 1.5 0 0 1-1.5-1.5V5A1.5 1.5 0 0 1 5 3.5h8.5A1.5 1.5 0 0 1 15 5v.5" stroke="currentColor" stroke-width="1.7"/></svg>
+        <span id="copy-link-label">Copy Link</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+    <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Orders Referred</span>
+      <p class="text-2xl font-extrabold text-coffee-900 mt-2" id="aff-stat-orders">0</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Boxes Sold</span>
+      <p class="text-2xl font-extrabold text-coffee-900 mt-2" id="aff-stat-boxes">0</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Total Commission</span>
+      <p class="text-2xl font-extrabold text-coffee-900 mt-2" id="aff-stat-commission">&#8369;0</p>
+      <p class="text-xs text-coffee-400 mt-1">&#8369;60 per box sold</p>
+    </div>
+  </div>
+
+  <!-- Orders -->
+  <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+    <div class="px-5 pt-5 pb-2">
+      <h2 class="font-bold text-coffee-900">Your referred orders</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full" id="aff-orders-table">
+        <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Date</th><th>Commission</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p id="aff-orders-empty" class="hidden text-center text-sm text-coffee-400 py-10">No referred orders yet &mdash; share your link to get started!</p>
+  </div>
+</main>
+
+<script>
+  // Same affiliate roster admin.html manages — kept in sync manually until this is backed
+  // by a real database (see README).
+  const COMMISSION_PER_BOX = 60;
+  const boxesInPack = { '1 Box': 1, '3 Boxes': 3, '10 Boxes': 10 };
+  const AFFILIATES = [
+    { name: 'Bea Santos', email: 'bea.santos@gmail.com', code: 'BEA10', status: 'Active',
+      orders: [
+        { orderId: '#KPY10231', customer: 'Maria Santos', pack: '3 Boxes',  date: 'Aug 14, 2026' },
+        { orderId: '#KPY10224', customer: 'Joana Lazaro',  pack: '10 Boxes', date: 'Aug 11, 2026' },
+        { orderId: '#KPY10198', customer: 'Liza Mendoza',  pack: '1 Box',   date: 'Aug 07, 2026' },
+      ] },
+    { name: 'Marco Villareal', email: 'marco.villareal@gmail.com', code: 'MARCO15', status: 'Active',
+      orders: [
+        { orderId: '#KPY10229', customer: 'Cathy Lim Domingo', pack: '10 Boxes', date: 'Aug 13, 2026' },
+        { orderId: '#KPY10220', customer: 'Diego Ramos',       pack: '3 Boxes',  date: 'Aug 09, 2026' },
+      ] },
+    { name: 'Jamie Cruz', email: 'jamie.cruz@gmail.com', code: 'JAMIE5', status: 'Active',
+      orders: [
+        { orderId: '#KPY10227', customer: 'Ots Jimenez', pack: '1 Box', date: 'Aug 12, 2026' },
+      ] },
+    { name: 'Rhea Domingo', email: 'rhea.domingo@yahoo.com', code: 'RHEA20', status: 'Inactive', orders: [] },
+  ];
+
+  const peso = n => '₱' + n.toLocaleString('en-PH');
+
+  const code = localStorage.getItem('kopify-affiliate-code');
+  const me = AFFILIATES.find(a => a.code === code);
+  if (!me) {
+    localStorage.removeItem('kopify-affiliate-code');
+    window.location.replace('affiliate-login.html');
+  } else {
+    document.getElementById('aff-name').textContent = me.name.split(' ')[0];
+    const fullLink = `kopify.ph/?ref=${me.code}`;
+    document.getElementById('aff-link').textContent = fullLink;
+
+    const boxes = me.orders.reduce((sum, o) => sum + (boxesInPack[o.pack] || 0), 0);
+    const commission = boxes * COMMISSION_PER_BOX;
+    document.getElementById('aff-stat-orders').textContent = me.orders.length;
+    document.getElementById('aff-stat-boxes').textContent = boxes;
+    document.getElementById('aff-stat-commission').textContent = peso(commission);
+
+    const tbody = document.querySelector('#aff-orders-table tbody');
+    tbody.innerHTML = me.orders.map(o => `
+      <tr>
+        <td class="font-semibold text-coffee-800">${o.orderId}</td>
+        <td>${o.customer}</td>
+        <td class="text-coffee-500">${o.pack}</td>
+        <td class="text-coffee-500">${o.date}</td>
+        <td class="font-semibold">${peso((boxesInPack[o.pack] || 0) * COMMISSION_PER_BOX)}</td>
+      </tr>`).join('');
+    document.getElementById('aff-orders-empty').classList.toggle('hidden', me.orders.length > 0);
+
+    document.getElementById('copy-link-btn').addEventListener('click', () => {
+      const url = `https://${fullLink}`;
+      if (navigator.clipboard) navigator.clipboard.writeText(url).catch(() => {});
+      const label = document.getElementById('copy-link-label');
+      label.textContent = 'Copied!';
+      setTimeout(() => { label.textContent = 'Copy Link'; }, 1200);
+    });
+  }
+
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('kopify-affiliate-code');
+    window.location.href = 'affiliate-login.html';
+  });
+</script>
+</body>
+</html>

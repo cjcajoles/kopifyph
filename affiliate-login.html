@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In | Kopify Affiliates</title>
+<script>
+  (function () {
+    const stored = localStorage.getItem('kopify-admin-theme');
+    const wantsDark = stored ? stored === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (wantsDark) document.documentElement.classList.add('dark');
+    if (localStorage.getItem('kopify-affiliate-code')) {
+      window.location.replace('affiliate-dashboard.html');
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'sans-serif'] },
+        colors: {
+          coffee: {
+            50:  '#FBF3EA', 100: '#F3E1CC', 200: '#E4C79E', 300: '#D2A66B', 400: '#B98247',
+            500: '#8B5A2B', 600: '#6F4423', 700: '#54331C', 800: '#3B2114', 900: '#2A170D'
+          },
+          gold: { 50: '#FDF7EC', 100: '#FBF0DC', 300: '#F1D28C', 400: '#E8B35C', 500: '#D4941F', 600: '#B47A15' }
+        },
+        boxShadow: { card: '0 1px 2px 0 rgba(42, 23, 13, 0.04), 0 1px 6px -2px rgba(42, 23, 13, 0.06)' }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; letter-spacing: -0.01em; }
+  .field-label { display:block; font-size:.8125rem; font-weight:600; color:#54331C; margin-bottom:.25rem; }
+  .field-input { width:100%; border-radius:.75rem; border:1px solid #E4C79E; padding:.7rem 1rem; font-size:.875rem; background:#fff; }
+  .field-input:focus { outline:none; box-shadow:0 0 0 2px #E8B35C; border-color:#E8B35C; }
+
+  html.dark body { background:#2A170D; }
+  html.dark .bg-white { background-color:#3B2114 !important; }
+  html.dark .bg-coffee-50 { background-color:#2A170D !important; }
+  html.dark .border-coffee-100 { border-color:#54331C !important; }
+  html.dark .field-input { background:#3B2114 !important; border-color:#54331C !important; color:#FBF3EA; }
+  html.dark .text-coffee-900 { color:#FBF3EA !important; }
+  html.dark .text-coffee-700 { color:#E4C79E !important; }
+  html.dark .text-coffee-500 { color:#D2A66B !important; }
+  html.dark .text-coffee-400 { color:#B98247 !important; }
+  html.dark .field-label { color:#E4C79E !important; }
+</style>
+</head>
+<body class="bg-coffee-50 text-coffee-900 min-h-screen flex items-center justify-center p-4">
+
+<div class="w-full max-w-sm">
+  <div class="flex flex-col items-center mb-7">
+    <div class="rounded-full w-14 h-14 shrink-0 flex items-center justify-center p-2 mb-3" style="background:#C79A5D">
+      <svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.55"/>
+        <path d="M40 28c-3-4 3-6 0-10M50 26c-3-4 3-6 0-10M60 28c-3-4 3-6 0-10" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M28 40h36v15a18 18 0 0 1-18 18 18 18 0 0 1-18-18V40Z" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M64 44h6.5a7.5 7.5 0 0 1 0 15H64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        <path d="M22 68h48" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="font-extrabold text-xl text-coffee-900">Kopify</span>
+    <span class="text-xs tracking-wide text-coffee-400 font-bold uppercase">Affiliate Portal</span>
+  </div>
+
+  <div class="bg-white rounded-3xl shadow-card border border-coffee-100 p-7">
+    <h1 class="font-extrabold text-lg text-coffee-900 mb-1">Sign in</h1>
+    <p class="text-sm text-coffee-500 mb-5">Check your referral link, orders, and commission.</p>
+
+    <form id="login-form" novalidate class="space-y-4">
+      <div>
+        <label class="field-label" for="login-email">Email</label>
+        <input id="login-email" type="email" required class="field-input" placeholder="you@email.com" autocomplete="username">
+      </div>
+      <div>
+        <label class="field-label" for="login-password">Password</label>
+        <input id="login-password" type="password" required class="field-input" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password">
+      </div>
+      <p id="login-error" class="hidden text-sm text-red-600 font-semibold"></p>
+      <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 active:scale-[0.98] transition rounded-full text-white font-bold py-3.5">
+        Sign In &rarr;
+      </button>
+    </form>
+  </div>
+
+  <div class="text-center text-xs text-coffee-400 mt-5 space-y-1">
+    <p>Demo accounts (any password): bea.santos@gmail.com &middot; marco.villareal@gmail.com &middot; jamie.cruz@gmail.com</p>
+    <p>&copy; Kopify PH Affiliate Program</p>
+  </div>
+</div>
+
+<script>
+  // Same affiliate roster admin.html manages — kept in sync manually until this is backed
+  // by a real database (see README). Only the fields the portal needs are duplicated here.
+  const AFFILIATES = [
+    { name: 'Bea Santos',      email: 'bea.santos@gmail.com',      code: 'BEA10',   status: 'Active' },
+    { name: 'Marco Villareal', email: 'marco.villareal@gmail.com', code: 'MARCO15', status: 'Active' },
+    { name: 'Jamie Cruz',      email: 'jamie.cruz@gmail.com',      code: 'JAMIE5',  status: 'Active' },
+    { name: 'Rhea Domingo',    email: 'rhea.domingo@yahoo.com',    code: 'RHEA20',  status: 'Inactive' },
+  ];
+
+  const form = document.getElementById('login-form');
+  const errorEl = document.getElementById('login-error');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const password = document.getElementById('login-password').value;
+    if (!email || !password) {
+      errorEl.textContent = 'Enter both your email and password.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    const match = AFFILIATES.find(a => a.email.toLowerCase() === email);
+    if (!match) {
+      errorEl.textContent = "We couldn't find an affiliate account for that email.";
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    if (match.status !== 'Active') {
+      errorEl.textContent = 'This affiliate account is inactive. Contact Kopify PH for help.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+    // NOTE: placeholder gate only — accepts any password for a matching email.
+    // Swap for real auth (e.g. Supabase Auth) before this goes live; see README.
+    localStorage.setItem('kopify-affiliate-code', match.code);
+    window.location.href = 'affiliate-dashboard.html';
+  });
+</script>
+</body>
+</html>
