@@ -11,21 +11,24 @@ All in `index.html`:
 | Checkout links | `<script>` near bottom, `CHECKOUT_URL_1/3/10` | `https://kopify.shop/...` placeholders — swap for real/Xendit links |
 | Meta Pixel ID | `<head>`, `META_PIXEL_ID` | `"REPLACE_ME"` — pixel snippet is wired (fires `PageView` on load, `InitiateCheckout` on the 3 order buttons) but inert until a real ID is set |
 
-## Known limitation: images and some copy are placeholders
+## Known limitation: photos are placeholders; a few text blocks need a final proofread
 
-This build could not reach `kopify.shop` (network egress to that domain — and its related `kopify.ph` / `buy.kopify.ph` domains — was blocked in the build environment), so live-site content could not be scraped 1:1. What's real vs. placeholder:
+This build could not reach `kopify.shop` directly (network egress to that domain, and its related `kopify.ph` / `buy.kopify.ph` domains, was blocked in the build environment). Most of the real copy below was instead transcribed from a screenshot of the live page the client provided partway through the build. What's real vs. still-uncertain:
 
-**Real / from spec (verbatim):**
-- All hero, product intro, benefits grid, distributor section, and pricing copy — taken directly from Spec.md.
-- The 20-ingredient list (Moringa/Malunggay, Glutathione, Collagen, Mangosteen, L-Carnitine, Turmeric, Garcinia Cambogia, Inulin Fiber, Green Coffee Extract, Lemon, Barley, Coffee, Non-Dairy Creamer, Chlorella, Vitamin C, Goji Berry, Grape Seed, Spirulina, Acai Berry, Stevia) — confirmed via public search results, not scraped.
+**Real / high confidence:**
+- All hero, product intro, benefits grid, distributor section, and pricing copy — from Spec.md.
+- Founders' letter (Randave & CJ), hero callout ("Your coffee is boring..."), benefits/testimonials/ingredients CTA taglines and stats row (5.0★, 10K+ Ratings, 10K+ Sold), and the "It's not just coffee...It's Kopify" benefits list — transcribed from the client's screenshot.
+- The 20-ingredient list and its 4 groupings (Moringa, Turmeric, Barley, Goji Berry groups) — transcribed from the screenshot and cross-checked against public search results.
 - FAQ distributor answer — verbatim from spec: "Yes. Email us at support@kopify.ph or message our Facebook Page to resell our brand."
 - Testimonial names (Cathy Lim-Domingo, Ots Jimenez, Mara Gaviola, Direk Paul, Joana Lazaro, Cilebritee Shop) — from spec.
 
-**Placeholder — search for `TODO` in `index.html` to find every instance:**
-- All product/hero/testimonial/founder photos are rendered as labeled brown/gold placeholder blocks (per spec's fallback instruction). The spec's CDN filenames are noted in HTML comments next to each placeholder so real URLs can be dropped in quickly once available.
-- Testimonial quotes, the founders' letter body, and most FAQ answers (other than the distributor one) are best-effort placeholder copy in the site's voice — not scraped from the live page. Re-sync with the live site before this replaces kopify.shop in production.
-- Ingredient grouping into "Moringa / Turmeric / Barley / Goji Berry" groups is this build's own organization of the real 20-ingredient list, not confirmed against the live page's exact grouping.
-- Benefit icons are original inline SVGs (not the live site's icon images).
+**Needs a final proofread — search for `TODO` in `index.html`:**
+- The 6 testimonial quotes were transcribed from small print in the screenshot and may have small wording errors — worth a quick compare against the live page before launch.
+- Most FAQ answers (other than the distributor one) are still best-effort copy in the site's voice, not transcribed from a source — the FAQ wasn't visible in the screenshot.
+
+**Still placeholder:**
+- All product/hero/testimonial/founder/collage photos are rendered as labeled brown/gold placeholder blocks (per spec's fallback instruction) — the screenshot let us recover the *text*, but not usable image files. If you can share the individual image files (not a full-page screenshot), they can be dropped in directly.
+- Benefit icons are original inline SVGs (not the live site's photographic icons).
 
 ## PWA
 
