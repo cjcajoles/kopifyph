@@ -27,8 +27,11 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - Most FAQ answers (other than the distributor one) are still best-effort copy in the site's voice, not transcribed from a source — the FAQ wasn't visible in the screenshot.
 
 **Still placeholder:**
-- All product/hero/testimonial/founder/collage photos are rendered as labeled brown/gold placeholder blocks (per spec's fallback instruction) — the screenshot let us recover the *text*, but not usable image files. If you can share the individual image files (not a full-page screenshot), they can be dropped in directly.
-- Benefit icons are original inline SVGs (not the live site's photographic icons).
+- All product/hero/testimonial/founder/collage/benefit photos are rendered as labeled brown/gold placeholder shapes (per spec's fallback instruction) — screenshots let us recover the *text* and layout, but not usable image files. If you can share the individual image files (not a full-page screenshot), they can be dropped in directly.
+
+## FDA Approved section
+
+New section added after the founders' letter, per client request, showing the certificate with an arrow callout. Registration details (FDA Reg. No. FR-4000015029346, brand/product name, packaging, validity 13 Mar 2026 – 13 Mar 2029) are transcribed from the certificate the client shared and are real. The **manufacturer name and address are intentionally left redacted** — the client said this is not allowed to be shown publicly. The certificate itself is still a placeholder card (text only); swap in the real certificate image when available, and keep the manufacturer field blurred/cropped out of that image too, not just the text summary.
 
 ## PWA
 
