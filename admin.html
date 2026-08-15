@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kopify Admin | Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Poppins', 'sans-serif'] },
+        colors: {
+          coffee: {
+            50:  '#FBF3EA',
+            100: '#F3E1CC',
+            200: '#E4C79E',
+            300: '#D2A66B',
+            400: '#B98247',
+            500: '#8B5A2B',
+            600: '#6F4423',
+            700: '#54331C',
+            800: '#3B2114',
+            900: '#2A170D'
+          },
+          gold: {
+            50:  '#FDF7EC',
+            100: '#FBF0DC',
+            300: '#F1D28C',
+            400: '#E8B35C',
+            500: '#D4941F',
+            600: '#B47A15'
+          }
+        },
+        boxShadow: {
+          card: '0 10px 30px -10px rgba(59, 33, 20, 0.12)'
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Poppins', sans-serif; }
+  .nav-btn { display:flex; align-items:center; gap:.75rem; width:100%; padding:.625rem .875rem; border-radius:.75rem; font-size:.875rem; font-weight:600; color:#6F4423; transition:background .15s, color .15s; }
+  .nav-btn:hover { background:#FBF3EA; }
+  .nav-btn.active { background:#3B2114; color:#fff; }
+  .nav-btn.active svg { color:#F1D28C; }
+  .nav-btn svg { color:#B98247; flex-shrink:0; }
+  .nav-btn.active:hover { background:#3B2114; }
+  .status-pill { display:inline-flex; align-items:center; gap:.375rem; font-size:.75rem; font-weight:700; padding:.25rem .625rem; border-radius:9999px; }
+  .status-dot { width:6px; height:6px; border-radius:9999px; }
+  th { font-size:.75rem; text-transform:uppercase; letter-spacing:.03em; color:#B98247; font-weight:700; text-align:left; padding:.75rem 1rem; }
+  td { padding:1rem; font-size:.875rem; border-top:1px solid #F3E1CC; }
+  #bar-tooltip { pointer-events:none; }
+</style>
+</head>
+<body class="bg-coffee-50 text-coffee-900">
+
+<div class="flex min-h-screen">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="w-64 bg-white border-r border-coffee-100 flex flex-col shrink-0">
+    <div class="h-16 flex items-center gap-2.5 px-5 border-b border-coffee-100">
+      <div class="rounded-full w-9 h-9 shrink-0 flex items-center justify-center p-1.5" style="background:#C79A5D">
+        <svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.55"/>
+          <path d="M40 28c-3-4 3-6 0-10M50 26c-3-4 3-6 0-10M60 28c-3-4 3-6 0-10" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M28 40h36v15a18 18 0 0 1-18 18 18 18 0 0 1-18-18V40Z" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M64 44h6.5a7.5 7.5 0 0 1 0 15H64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+          <path d="M22 68h48" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="leading-tight">
+        <span class="block text-base font-extrabold tracking-tight text-coffee-900">Kopify</span>
+        <span class="block text-[10px] tracking-wide text-coffee-400 font-bold uppercase">Admin</span>
+      </span>
+    </div>
+
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <button class="nav-btn active" data-view="home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20h3.5a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Home
+      </button>
+      <button class="nav-btn" data-view="orders">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 3.5h6a1 1 0 0 1 1 1V6H8V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Orders
+        <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">3</span>
+      </button>
+      <button class="nav-btn" data-view="products">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m3.5 8 8.5-4.5L20.5 8v8L12 20.5 3.5 16V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 8 12 12.5 20.5 8M12 12.5V20.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        Products
+      </button>
+      <button class="nav-btn" data-view="customers">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8.5" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M15.2 5.7a3.2 3.2 0 0 1 0 6.2M17.5 14.3c2.3.4 4 2.7 4 5.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Customers
+      </button>
+    </nav>
+
+    <div class="px-3 py-4 border-t border-coffee-100">
+      <button class="nav-btn" data-view="settings" disabled style="opacity:.5;cursor:not-allowed">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.4 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-.9c.6.5 1.3.9 2 1.2L10 21h4l.4-2.6c.7-.3 1.4-.7 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        Settings
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- Header -->
+    <header class="h-16 bg-white border-b border-coffee-100 flex items-center justify-between px-6 gap-4 shrink-0">
+      <div class="relative flex-1 max-w-sm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="Search orders, products, customers" class="w-full bg-coffee-50 border border-coffee-100 rounded-full pl-10 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+      </div>
+      <div class="flex items-center gap-5">
+        <button class="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-coffee-50">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" class="text-coffee-500"><path d="M6 10a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 14 6 10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+        </button>
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-full bg-coffee-800 text-gold-300 flex items-center justify-center font-bold text-sm">KA</div>
+          <div class="leading-tight hidden sm:block">
+            <p class="font-semibold text-sm text-coffee-900">Store Owner</p>
+            <p class="text-xs text-coffee-400">Kopify PH</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+
+      <!-- ================= HOME ================= -->
+      <section id="view-home">
+        <div class="mb-6">
+          <h1 class="text-2xl font-extrabold text-coffee-900">Welcome back, Store Owner 👋</h1>
+          <p class="text-coffee-500 text-sm mt-1">Here's how Kopify is doing over the last 30 days.</p>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-2xl shadow-card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Total Revenue</span>
+              <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><path d="M12 3v18M17 7.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3 5 3.5c2.8.5 5 1.6 5 3.5s-2.2 3.5-5 3.5-5-1.6-5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <p class="text-2xl font-extrabold text-coffee-900">&#8369;182,450</p>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs font-bold text-emerald-600">&#8593; 18.2%</span>
+              <span class="text-xs text-coffee-400">Last 30 days</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Total Orders</span>
+              <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><rect x="4" y="4" width="16" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <p class="text-2xl font-extrabold text-coffee-900">214</p>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs font-bold text-emerald-600">&#8593; 9.4%</span>
+              <span class="text-xs text-coffee-400">Last 30 days</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Customers</span>
+              <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5M15.5 6a2.8 2.8 0 0 1 0 5.4M17.5 13.2c2 .4 3.5 2.4 3.5 5.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <p class="text-2xl font-extrabold text-coffee-900">187</p>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs font-bold text-emerald-600">&#8593; 12.5%</span>
+              <span class="text-xs text-coffee-400">Last 30 days</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Boxes Sold</span>
+              <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><path d="m3.5 8 8.5-4.5L20.5 8v8L12 20.5 3.5 16V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <p class="text-2xl font-extrabold text-coffee-900">512</p>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs font-bold text-emerald-600">&#8593; 22.0%</span>
+              <span class="text-xs text-coffee-400">Last 30 days</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <!-- Chart -->
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-card p-5">
+            <div class="flex items-center justify-between mb-1">
+              <h2 class="font-bold text-coffee-900">Revenue, last 7 days</h2>
+              <span class="text-xs text-coffee-400">In &#8369;, per day</span>
+            </div>
+            <div class="relative mt-4" id="chart-wrap">
+              <svg id="revenue-chart" viewBox="0 0 560 220" class="w-full h-[220px]" preserveAspectRatio="none"></svg>
+              <div id="bar-tooltip" class="absolute hidden bg-coffee-900 text-white text-xs font-semibold rounded-lg px-3 py-1.5 shadow-lg whitespace-nowrap" style="transform:translate(-50%,-115%)"></div>
+            </div>
+          </div>
+
+          <!-- Best sellers -->
+          <div class="bg-white rounded-2xl shadow-card p-5">
+            <h2 class="font-bold text-coffee-900 mb-4">Best sellers</h2>
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <img src="./assets/pack-3boxes.jpg" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="3 Boxes">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-coffee-900 truncate">3 Boxes &ndash; Family Pack</p>
+                  <p class="text-xs text-coffee-400">241 sold</p>
+                </div>
+                <p class="text-sm font-bold text-coffee-900">&#8369;1,097</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <img src="./assets/pack-1box.jpg" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="1 Box">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-coffee-900 truncate">1 Box</p>
+                  <p class="text-xs text-coffee-400">198 sold</p>
+                </div>
+                <p class="text-sm font-bold text-coffee-900">&#8369;399</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <img src="./assets/pack-10boxes.jpg" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="10 Boxes">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-coffee-900 truncate">10 Boxes &ndash; Bundle</p>
+                  <p class="text-xs text-coffee-400">73 sold</p>
+                </div>
+                <p class="text-sm font-bold text-coffee-900">&#8369;3,790</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent orders -->
+        <div class="bg-white rounded-2xl shadow-card mt-4 overflow-hidden">
+          <div class="flex items-center justify-between px-5 pt-5 pb-2">
+            <h2 class="font-bold text-coffee-900">Recent orders</h2>
+            <button data-goto="orders" class="text-sm font-bold text-gold-600 hover:text-gold-500">View all &rarr;</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full" id="recent-orders-table">
+              <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ORDERS ================= -->
+      <section id="view-orders" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Orders</h1>
+            <p class="text-coffee-500 text-sm mt-1">Track and manage every Kopify order.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="orders-search" type="text" placeholder="Search by order ID or customer" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="orders-status-filter">
+            <button data-status="all" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
+            <button data-status="Pending" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Pending</button>
+            <button data-status="Paid" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Paid</button>
+            <button data-status="Shipped" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Shipped</button>
+            <button data-status="Cancelled" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Cancelled</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="orders-table">
+              <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="orders-empty" class="hidden text-center text-sm text-coffee-400 py-10">No orders match your search.</p>
+        </div>
+      </section>
+
+      <!-- ================= PRODUCTS ================= -->
+      <section id="view-products" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Products</h1>
+            <p class="text-coffee-500 text-sm mt-1">Manage Kopify's pricing and stock.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="products-search" type="text" placeholder="Search products" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="products-table">
+              <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Units sold</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CUSTOMERS ================= -->
+      <section id="view-customers" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Customers</h1>
+            <p class="text-coffee-500 text-sm mt-1">Everyone who's ordered Kopify.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="customers-search" type="text" placeholder="Search by name or email" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="customers-table">
+              <thead><tr><th>Customer</th><th>Email</th><th>Orders</th><th>Total spent</th><th>Joined</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// ---------- Mock data ----------
+const orders = [
+  { id: '#KPY10231', customer: 'Maria Santos',     pack: '3 Boxes',  date: 'Aug 14, 2026', total: 1097, status: 'Paid' },
+  { id: '#KPY10230', customer: 'Jonas Reyes',       pack: '1 Box',    date: 'Aug 14, 2026', total: 399,  status: 'Pending' },
+  { id: '#KPY10229', customer: 'Cathy Lim Domingo', pack: '10 Boxes', date: 'Aug 13, 2026', total: 3790, status: 'Shipped' },
+  { id: '#KPY10228', customer: 'Ana Bautista',      pack: '3 Boxes',  date: 'Aug 13, 2026', total: 1097, status: 'Paid' },
+  { id: '#KPY10227', customer: 'Ots Jimenez',       pack: '1 Box',    date: 'Aug 12, 2026', total: 399,  status: 'Shipped' },
+  { id: '#KPY10226', customer: 'Mara Gaviola',      pack: '3 Boxes',  date: 'Aug 12, 2026', total: 1097, status: 'Paid' },
+  { id: '#KPY10225', customer: 'Paulo Dela Cruz',   pack: '1 Box',    date: 'Aug 11, 2026', total: 399,  status: 'Cancelled' },
+  { id: '#KPY10224', customer: 'Joana Lazaro',      pack: '10 Boxes', date: 'Aug 11, 2026', total: 3790, status: 'Paid' },
+  { id: '#KPY10223', customer: 'Rico Fernandez',    pack: '3 Boxes',  date: 'Aug 10, 2026', total: 1097, status: 'Shipped' },
+  { id: '#KPY10222', customer: 'Liza Mendoza',      pack: '1 Box',    date: 'Aug 10, 2026', total: 399,  status: 'Pending' },
+  { id: '#KPY10221', customer: 'Cilebritee Shop',   pack: '10 Boxes', date: 'Aug 09, 2026', total: 3790, status: 'Paid' },
+  { id: '#KPY10220', customer: 'Diego Ramos',       pack: '3 Boxes',  date: 'Aug 09, 2026', total: 1097, status: 'Cancelled' },
+];
+
+const products = [
+  { name: '1 Box',   sub: '10 Sachets Inside',      img: './assets/pack-1box.jpg',    price: 399,  stock: 340, sold: 198, status: 'Published' },
+  { name: '3 Boxes', sub: 'Family Pack – Best Seller', img: './assets/pack-3boxes.jpg', price: 1097, stock: 128, sold: 241, status: 'Published' },
+  { name: '10 Boxes',sub: 'Kopifyholic Bundle',      img: './assets/pack-10boxes.jpg', price: 3790, stock: 22,  sold: 73,  status: 'Published' },
+];
+
+const customers = [
+  { name: 'Maria Santos',      email: 'maria.santos@gmail.com',   orders: 5, spent: 4485, joined: 'Feb 12, 2026' },
+  { name: 'Cathy Lim Domingo', email: 'cathylim.d@gmail.com',     orders: 8, spent: 9720, joined: 'Jan 03, 2026' },
+  { name: 'Ots Jimenez',       email: 'ots.jimenez@gmail.com',    orders: 3, spent: 1197, joined: 'Mar 20, 2026' },
+  { name: 'Mara Gaviola',      email: 'mara.gaviola@yahoo.com',   orders: 6, spent: 6582, joined: 'Jan 28, 2026' },
+  { name: 'Joana Lazaro',      email: 'joana.lazaro@gmail.com',   orders: 2, spent: 4189, joined: 'Apr 09, 2026' },
+  { name: 'Ana Bautista',      email: 'ana.bautista21@gmail.com', orders: 4, spent: 3188, joined: 'Feb 27, 2026' },
+  { name: 'Paulo Dela Cruz',   email: 'paulo.delacruz@outlook.com', orders: 1, spent: 399, joined: 'Jul 30, 2026' },
+  { name: 'Cilebritee Shop',   email: 'orders@cilebriteeshop.ph', orders: 11, spent: 22990, joined: 'Nov 14, 2025' },
+  { name: 'Rico Fernandez',    email: 'rico.fernandez@gmail.com', orders: 3, spent: 2691, joined: 'May 05, 2026' },
+  { name: 'Liza Mendoza',      email: 'liza.mendoza@gmail.com',   orders: 2, spent: 1496, joined: 'Jun 18, 2026' },
+];
+
+const revenue7d = [
+  { day: 'Wed', v: 4820 }, { day: 'Thu', v: 6140 }, { day: 'Fri', v: 5390 },
+  { day: 'Sat', v: 8920 }, { day: 'Sun', v: 7460 }, { day: 'Mon', v: 5980 }, { day: 'Tue', v: 9310 },
+];
+
+// ---------- Helpers ----------
+const peso = n => '₱' + n.toLocaleString('en-PH');
+const statusStyle = {
+  Paid:      { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
+  Published: { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
+  Pending:   { bg: '#FEF3C7', text: '#B45309', dot: '#F59E0B' },
+  Shipped:   { bg: '#DBEAFE', text: '#1D4ED8', dot: '#3B82F6' },
+  Cancelled: { bg: '#FEE2E2', text: '#B91C1C', dot: '#EF4444' },
+};
+function statusPill(status) {
+  const s = statusStyle[status] || statusStyle.Pending;
+  return `<span class="status-pill" style="background:${s.bg};color:${s.text}"><span class="status-dot" style="background:${s.dot}"></span>${status}</span>`;
+}
+
+// ---------- Render: recent orders (Home) ----------
+function renderRecentOrders() {
+  const tbody = document.querySelector('#recent-orders-table tbody');
+  tbody.innerHTML = orders.slice(0, 5).map(o => `
+    <tr>
+      <td class="font-semibold text-coffee-800">${o.id}</td>
+      <td>${o.customer}</td>
+      <td class="text-coffee-500">${o.pack}</td>
+      <td class="font-semibold">${peso(o.total)}</td>
+      <td>${statusPill(o.status)}</td>
+    </tr>`).join('');
+}
+
+// ---------- Render: orders table (with search + filter) ----------
+let ordersStatusFilter = 'all';
+function renderOrders() {
+  const q = document.getElementById('orders-search').value.trim().toLowerCase();
+  const rows = orders.filter(o =>
+    (ordersStatusFilter === 'all' || o.status === ordersStatusFilter) &&
+    (o.id.toLowerCase().includes(q) || o.customer.toLowerCase().includes(q))
+  );
+  const tbody = document.querySelector('#orders-table tbody');
+  tbody.innerHTML = rows.map(o => `
+    <tr>
+      <td class="font-semibold text-coffee-800">${o.id}</td>
+      <td>${o.customer}</td>
+      <td class="text-coffee-500">${o.pack}</td>
+      <td class="text-coffee-500">${o.date}</td>
+      <td class="font-semibold">${peso(o.total)}</td>
+      <td>${statusPill(o.status)}</td>
+    </tr>`).join('');
+  document.getElementById('orders-empty').classList.toggle('hidden', rows.length > 0);
+}
+document.getElementById('orders-search').addEventListener('input', renderOrders);
+document.querySelectorAll('#orders-status-filter .status-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    ordersStatusFilter = btn.dataset.status;
+    document.querySelectorAll('#orders-status-filter .status-filter-btn').forEach(b => {
+      b.classList.remove('bg-coffee-800', 'text-white');
+      b.classList.add('text-coffee-500');
+    });
+    btn.classList.add('bg-coffee-800', 'text-white');
+    btn.classList.remove('text-coffee-500');
+    renderOrders();
+  });
+});
+
+// ---------- Render: products table ----------
+function renderProducts() {
+  const q = document.getElementById('products-search').value.trim().toLowerCase();
+  const rows = products.filter(p => p.name.toLowerCase().includes(q) || p.sub.toLowerCase().includes(q));
+  const tbody = document.querySelector('#products-table tbody');
+  tbody.innerHTML = rows.map(p => `
+    <tr>
+      <td>
+        <div class="flex items-center gap-3">
+          <img src="${p.img}" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="${p.name}">
+          <div>
+            <p class="font-semibold text-coffee-900">${p.name}</p>
+            <p class="text-xs text-coffee-400">${p.sub}</p>
+          </div>
+        </div>
+      </td>
+      <td class="font-semibold">${peso(p.price)}</td>
+      <td>${p.stock.toLocaleString('en-PH')}</td>
+      <td class="text-coffee-500">${p.sold.toLocaleString('en-PH')}</td>
+      <td>${statusPill(p.status)}</td>
+    </tr>`).join('');
+}
+document.getElementById('products-search').addEventListener('input', renderProducts);
+
+// ---------- Render: customers table ----------
+function renderCustomers() {
+  const q = document.getElementById('customers-search').value.trim().toLowerCase();
+  const rows = customers.filter(c => c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
+  const initials = n => n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const palette = ['#3B2114', '#6F4423', '#B47A15'];
+  const tbody = document.querySelector('#customers-table tbody');
+  tbody.innerHTML = rows.map((c, i) => `
+    <tr>
+      <td>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style="background:${palette[i % palette.length]}">${initials(c.name)}</div>
+          <p class="font-semibold text-coffee-900">${c.name}</p>
+        </div>
+      </td>
+      <td class="text-coffee-500">${c.email}</td>
+      <td>${c.orders}</td>
+      <td class="font-semibold">${peso(c.spent)}</td>
+      <td class="text-coffee-500">${c.joined}</td>
+    </tr>`).join('');
+}
+document.getElementById('customers-search').addEventListener('input', renderCustomers);
+
+// ---------- Revenue bar chart ----------
+function renderChart() {
+  const svg = document.getElementById('revenue-chart');
+  const W = 560, H = 220, padL = 40, padB = 28, padT = 10;
+  const plotW = W - padL - 10, plotH = H - padB - padT;
+  const max = Math.max(...revenue7d.map(d => d.v));
+  const niceMax = Math.ceil(max / 2000) * 2000;
+  const barW = 24;
+  const gap = (plotW - barW * revenue7d.length) / (revenue7d.length - 1 + 2);
+
+  let gridSvg = '';
+  const ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const val = (niceMax / ticks) * i;
+    const y = padT + plotH - (val / niceMax) * plotH;
+    gridSvg += `<line x1="${padL}" y1="${y}" x2="${W - 6}" y2="${y}" stroke="#F3E1CC" stroke-width="1"/>`;
+    gridSvg += `<text x="${padL - 8}" y="${y + 4}" font-size="10" fill="#B98247" text-anchor="end">${val >= 1000 ? (val/1000) + 'k' : val}</text>`;
+  }
+
+  let barsSvg = '';
+  revenue7d.forEach((d, i) => {
+    const x = padL + gap + i * (barW + gap);
+    const barH = (d.v / niceMax) * plotH;
+    const y = padT + plotH - barH;
+    barsSvg += `
+      <rect data-i="${i}" x="${x}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="#D4941F" class="chart-bar" style="cursor:pointer"/>
+      <text x="${x + barW/2}" y="${H - 8}" font-size="11" fill="#8B5A2B" text-anchor="middle" font-weight="600">${d.day}</text>
+    `;
+  });
+
+  svg.innerHTML = gridSvg + barsSvg;
+
+  const tooltip = document.getElementById('bar-tooltip');
+  svg.querySelectorAll('.chart-bar').forEach(bar => {
+    bar.addEventListener('mouseenter', () => {
+      const i = +bar.dataset.i;
+      const d = revenue7d[i];
+      tooltip.textContent = `${d.day}: ${peso(d.v)}`;
+      tooltip.classList.remove('hidden');
+      const rect = bar.getBoundingClientRect();
+      const wrapRect = document.getElementById('chart-wrap').getBoundingClientRect();
+      tooltip.style.left = (rect.left - wrapRect.left + rect.width / 2) + 'px';
+      tooltip.style.top = (rect.top - wrapRect.top) + 'px';
+    });
+    bar.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
+  });
+}
+
+// ---------- Nav switching ----------
+const navBtns = document.querySelectorAll('.nav-btn[data-view]');
+const views = {
+  home: document.getElementById('view-home'),
+  orders: document.getElementById('view-orders'),
+  products: document.getElementById('view-products'),
+  customers: document.getElementById('view-customers'),
+};
+function goToView(name) {
+  if (!views[name]) return;
+  navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  Object.entries(views).forEach(([k, el]) => el.classList.toggle('hidden', k !== name));
+  window.scrollTo({ top: 0 });
+}
+navBtns.forEach(btn => {
+  if (btn.hasAttribute('disabled')) return;
+  btn.addEventListener('click', () => goToView(btn.dataset.view));
+});
+document.querySelectorAll('[data-goto]').forEach(btn => {
+  btn.addEventListener('click', () => goToView(btn.dataset.goto));
+});
+
+// ---------- Init ----------
+renderRecentOrders();
+renderOrders();
+renderProducts();
+renderCustomers();
+renderChart();
+</script>
+</body>
+</html>
