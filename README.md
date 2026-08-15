@@ -31,7 +31,7 @@ Real photos added for 3 of the 6 testimonials, per client-supplied PDF matched b
 
 ## Benefits grid photos
 
-`assets/benefit-lowcalorie.jpg` is a real photo (steaming cup + coffee splash) from a client-supplied PDF, placed in the "Low Calorie Coffee" card per client request. The other 5 benefit cards are still placeholders.
+`assets/benefit-lowcalorie.jpg` (steaming cup + coffee splash), `assets/benefit-acidreflux.jpg` (stomach shield icon + hand on belly), and `assets/benefit-palpitation.jpg` (heart shield icon, "Heart Friendly" badge) are real photos from client-supplied PDFs, placed in the "Low Calorie Coffee", "No Acid Reflux", and "No Palpitation" cards per client request. The other 3 benefit cards are still placeholders.
 
 ## Known limitation: most other photos are still placeholders
 
@@ -50,7 +50,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - FAQ answers 2–10 (everything except Q1 and the distributor one) are still best-effort copy in the site's voice, not transcribed from a source.
 
 **Still placeholder:**
-- Hero/product-intro/collage photos, 5 of 6 benefit-grid photos, and Joana's + Cilebritee's testimonial photos, are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
+- Hero/product-intro/collage photos, 3 of 6 benefit-grid photos, and Joana's + Cilebritee's testimonial photos, are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
 
 ## PWA
 
@@ -71,4 +71,6 @@ assets/testimonial-cathy.jpg   — real photo, Cathy Lim Domingo
 assets/testimonial-ots.jpg     — real photo, Ots Jimenez
 assets/testimonial-mara.jpg    — real photo, Mara Gaviola
 assets/benefit-lowcalorie.jpg  — real photo, "Low Calorie Coffee" benefit card
+assets/benefit-acidreflux.jpg  — real photo, "No Acid Reflux" benefit card
+assets/benefit-palpitation.jpg — real photo, "No Palpitation" benefit card
 ```
