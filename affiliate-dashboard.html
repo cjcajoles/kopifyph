@@ -9,11 +9,10 @@
     const stored = localStorage.getItem('kopify-admin-theme');
     const wantsDark = stored ? stored === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
     if (wantsDark) document.documentElement.classList.add('dark');
-    if (!localStorage.getItem('kopify-affiliate-code')) {
-      window.location.replace('affiliate-login.html');
-    }
   })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="./supabase-config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -51,6 +50,7 @@
   html.dark .text-coffee-400 { color:#B98247 !important; }
   html.dark th { color:#E8B35C; }
   html.dark td { border-top-color:#54331C; }
+  body:not([data-auth-checked]) > * { display:none !important; }
 </style>
 </head>
 <body class="bg-coffee-50 text-coffee-900">
@@ -127,57 +127,59 @@
 </main>
 
 <script>
-  // Same affiliate roster admin.html manages — kept in sync manually until this is backed
-  // by a real database (see README).
   const COMMISSION_PER_BOX = 60;
   const boxesInPack = { '1 Box': 1, '3 Boxes': 3, '10 Boxes': 10 };
-  const AFFILIATES = [
-    { name: 'Bea Santos', email: 'bea.santos@gmail.com', code: 'BEA10', status: 'Active',
-      orders: [
-        { orderId: '#KPY10231', customer: 'Maria Santos', pack: '3 Boxes',  date: 'Aug 14, 2026' },
-        { orderId: '#KPY10224', customer: 'Joana Lazaro',  pack: '10 Boxes', date: 'Aug 11, 2026' },
-        { orderId: '#KPY10198', customer: 'Liza Mendoza',  pack: '1 Box',   date: 'Aug 07, 2026' },
-      ] },
-    { name: 'Marco Villareal', email: 'marco.villareal@gmail.com', code: 'MARCO15', status: 'Active',
-      orders: [
-        { orderId: '#KPY10229', customer: 'Cathy Lim Domingo', pack: '10 Boxes', date: 'Aug 13, 2026' },
-        { orderId: '#KPY10220', customer: 'Diego Ramos',       pack: '3 Boxes',  date: 'Aug 09, 2026' },
-      ] },
-    { name: 'Jamie Cruz', email: 'jamie.cruz@gmail.com', code: 'JAMIE5', status: 'Active',
-      orders: [
-        { orderId: '#KPY10227', customer: 'Ots Jimenez', pack: '1 Box', date: 'Aug 12, 2026' },
-      ] },
-    { name: 'Rhea Domingo', email: 'rhea.domingo@yahoo.com', code: 'RHEA20', status: 'Inactive', orders: [] },
-  ];
-
   const peso = n => '₱' + n.toLocaleString('en-PH');
+  const fmtDate = iso => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
 
-  const code = localStorage.getItem('kopify-affiliate-code');
-  const me = AFFILIATES.find(a => a.code === code);
-  if (!me) {
-    localStorage.removeItem('kopify-affiliate-code');
-    window.location.replace('affiliate-login.html');
-  } else {
-    document.getElementById('aff-name').textContent = me.name.split(' ')[0];
-    const fullLink = `kopify.ph/?ref=${me.code}`;
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.replace('affiliate-login.html'); return; }
+
+    const { data: profile } = await sb.from('profiles').select('role, affiliate_code, full_name').eq('id', session.user.id).single();
+    if (profile?.role !== 'affiliate' || !profile.affiliate_code) {
+      await sb.auth.signOut();
+      window.location.replace('affiliate-login.html');
+      return;
+    }
+
+    const myCode = profile.affiliate_code;
+    const { data: affiliate } = await sb.from('affiliates').select('name, status').eq('code', myCode).single();
+    if (affiliate?.status !== 'Active') {
+      await sb.auth.signOut();
+      window.location.replace('affiliate-login.html');
+      return;
+    }
+
+    document.getElementById('aff-name').textContent = (affiliate.name || profile.full_name || 'there').split(' ')[0];
+    const fullLink = `kopify.ph/?ref=${myCode}`;
     document.getElementById('aff-link').textContent = fullLink;
 
-    const boxes = me.orders.reduce((sum, o) => sum + (boxesInPack[o.pack] || 0), 0);
+    // RLS on the orders table already restricts this to rows where
+    // affiliate_code = my_affiliate_code() — this can't see anyone else's orders.
+    const { data: myOrders, error: ordersError } = await sb
+      .from('orders')
+      .select('order_number, customer_name, pack, created_at')
+      .eq('affiliate_code', myCode)
+      .order('created_at', { ascending: false });
+
+    const orders = ordersError ? [] : myOrders;
+    const boxes = orders.reduce((sum, o) => sum + (boxesInPack[o.pack] || 0), 0);
     const commission = boxes * COMMISSION_PER_BOX;
-    document.getElementById('aff-stat-orders').textContent = me.orders.length;
+    document.getElementById('aff-stat-orders').textContent = orders.length;
     document.getElementById('aff-stat-boxes').textContent = boxes;
     document.getElementById('aff-stat-commission').textContent = peso(commission);
 
     const tbody = document.querySelector('#aff-orders-table tbody');
-    tbody.innerHTML = me.orders.map(o => `
+    tbody.innerHTML = orders.map(o => `
       <tr>
-        <td class="font-semibold text-coffee-800">${o.orderId}</td>
-        <td>${o.customer}</td>
+        <td class="font-semibold text-coffee-800">${o.order_number}</td>
+        <td>${o.customer_name}</td>
         <td class="text-coffee-500">${o.pack}</td>
-        <td class="text-coffee-500">${o.date}</td>
+        <td class="text-coffee-500">${fmtDate(o.created_at)}</td>
         <td class="font-semibold">${peso((boxesInPack[o.pack] || 0) * COMMISSION_PER_BOX)}</td>
       </tr>`).join('');
-    document.getElementById('aff-orders-empty').classList.toggle('hidden', me.orders.length > 0);
+    document.getElementById('aff-orders-empty').classList.toggle('hidden', orders.length > 0);
 
     document.getElementById('copy-link-btn').addEventListener('click', () => {
       const url = `https://${fullLink}`;
@@ -186,10 +188,12 @@
       label.textContent = 'Copied!';
       setTimeout(() => { label.textContent = 'Copy Link'; }, 1200);
     });
-  }
 
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('kopify-affiliate-code');
+    document.body.setAttribute('data-auth-checked', '1');
+  })();
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await sb.auth.signOut();
     window.location.href = 'affiliate-login.html';
   });
 </script>

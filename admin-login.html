@@ -10,12 +10,10 @@
     const stored = localStorage.getItem('kopify-admin-theme');
     const wantsDark = stored ? stored === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
     if (wantsDark) document.documentElement.classList.add('dark');
-    // Already signed in? Skip straight to the dashboard.
-    if (localStorage.getItem('kopify-admin-authed') === 'true') {
-      window.location.replace('admin.html');
-    }
   })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="./supabase-config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -98,19 +96,50 @@
 <script>
   const form = document.getElementById('login-form');
   const errorEl = document.getElementById('login-error');
-  form.addEventListener('submit', (e) => {
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.remove('hidden');
+  }
+
+  // Already have a valid admin session? Skip straight to the dashboard.
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+    if (profile?.role === 'admin') window.location.replace('admin.html');
+  })();
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     if (!email || !password) {
-      errorEl.textContent = 'Enter both your email and password.';
-      errorEl.classList.remove('hidden');
+      showError('Enter both your email and password.');
       return;
     }
-    // NOTE: placeholder gate only — accepts any non-empty email/password.
-    // Swap for real Supabase Auth (or similar) before this goes live; see README.
-    localStorage.setItem('kopify-admin-authed', 'true');
-    localStorage.setItem('kopify-admin-email', email);
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing in…';
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      showError('Invalid email or password.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In →';
+      return;
+    }
+
+    const { data: profile } = await sb.from('profiles').select('role').eq('id', data.user.id).single();
+    if (profile?.role !== 'admin') {
+      await sb.auth.signOut();
+      showError("This account isn't set up as an admin.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In →';
+      return;
+    }
+
     window.location.href = 'admin.html';
   });
 </script>

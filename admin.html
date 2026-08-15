@@ -6,17 +6,17 @@
 <title>Kopify Admin | Dashboard</title>
 <script>
   // Applied before first paint so dark-mode users don't see a light-mode flash.
+  // The dashboard itself stays hidden (see body[data-auth-checked] CSS below) until
+  // the async Supabase session/role check at the bottom of this page passes — that
+  // check is what actually gates access; this block only handles theme.
   (function () {
     const stored = localStorage.getItem('kopify-admin-theme');
     const wantsDark = stored ? stored === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
     if (wantsDark) document.documentElement.classList.add('dark');
-    // Gate the dashboard behind admin-login.html. This is a client-side placeholder
-    // (see the NOTE in admin-login.html) — swap for real auth before this goes live.
-    if (localStorage.getItem('kopify-admin-authed') !== 'true') {
-      window.location.replace('admin-login.html');
-    }
   })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="./supabase-config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -105,6 +105,10 @@
   html.dark .nav-btn svg { color:#B98247; }
   html.dark .period-btn, html.dark .theme-choice-btn { color:#E8B35C; }
   html.dark .period-btn.active, html.dark .theme-choice-btn.active { background:#54331C; color:#FBF3EA; }
+  /* Hidden until the async auth check (bottom of page) confirms an admin session,
+     so a signed-out visitor never sees a flash of dashboard content before the
+     redirect to admin-login.html kicks in. */
+  body:not([data-auth-checked]) > * { display:none !important; }
 </style>
 </head>
 <body class="bg-coffee-50 text-coffee-900">
@@ -609,6 +613,26 @@
 </div>
 
 <script>
+// ---------- Auth guard ----------
+// Real gate: must have a Supabase session AND a profiles.role of 'admin'. Runs first;
+// the CSS at the top of <head> keeps the whole page hidden until this either reveals
+// it (data-auth-checked) or bounces to the login page.
+let currentAdminEmail = '';
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.replace('admin-login.html'); return; }
+  const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+  if (profile?.role !== 'admin') {
+    await sb.auth.signOut();
+    window.location.replace('admin-login.html');
+    return;
+  }
+  currentAdminEmail = session.user.email;
+  const emailEl = document.getElementById('settings-account-email');
+  if (emailEl) emailEl.textContent = currentAdminEmail;
+  document.body.setAttribute('data-auth-checked', '1');
+})();
+
 // ---------- Mock data ----------
 const orders = [
   { id: '#KPY10231', customer: 'Maria Santos',     pack: '3 Boxes',  date: 'Aug 14, 2026', total: 1097, status: 'Paid' },
@@ -1255,10 +1279,9 @@ applyPeriod('monthly');
 document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
 document.getElementById('dist-nav-count').textContent = distributors.length;
 
-// ---------- Auth ----------
-document.getElementById('settings-account-email').textContent = localStorage.getItem('kopify-admin-email') || 'admin@kopify.ph';
-document.getElementById('logout-btn').addEventListener('click', () => {
-  localStorage.removeItem('kopify-admin-authed');
+// ---------- Logout ----------
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  await sb.auth.signOut();
   window.location.href = 'admin-login.html';
 });
 </script>
