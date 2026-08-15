@@ -157,6 +157,7 @@ create table if not exists public.distributors (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   address text not null,
+  region text,
   email text not null,
   mobile text not null,
   channel text not null check (channel in ('Lazada', 'Shopee', 'TikTok', 'Offline')),
@@ -208,6 +209,7 @@ create table if not exists public.affiliates (
   email text not null unique,
   code text not null unique,
   status text not null default 'Active' check (status in ('Active', 'Inactive')),
+  region text,
   joined_at timestamptz not null default now()
 );
 
