@@ -31,7 +31,7 @@ Real photos added for all 6 testimonials: `assets/testimonial-{cathy,ots,mara,di
 
 ## Benefits grid photos
 
-`assets/benefit-lowcalorie.jpg` (steaming cup + coffee splash), `assets/benefit-acidreflux.jpg` (stomach shield icon + hand on belly), `assets/benefit-palpitation.jpg` (heart shield icon, "Heart Friendly" badge), `assets/benefit-jitters.jpg` (crossed-out brain icon), `assets/benefit-bloating.jpg` (stomach outline icon, cropped from a source image that had "NO MORE BLOATING" baked in as text — cropped it out since the card's own `<h3>` heading already says that), and `assets/benefit-nosugar.jpg` (crossed-out sugar cubes icon, also cropped to remove baked-in "NO SUGAR" text) are real images from client-supplied PDFs. All 6 of 6 benefit-grid icons are now real.
+`assets/benefit-lowcalorie.jpg` (steaming cup + coffee splash), `assets/benefit-acidreflux.jpg` (stomach shield icon + hand on belly), `assets/benefit-palpitation.jpg` (heart shield icon, "Heart Friendly" badge), `assets/benefit-jitters.jpg` (crossed-out brain icon), `assets/benefit-bloating.jpg` (glowing gold stomach-outline icon on a coffee-bean background — replaced per client request, the flat black-and-white version looked out of place), and `assets/benefit-nosugar.jpg` (crossed-out sugar cubes icon, also cropped to remove baked-in "NO SUGAR" text) are real images from client-supplied PDFs. All 6 of 6 benefit-grid icons are now real.
 
 ## Hero video
 
