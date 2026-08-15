@@ -29,6 +29,10 @@ All in `index.html`:
 
 Real photos added for 3 of the 6 testimonials, per client-supplied PDF matched by the client's description (the woman → Cathy, the guy → Ots, the couple selfie → Mara): `assets/testimonial-{cathy,ots,mara}.jpg`. The client also corrected two quotes to the real wording — Cathy Lim Domingo's and Direk Paul's are now verbatim as given by the client. Ots's, Mara's, Joana's, and Cilebritee's quotes are still the earlier best-effort transcription (not corrected/confirmed yet).
 
+## Benefits grid photos
+
+`assets/benefit-lowcalorie.jpg` is a real photo (steaming cup + coffee splash) from a client-supplied PDF, placed in the "Low Calorie Coffee" card per client request. The other 5 benefit cards are still placeholders.
+
 ## Known limitation: most other photos are still placeholders
 
 This build could not reach `kopify.shop` directly (network egress to that domain, and its related `kopify.ph` / `buy.kopify.ph` domains, was blocked in the build environment). Most of the real copy was instead transcribed from screenshots of the live page the client provided partway through the build. What's real vs. still-uncertain:
@@ -46,7 +50,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - FAQ answers 2–10 (everything except Q1 and the distributor one) are still best-effort copy in the site's voice, not transcribed from a source.
 
 **Still placeholder:**
-- Hero/product-intro/collage/benefit photos, and Joana's + Cilebritee's testimonial photos, are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
+- Hero/product-intro/collage photos, 5 of 6 benefit-grid photos, and Joana's + Cilebritee's testimonial photos, are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
 
 ## PWA
 
@@ -66,4 +70,5 @@ assets/ingredients-summary.jpg — real "20-in-1, Powered by Nature" summary gra
 assets/testimonial-cathy.jpg   — real photo, Cathy Lim Domingo
 assets/testimonial-ots.jpg     — real photo, Ots Jimenez
 assets/testimonial-mara.jpg    — real photo, Mara Gaviola
+assets/benefit-lowcalorie.jpg  — real photo, "Low Calorie Coffee" benefit card
 ```
