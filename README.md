@@ -31,7 +31,15 @@ Real photos added for 3 of the 6 testimonials, per client-supplied PDF matched b
 
 ## Benefits grid photos
 
-`assets/benefit-lowcalorie.jpg` (steaming cup + coffee splash), `assets/benefit-acidreflux.jpg` (stomach shield icon + hand on belly), and `assets/benefit-palpitation.jpg` (heart shield icon, "Heart Friendly" badge) are real photos from client-supplied PDFs, placed in the "Low Calorie Coffee", "No Acid Reflux", and "No Palpitation" cards per client request. The other 3 benefit cards are still placeholders.
+`assets/benefit-lowcalorie.jpg` (steaming cup + coffee splash), `assets/benefit-acidreflux.jpg` (stomach shield icon + hand on belly), `assets/benefit-palpitation.jpg` (heart shield icon, "Heart Friendly" badge), and `assets/benefit-jitters.jpg` (crossed-out brain icon) are real images from client-supplied PDFs, placed in the "Low Calorie Coffee", "No Acid Reflux", "No Palpitation", and "No More Jitters" cards per client request. Only "No More Bloating" and "No Sugar Cravings" are still placeholders.
+
+## Hero video
+
+`assets/hero-video.mp4` (720×720, desktop) and `assets/hero-video-mobile.mp4` (480×480, mobile) replace the hero product placeholder, from a client-uploaded video. The source was **HEVC/H.265 at 1920×1080 with pillarboxing** — HEVC doesn't play in Chrome or Firefox, so it was transcoded to H.264/AAC (universal support), the black bars were cropped out via `cropdetect`, and the portrait content was center-cropped to a square framed on the face/cup. Two renditions are served (`assets/hero-video-poster.jpg` as the shared poster): `index.html`'s inline script picks the mobile file below a 640px viewport via `matchMedia`, so phones don't download the larger desktop file. `preload="metadata"` means only the poster + duration load up front — the ~50s video body (4.7MB desktop / 1.9MB mobile) only downloads when the user taps the play button, matching the click-to-play behavior from the live site's reference screenshots (not an autoplay loop, since it has spoken audio).
+
+## Testimonial collage photo
+
+`assets/testimonial-collage.jpg` replaces the collage placeholder under the 5.0★/10K+ Ratings/10K+ Sold stats row, from a client-supplied PDF.
 
 ## Known limitation: most other photos are still placeholders
 
@@ -42,7 +50,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - Hero callout ("Your coffee is boring..."), benefits/testimonials/ingredients CTA taglines and stats row (5.0★, 10K+ Ratings, 10K+ Sold), and the "It's not just coffee...It's Kopify" benefits list — transcribed from client screenshots.
 - The 20-ingredient list and its 4 groupings (Moringa, Turmeric, Barley, Goji Berry groups) — transcribed and cross-checked against public search results, and confirmed again by the FAQ Q1 screenshot and the real ingredient images.
 - FAQ Q1 (ingredients) — verbatim from a live-site screenshot. FAQ distributor answer — verbatim from spec.
-- FDA certificate, the 3 pricing pack photos, the 4 ingredient group images, the 20-in-1 summary graphic, and 3 of 6 testimonial photos — real files (see above).
+- FDA certificate, the 3 pricing pack photos, the 4 ingredient group images, the 20-in-1 summary graphic, the testimonial collage, the hero video, and 3 of 6 testimonial photos — real files (see above).
 - Testimonial names (Cathy Lim-Domingo, Ots Jimenez, Mara Gaviola, Direk Paul, Joana Lazaro, Cilebritee Shop) — from spec. Cathy's and Direk Paul's quotes are client-confirmed verbatim.
 
 **Needs a final proofread — search for `TODO` in `index.html`:**
@@ -50,7 +58,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - FAQ answers 2–10 (everything except Q1 and the distributor one) are still best-effort copy in the site's voice, not transcribed from a source.
 
 **Still placeholder:**
-- Hero/product-intro/collage photos, 3 of 6 benefit-grid photos, and Joana's + Cilebritee's testimonial photos, are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
+- Product-intro photo, 2 of 6 benefit-grid photos (No More Bloating, No Sugar Cravings), and Joana's + Cilebritee's testimonial photos, are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
 
 ## PWA
 
@@ -73,4 +81,9 @@ assets/testimonial-mara.jpg    — real photo, Mara Gaviola
 assets/benefit-lowcalorie.jpg  — real photo, "Low Calorie Coffee" benefit card
 assets/benefit-acidreflux.jpg  — real photo, "No Acid Reflux" benefit card
 assets/benefit-palpitation.jpg — real photo, "No Palpitation" benefit card
+assets/benefit-jitters.jpg      — real icon, "No More Jitters" benefit card
+assets/testimonial-collage.jpg — real customer photo collage
+assets/hero-video.mp4           — real hero video, desktop (720x720, H.264)
+assets/hero-video-mobile.mp4    — real hero video, mobile (480x480, H.264)
+assets/hero-video-poster.jpg    — poster frame for the hero video
 ```

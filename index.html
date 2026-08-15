@@ -141,15 +141,12 @@
   </p>
 
   <div class="relative max-w-sm mx-auto aspect-square rounded-3xl overflow-hidden shadow-card bg-gold-400">
-    <img src="" alt="Kopify hero product" class="w-full h-full object-cover placeholder-img"
-         onerror="this.classList.add('placeholder-img')"
-         data-fallback-label="Hero Product Video">
-    <!-- TODO: swap src for CDN hero video/gif 66b1968edd126b4b7fe1b20e.gif -->
-    <span class="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <video id="hero-video" class="w-full h-full object-cover" poster="./assets/hero-video-poster.jpg" playsinline preload="metadata"></video>
+    <button id="hero-video-play" type="button" aria-label="Play video" class="absolute inset-0 flex items-center justify-center">
       <span class="w-14 h-14 rounded-xl bg-black/40 flex items-center justify-center">
         <svg viewBox="0 0 24 24" class="w-6 h-6 text-white ml-0.5"><path d="M8 5v14l11-7Z" fill="currentColor"/></svg>
       </span>
-    </span>
+    </button>
   </div>
 
   <a href="#pricing" class="mt-6 block max-w-sm mx-auto rounded-2xl bg-coffee-900 hover:bg-coffee-800 active:scale-[0.98] transition shadow-card overflow-hidden">
@@ -213,7 +210,7 @@
 
     <!-- Card 5 -->
     <div class="text-center">
-      <div class="mx-auto mb-4 w-36 h-24 sm:w-40 sm:h-28 placeholder-img shadow-card text-[9px]" style="border-radius:50%">Jitters</div>
+      <img src="./assets/benefit-jitters.jpg" alt="No jitters icon" class="mx-auto mb-4 w-36 h-24 sm:w-40 sm:h-28 object-contain bg-white shadow-card" style="border-radius:50%">
       <h3 class="font-extrabold text-lg mb-1 text-coffee-900">No More Jitters</h3>
       <p class="text-coffee-800 text-sm">Provides a smooth caffeine boost without the shaky feeling often caused by regular coffee</p>
     </div>
@@ -255,10 +252,7 @@
       <span class="text-coffee-900 font-bold text-sm">10K+ <span class="text-coffee-400 font-medium">Sold</span></span>
     </div>
 
-    <div class="max-w-2xl mx-auto aspect-[16/9] rounded-3xl placeholder-img shadow-card mb-10 text-[11px]">
-      Customer Photo Collage
-      <!-- TODO: swap for CDN customer + product collage image -->
-    </div>
+    <img src="./assets/testimonial-collage.jpg" alt="Kopify customers sharing their orders and testimonials" class="max-w-2xl w-full mx-auto rounded-3xl shadow-card mb-10">
 
     <!-- TODO: 3 of 6 quotes/photos below are now confirmed real (Cathy, Ots via photo match, Direk Paul) — the rest (Mara's quote text, Joana, Cilebritee) are still best-effort transcriptions, please sanity-check against the live page -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
@@ -761,6 +755,25 @@
       item.setAttribute('data-open', isOpen ? 'false' : 'true');
     });
   });
+
+  // ===== Hero video: mobile/desktop source switch + click-to-play =====
+  (function () {
+    const video = document.getElementById('hero-video');
+    const playBtn = document.getElementById('hero-video-play');
+    if (!video || !playBtn) return;
+
+    const isMobile = window.matchMedia('(max-width: 640px)').matches;
+    const source = document.createElement('source');
+    source.src = isMobile ? './assets/hero-video-mobile.mp4' : './assets/hero-video.mp4';
+    source.type = 'video/mp4';
+    video.appendChild(source);
+
+    playBtn.addEventListener('click', () => {
+      video.controls = true;
+      video.play();
+      playBtn.classList.add('hidden');
+    });
+  })();
 
   // ===== Placeholder image fallback =====
   document.querySelectorAll('img').forEach((img) => {
