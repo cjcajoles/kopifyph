@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kopify Admin | Dashboard</title>
+<script>
+  // Applied before first paint so dark-mode users don't see a light-mode flash.
+  (function () {
+    const stored = localStorage.getItem('kopify-admin-theme');
+    const wantsDark = stored ? stored === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (wantsDark) document.documentElement.classList.add('dark');
+    // Gate the dashboard behind admin-login.html. This is a client-side placeholder
+    // (see the NOTE in admin-login.html) — swap for real auth before this goes live.
+    if (localStorage.getItem('kopify-admin-authed') !== 'true') {
+      window.location.replace('admin-login.html');
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'sans-serif'] },
+        colors: {
+          coffee: {
+            50:  '#FBF3EA',
+            100: '#F3E1CC',
+            200: '#E4C79E',
+            300: '#D2A66B',
+            400: '#B98247',
+            500: '#8B5A2B',
+            600: '#6F4423',
+            700: '#54331C',
+            800: '#3B2114',
+            900: '#2A170D'
+          },
+          gold: {
+            50:  '#FDF7EC',
+            100: '#FBF0DC',
+            300: '#F1D28C',
+            400: '#E8B35C',
+            500: '#D4941F',
+            600: '#B47A15'
+          }
+        },
+        boxShadow: {
+          card: '0 1px 2px 0 rgba(42, 23, 13, 0.04), 0 1px 6px -2px rgba(42, 23, 13, 0.06)'
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; letter-spacing: -0.01em; }
+  .nav-btn { display:flex; align-items:center; gap:.75rem; width:100%; padding:.625rem .875rem; border-radius:.625rem; font-size:.875rem; font-weight:500; color:#6F4423; transition:background .15s, color .15s; }
+  .nav-btn:hover { background:#FBF3EA; }
+  .nav-btn.active { background:#3B2114; color:#fff; }
+  .nav-btn.active svg { color:#F1D28C; }
+  .nav-btn svg { color:#B98247; flex-shrink:0; }
+  .nav-btn.active:hover { background:#3B2114; }
+  .status-pill { display:inline-flex; align-items:center; gap:.375rem; font-size:.75rem; font-weight:600; padding:.25rem .625rem; border-radius:9999px; }
+  .status-dot { width:6px; height:6px; border-radius:9999px; }
+  th { font-size:.6875rem; text-transform:uppercase; letter-spacing:.04em; color:#B98247; font-weight:600; text-align:left; padding:.75rem 1rem; }
+  td { padding:1rem; font-size:.875rem; border-top:1px solid #F3E1CC; }
+  #bar-tooltip { pointer-events:none; }
+  .period-btn { padding:.5rem 1rem; border-radius:9999px; font-size:.8125rem; font-weight:600; color:#8B5A2B; transition:background .15s,color .15s,box-shadow .15s; }
+  .period-btn.active { background:#fff; color:#3B2114; box-shadow:0 1px 2px 0 rgba(42,23,13,.08); }
+  .theme-choice-btn { color:#8B5A2B; transition:background .15s,color .15s,box-shadow .15s; }
+  .theme-choice-btn.active { background:#fff; color:#3B2114; box-shadow:0 1px 2px 0 rgba(42,23,13,.08); }
+
+  /* ============ DARK MODE ============
+     Re-targets the same Tailwind-generated classes used everywhere in this file (both
+     static HTML and JS-rendered table rows) rather than adding dark: variants to every
+     element — one block to keep in sync instead of ~150 scattered edits. */
+  html.dark body { background:#2A170D; color:#FBF3EA; }
+  html.dark .bg-white { background-color:#3B2114 !important; }
+  html.dark .bg-coffee-50 { background-color:#2A170D !important; }
+  html.dark .bg-coffee-100 { background-color:#54331C !important; }
+  html.dark .bg-coffee-800 { background-color:#B47A15 !important; }
+  html.dark .border-coffee-100 { border-color:#54331C !important; }
+  html.dark .text-coffee-900 { color:#FBF3EA !important; }
+  html.dark .text-coffee-800 { color:#F3E1CC !important; }
+  html.dark .text-coffee-700 { color:#E4C79E !important; }
+  html.dark .text-coffee-600 { color:#D2A66B !important; }
+  html.dark .text-coffee-500 { color:#D2A66B !important; }
+  html.dark .text-coffee-400 { color:#B98247 !important; }
+  html.dark .text-coffee-300 { color:#8B5A2B !important; }
+  html.dark .text-gold-300 { color:#2A170D !important; }
+  html.dark .bg-gold-100 { background-color:rgba(212,148,31,.18) !important; }
+  html.dark .text-gold-600 { color:#E8B35C !important; }
+  html.dark .text-gold-500 { color:#F1D28C !important; }
+  html.dark .placeholder-coffee-300::placeholder { color:#6F4423 !important; }
+  html.dark th { color:#E8B35C; }
+  html.dark td { border-top-color:#54331C; }
+  html.dark .ring-white { --tw-ring-color:#3B2114; }
+  html.dark .nav-btn { color:#D2A66B; }
+  html.dark .nav-btn:hover { background:#3B2114; }
+  html.dark .nav-btn.active { background:#D4941F; color:#2A170D; }
+  html.dark .nav-btn.active svg { color:#2A170D; }
+  html.dark .nav-btn svg { color:#B98247; }
+  html.dark .period-btn, html.dark .theme-choice-btn { color:#E8B35C; }
+  html.dark .period-btn.active, html.dark .theme-choice-btn.active { background:#54331C; color:#FBF3EA; }
+</style>
+</head>
+<body class="bg-coffee-50 text-coffee-900">
+
+<div class="flex min-h-screen">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="w-64 bg-white border-r border-coffee-100 flex flex-col shrink-0">
+    <div class="h-16 flex items-center gap-2.5 px-5 border-b border-coffee-100">
+      <div class="rounded-full w-9 h-9 shrink-0 flex items-center justify-center p-1.5" style="background:#C79A5D">
+        <svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.55"/>
+          <path d="M40 28c-3-4 3-6 0-10M50 26c-3-4 3-6 0-10M60 28c-3-4 3-6 0-10" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M28 40h36v15a18 18 0 0 1-18 18 18 18 0 0 1-18-18V40Z" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M64 44h6.5a7.5 7.5 0 0 1 0 15H64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+          <path d="M22 68h48" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="leading-tight">
+        <span class="block text-base font-extrabold tracking-tight text-coffee-900">Kopify</span>
+        <span class="block text-[10px] tracking-wide text-coffee-400 font-bold uppercase">Admin</span>
+      </span>
+    </div>
+
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <button class="nav-btn active" data-view="home">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20h3.5a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Home
+      </button>
+      <button class="nav-btn" data-view="orders">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 3.5h6a1 1 0 0 1 1 1V6H8V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Orders
+        <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center" id="orders-nav-count">3</span>
+      </button>
+      <button class="nav-btn" data-view="products">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m3.5 8 8.5-4.5L20.5 8v8L12 20.5 3.5 16V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 8 12 12.5 20.5 8M12 12.5V20.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        Products
+      </button>
+      <button class="nav-btn" data-view="customers">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8.5" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M15.2 5.7a3.2 3.2 0 0 1 0 6.2M17.5 14.3c2.3.4 4 2.7 4 5.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Customers
+      </button>
+      <button class="nav-btn" data-view="distributors">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="9.5" width="17" height="11" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 9.5V7a4.5 4.5 0 0 1 9 0v2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 13.5v3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Distributors
+        <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center" id="dist-nav-count">2</span>
+      </button>
+      <button class="nav-btn" data-view="vouchers">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3.5 9.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v1.2a1.7 1.7 0 0 0 0 3.2v1.6a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-1.6a1.7 1.7 0 0 0 0-3.2V9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14.5 8v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="1.6 1.8"/></svg>
+        Vouchers
+      </button>
+      <button class="nav-btn" data-view="refunds">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.5 5.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 17v-4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8v4l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Refunds
+        <span class="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center" id="refunds-nav-count">2</span>
+      </button>
+    </nav>
+
+    <div class="px-3 py-4 border-t border-coffee-100">
+      <button class="nav-btn" data-view="settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.4 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-.9c.6.5 1.3.9 2 1.2L10 21h4l.4-2.6c.7-.3 1.4-.7 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        Settings
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- Header -->
+    <header class="h-16 bg-white border-b border-coffee-100 flex items-center justify-between px-6 gap-4 shrink-0">
+      <div class="relative flex-1 max-w-sm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="Search orders, products, customers" class="w-full bg-coffee-50 border border-coffee-100 rounded-full pl-10 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+      </div>
+      <div class="flex items-center gap-5">
+        <button id="theme-toggle-btn" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-coffee-50" title="Toggle dark mode">
+          <svg id="theme-icon-sun" width="19" height="19" viewBox="0 0 24 24" fill="none" class="text-coffee-500"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6M18.4 18.4l-1.6-1.6M7.2 7.2 5.6 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg id="theme-icon-moon" width="19" height="19" viewBox="0 0 24 24" fill="none" class="text-coffee-500 hidden"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-coffee-50">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" class="text-coffee-500"><path d="M6 10a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 14 6 10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" id="notif-dot"></span>
+        </button>
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-full bg-coffee-800 text-gold-300 flex items-center justify-center font-bold text-sm">KA</div>
+          <div class="leading-tight hidden sm:block">
+            <p class="font-semibold text-sm text-coffee-900">Store Owner</p>
+            <p class="text-xs text-coffee-400">Kopify PH</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+
+      <!-- ================= HOME ================= -->
+      <section id="view-home">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Welcome back! 👋</h1>
+            <p class="text-coffee-500 text-sm mt-1" id="home-subtitle">Here's how Kopify is doing today.</p>
+          </div>
+          <div class="flex gap-1 bg-coffee-100 rounded-full p-1" id="period-filter">
+            <button data-period="daily" class="period-btn">Daily</button>
+            <button data-period="weekly" class="period-btn">Weekly</button>
+            <button data-period="monthly" class="period-btn active">Monthly</button>
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Revenue</span>
+              <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><path d="M12 3v18M17 7.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3 5 3.5c2.8.5 5 1.6 5 3.5s-2.2 3.5-5 3.5-5-1.6-5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <p class="text-2xl font-extrabold text-coffee-900" id="stat-revenue">&#8369;182,450</p>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs font-bold" id="stat-revenue-delta">&#8593; 18.2%</span>
+              <span class="text-xs text-coffee-400" id="stat-revenue-period">Last 30 days</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Orders</span>
+              <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><rect x="4" y="4" width="16" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <p class="text-2xl font-extrabold text-coffee-900" id="stat-orders">214</p>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs font-bold" id="stat-orders-delta">&#8593; 9.4%</span>
+              <span class="text-xs text-coffee-400" id="stat-orders-period">Last 30 days</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Customers</span>
+              <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5M15.5 6a2.8 2.8 0 0 1 0 5.4M17.5 13.2c2 .4 3.5 2.4 3.5 5.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <p class="text-2xl font-extrabold text-coffee-900" id="stat-customers">187</p>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs font-bold" id="stat-customers-delta">&#8593; 12.5%</span>
+              <span class="text-xs text-coffee-400" id="stat-customers-period">Last 30 days</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Boxes Sold</span>
+              <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><path d="m3.5 8 8.5-4.5L20.5 8v8L12 20.5 3.5 16V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <p class="text-2xl font-extrabold text-coffee-900" id="stat-boxes">512</p>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs font-bold" id="stat-boxes-delta">&#8593; 22.0%</span>
+              <span class="text-xs text-coffee-400" id="stat-boxes-period">Last 30 days</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <!-- Chart -->
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+            <div class="flex items-center justify-between mb-1">
+              <h2 class="font-bold text-coffee-900" id="chart-title">Revenue, last 5 weeks</h2>
+              <span class="text-xs text-coffee-400" id="chart-note">In &#8369;, per week</span>
+            </div>
+            <div class="relative mt-4" id="chart-wrap">
+              <svg id="revenue-chart" viewBox="0 0 560 220" class="w-full h-[220px]" preserveAspectRatio="none"></svg>
+              <div id="bar-tooltip" class="absolute hidden bg-coffee-900 text-white text-xs font-semibold rounded-lg px-3 py-1.5 shadow-lg whitespace-nowrap" style="transform:translate(-50%,-115%)"></div>
+            </div>
+          </div>
+
+          <!-- Best sellers -->
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+            <h2 class="font-bold text-coffee-900 mb-4">Best sellers</h2>
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <img src="./assets/pack-3boxes.jpg" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="3 Boxes">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-coffee-900 truncate">3 Boxes &ndash; Family Pack</p>
+                  <p class="text-xs text-coffee-400">241 sold</p>
+                </div>
+                <p class="text-sm font-bold text-coffee-900">&#8369;1,097</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <img src="./assets/pack-1box.jpg" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="1 Box">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-coffee-900 truncate">1 Box</p>
+                  <p class="text-xs text-coffee-400">198 sold</p>
+                </div>
+                <p class="text-sm font-bold text-coffee-900">&#8369;399</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <img src="./assets/pack-10boxes.jpg" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="10 Boxes">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-coffee-900 truncate">10 Boxes &ndash; Bundle</p>
+                  <p class="text-xs text-coffee-400">73 sold</p>
+                </div>
+                <p class="text-sm font-bold text-coffee-900">&#8369;3,790</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent orders -->
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 mt-4 overflow-hidden">
+          <div class="flex items-center justify-between px-5 pt-5 pb-2">
+            <h2 class="font-bold text-coffee-900">Recent orders</h2>
+            <button data-goto="orders" class="text-sm font-bold text-gold-600 hover:text-gold-500">View all &rarr;</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full" id="recent-orders-table">
+              <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ORDERS ================= -->
+      <section id="view-orders" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Orders</h1>
+            <p class="text-coffee-500 text-sm mt-1">Track and manage every Kopify order.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="orders-search" type="text" placeholder="Search by order ID or customer" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="orders-status-filter">
+            <button data-status="all" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
+            <button data-status="Pending" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Pending</button>
+            <button data-status="Paid" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Paid</button>
+            <button data-status="Shipped" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Shipped</button>
+            <button data-status="Cancelled" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Cancelled</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="orders-table">
+              <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="orders-empty" class="hidden text-center text-sm text-coffee-400 py-10">No orders match your search.</p>
+        </div>
+      </section>
+
+      <!-- ================= PRODUCTS ================= -->
+      <section id="view-products" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Products</h1>
+            <p class="text-coffee-500 text-sm mt-1">Manage Kopify's pricing and stock.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="products-search" type="text" placeholder="Search products" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="products-table">
+              <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Units sold</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CUSTOMERS ================= -->
+      <section id="view-customers" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Customers</h1>
+            <p class="text-coffee-500 text-sm mt-1">Everyone who's ordered Kopify.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="customers-search" type="text" placeholder="Search by name or email" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="customers-table">
+              <thead><tr><th>Customer</th><th>Email</th><th>Orders</th><th>Total spent</th><th>Joined</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= DISTRIBUTORS ================= -->
+      <section id="view-distributors" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Distributor Applications</h1>
+            <p class="text-coffee-500 text-sm mt-1">Everyone who applied through the "Become a Distributor" form on the site.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="distributors-search" type="text" placeholder="Search by name, email, or address" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="distributors-channel-filter">
+            <button data-channel="all" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
+            <button data-channel="Lazada" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Lazada</button>
+            <button data-channel="Shopee" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Shopee</button>
+            <button data-channel="TikTok" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">TikTok</button>
+            <button data-channel="Offline" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Offline</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="distributors-table">
+              <thead><tr><th>Applicant</th><th>Contact</th><th>Address</th><th>Plans to sell on</th><th>Applied</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="distributors-empty" class="hidden text-center text-sm text-coffee-400 py-10">No applications match your search.</p>
+        </div>
+      </section>
+
+      <!-- ================= VOUCHERS ================= -->
+      <section id="view-vouchers" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Vouchers &amp; Discounts</h1>
+            <p class="text-coffee-500 text-sm mt-1">Promo codes shoppers can apply at checkout.</p>
+          </div>
+          <button id="voucher-create-btn" class="flex items-center gap-1.5 bg-gold-500 hover:bg-gold-600 transition text-white text-sm font-bold px-4 py-2.5 rounded-full">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Create voucher
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="vouchers-search" type="text" placeholder="Search by code" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="vouchers-status-filter">
+            <button data-status="all" class="voucher-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
+            <button data-status="Active" class="voucher-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Active</button>
+            <button data-status="Scheduled" class="voucher-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Scheduled</button>
+            <button data-status="Expired" class="voucher-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Expired</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="vouchers-table">
+              <thead><tr><th>Code</th><th>Discount</th><th>Min. spend</th><th>Used</th><th>Valid dates</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="vouchers-empty" class="hidden text-center text-sm text-coffee-400 py-10">No vouchers match your search.</p>
+        </div>
+      </section>
+
+      <!-- ================= REFUNDS & CANCELLED ORDERS ================= -->
+      <section id="view-refunds" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Refunds &amp; Cancelled Orders</h1>
+            <p class="text-coffee-500 text-sm mt-1">Refund requests and cancellations that need a decision.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="refunds-search" type="text" placeholder="Search by order ID or customer" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="refunds-status-filter">
+            <button data-status="all" class="refund-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
+            <button data-status="Requested" class="refund-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Requested</button>
+            <button data-status="Approved" class="refund-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Approved</button>
+            <button data-status="Refunded" class="refund-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Refunded</button>
+            <button data-status="Rejected" class="refund-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Rejected</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="refunds-table">
+              <thead><tr><th>Order</th><th>Customer</th><th>Reason</th><th>Amount</th><th>Requested</th><th>Status</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="refunds-empty" class="hidden text-center text-sm text-coffee-400 py-10">No refund requests match your search.</p>
+        </div>
+      </section>
+
+      <!-- ================= SETTINGS ================= -->
+      <section id="view-settings" class="hidden">
+        <div class="mb-6">
+          <h1 class="text-2xl font-extrabold text-coffee-900">Settings</h1>
+          <p class="text-coffee-500 text-sm mt-1">Preferences for this admin dashboard.</p>
+        </div>
+
+        <div class="max-w-xl bg-white rounded-2xl shadow-card border border-coffee-100 p-6">
+          <h2 class="font-bold text-coffee-900 mb-1">Appearance</h2>
+          <p class="text-sm text-coffee-500 mb-4">Choose how the dashboard looks on this device.</p>
+          <div class="flex gap-1 bg-coffee-100 rounded-full p-1 w-fit" id="settings-theme-filter">
+            <button data-theme="light" class="theme-choice-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6M18.4 18.4l-1.6-1.6M7.2 7.2 5.6 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              Light
+            </button>
+            <button data-theme="dark" class="theme-choice-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              Dark
+            </button>
+          </div>
+        </div>
+
+        <div class="max-w-xl bg-white rounded-2xl shadow-card border border-coffee-100 p-6 mt-4">
+          <h2 class="font-bold text-coffee-900 mb-1">Account</h2>
+          <p class="text-sm text-coffee-500 mb-4">Signed in as <span id="settings-account-email" class="font-semibold text-coffee-700">&mdash;</span></p>
+          <button id="logout-btn" class="flex items-center gap-2 border border-coffee-100 hover:bg-coffee-50 transition text-sm font-bold text-coffee-700 px-4 py-2.5 rounded-full">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 16l4-4-4-4M19 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Log out
+          </button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// ---------- Mock data ----------
+const orders = [
+  { id: '#KPY10231', customer: 'Maria Santos',     pack: '3 Boxes',  date: 'Aug 14, 2026', total: 1097, status: 'Paid' },
+  { id: '#KPY10230', customer: 'Jonas Reyes',       pack: '1 Box',    date: 'Aug 14, 2026', total: 399,  status: 'Pending' },
+  { id: '#KPY10229', customer: 'Cathy Lim Domingo', pack: '10 Boxes', date: 'Aug 13, 2026', total: 3790, status: 'Shipped' },
+  { id: '#KPY10228', customer: 'Ana Bautista',      pack: '3 Boxes',  date: 'Aug 13, 2026', total: 1097, status: 'Paid' },
+  { id: '#KPY10227', customer: 'Ots Jimenez',       pack: '1 Box',    date: 'Aug 12, 2026', total: 399,  status: 'Shipped' },
+  { id: '#KPY10226', customer: 'Mara Gaviola',      pack: '3 Boxes',  date: 'Aug 12, 2026', total: 1097, status: 'Paid' },
+  { id: '#KPY10225', customer: 'Paulo Dela Cruz',   pack: '1 Box',    date: 'Aug 11, 2026', total: 399,  status: 'Cancelled' },
+  { id: '#KPY10224', customer: 'Joana Lazaro',      pack: '10 Boxes', date: 'Aug 11, 2026', total: 3790, status: 'Paid' },
+  { id: '#KPY10223', customer: 'Rico Fernandez',    pack: '3 Boxes',  date: 'Aug 10, 2026', total: 1097, status: 'Shipped' },
+  { id: '#KPY10222', customer: 'Liza Mendoza',      pack: '1 Box',    date: 'Aug 10, 2026', total: 399,  status: 'Pending' },
+  { id: '#KPY10221', customer: 'Cilebritee Shop',   pack: '10 Boxes', date: 'Aug 09, 2026', total: 3790, status: 'Paid' },
+  { id: '#KPY10220', customer: 'Diego Ramos',       pack: '3 Boxes',  date: 'Aug 09, 2026', total: 1097, status: 'Cancelled' },
+];
+
+const products = [
+  { name: '1 Box',   sub: '10 Sachets Inside',      img: './assets/pack-1box.jpg',    price: 399,  stock: 340, sold: 198, status: 'Published' },
+  { name: '3 Boxes', sub: 'Family Pack – Best Seller', img: './assets/pack-3boxes.jpg', price: 1097, stock: 128, sold: 241, status: 'Published' },
+  { name: '10 Boxes',sub: 'Kopifyholic Bundle',      img: './assets/pack-10boxes.jpg', price: 3790, stock: 22,  sold: 73,  status: 'Published' },
+];
+
+const customers = [
+  { name: 'Maria Santos',      email: 'maria.santos@gmail.com',   orders: 5, spent: 4485, joined: 'Feb 12, 2026' },
+  { name: 'Cathy Lim Domingo', email: 'cathylim.d@gmail.com',     orders: 8, spent: 9720, joined: 'Jan 03, 2026' },
+  { name: 'Ots Jimenez',       email: 'ots.jimenez@gmail.com',    orders: 3, spent: 1197, joined: 'Mar 20, 2026' },
+  { name: 'Mara Gaviola',      email: 'mara.gaviola@yahoo.com',   orders: 6, spent: 6582, joined: 'Jan 28, 2026' },
+  { name: 'Joana Lazaro',      email: 'joana.lazaro@gmail.com',   orders: 2, spent: 4189, joined: 'Apr 09, 2026' },
+  { name: 'Ana Bautista',      email: 'ana.bautista21@gmail.com', orders: 4, spent: 3188, joined: 'Feb 27, 2026' },
+  { name: 'Paulo Dela Cruz',   email: 'paulo.delacruz@outlook.com', orders: 1, spent: 399, joined: 'Jul 30, 2026' },
+  { name: 'Cilebritee Shop',   email: 'orders@cilebriteeshop.ph', orders: 11, spent: 22990, joined: 'Nov 14, 2025' },
+  { name: 'Rico Fernandez',    email: 'rico.fernandez@gmail.com', orders: 3, spent: 2691, joined: 'May 05, 2026' },
+  { name: 'Liza Mendoza',      email: 'liza.mendoza@gmail.com',   orders: 2, spent: 1496, joined: 'Jun 18, 2026' },
+];
+
+const PERIODS = {
+  daily: {
+    subtitle: "Here's how Kopify is doing today.",
+    periodLabel: 'vs yesterday',
+    stats: {
+      revenue: { value: 6980,  delta: -4.6 },
+      orders:  { value: 9,     delta: 12.5 },
+      customers: { value: 7,   delta: 0 },
+      boxes:   { value: 19,    delta: 8.0 },
+    },
+    chart: {
+      title: 'Revenue, today',
+      note: 'In ₱, per 3-hour block',
+      data: [
+        { label: '6AM',  v: 320  }, { label: '9AM',  v: 980  }, { label: '12PM', v: 1640 },
+        { label: '3PM',  v: 890  }, { label: '6PM',  v: 1720 }, { label: '9PM',  v: 1430 },
+      ],
+    },
+  },
+  weekly: {
+    subtitle: "Here's how Kopify is doing this week.",
+    periodLabel: 'vs last week',
+    stats: {
+      revenue: { value: 47990, delta: 15.3 },
+      orders:  { value: 51,    delta: 6.8  },
+      customers: { value: 41,  delta: 9.2  },
+      boxes:   { value: 121,   delta: 18.4 },
+    },
+    chart: {
+      title: 'Revenue, last 7 days',
+      note: 'In ₱, per day',
+      data: [
+        { label: 'Wed', v: 4820 }, { label: 'Thu', v: 6140 }, { label: 'Fri', v: 5390 },
+        { label: 'Sat', v: 8920 }, { label: 'Sun', v: 7460 }, { label: 'Mon', v: 5980 }, { label: 'Tue', v: 9310 },
+      ],
+    },
+  },
+  monthly: {
+    subtitle: "Here's how Kopify is doing this month.",
+    periodLabel: 'vs last month',
+    stats: {
+      revenue: { value: 182450, delta: 18.2 },
+      orders:  { value: 214,    delta: 9.4  },
+      customers: { value: 187,  delta: 12.5 },
+      boxes:   { value: 512,    delta: 22.0 },
+    },
+    chart: {
+      title: 'Revenue, last 5 weeks',
+      note: 'In ₱, per week',
+      data: [
+        { label: 'Wk 1', v: 38200 }, { label: 'Wk 2', v: 41800 }, { label: 'Wk 3', v: 33900 },
+        { label: 'Wk 4', v: 44100 }, { label: 'Wk 5', v: 24450 },
+      ],
+    },
+  },
+};
+let currentPeriod = 'monthly';
+
+const distributors = [
+  { name: 'Cilebritee Shop',    address: 'Unit 4B, Alabang, Muntinlupa City',      email: 'orders@cilebriteeshop.ph',   mobile: '0917 234 5678', channel: 'Shopee',  applied: 'Aug 12, 2026' },
+  { name: 'Jasmine Uy',         address: 'Brgy. Poblacion, Davao City',            email: 'jasmine.uy@gmail.com',       mobile: '0928 812 3344', channel: 'TikTok',  applied: 'Aug 10, 2026' },
+  { name: 'Mark Villanueva',    address: '25 Kalayaan St, Quezon City',            email: 'mark.villanueva@gmail.com',  mobile: '0915 667 2210', channel: 'Lazada',  applied: 'Aug 08, 2026' },
+  { name: 'Grace Tolentino',    address: 'Purok 3, Bacolod City',                  email: 'gtolentino.biz@gmail.com',   mobile: '0906 441 7789', channel: 'Offline', applied: 'Aug 05, 2026' },
+  { name: 'Kevin Ang',          address: 'San Fernando, Pampanga',                 email: 'kevin.ang@yahoo.com',        mobile: '0933 220 9981', channel: 'Shopee',  applied: 'Aug 03, 2026' },
+  { name: 'Precious Del Rosario', address: 'Lapu-Lapu City, Cebu',                 email: 'precious.delrosario@gmail.com', mobile: '0919 556 3312', channel: 'TikTok', applied: 'Jul 30, 2026' },
+];
+
+let vouchers = [
+  { code: 'KOPIFY10',      type: 'Percentage', amount: 10,  minSpend: 500,  used: 84,  limit: 200, validFrom: '2026-08-01', validUntil: '2026-08-31' },
+  { code: 'WELCOME50',     type: 'Fixed',      amount: 50,  minSpend: 399,  used: 312, limit: 500, validFrom: '2026-07-01', validUntil: '2026-12-31' },
+  { code: 'FLASH20',       type: 'Percentage', amount: 20,  minSpend: 0,    used: 0,   limit: 100, validFrom: '2026-08-20', validUntil: '2026-08-22' },
+  { code: 'FAMILYPACK100', type: 'Fixed',      amount: 100, minSpend: 1097, used: 156, limit: 300, validFrom: '2026-06-01', validUntil: '2026-07-31' },
+  { code: 'BOXHOLIC15',    type: 'Percentage', amount: 15,  minSpend: 500,  used: 22,  limit: 150, validFrom: '2026-08-10', validUntil: '2026-09-10' },
+];
+
+let refunds = [
+  { orderId: '#KPY10225', customer: 'Paulo Dela Cruz', pack: '1 Box',   amount: 399,  reason: 'Changed mind before it shipped',        requested: 'Aug 12, 2026', status: 'Refunded' },
+  { orderId: '#KPY10220', customer: 'Diego Ramos',     pack: '3 Boxes', amount: 1097, reason: 'Ordered by mistake (duplicate order)',   requested: 'Aug 10, 2026', status: 'Approved' },
+  { orderId: '#KPY10198', customer: 'Liza Mendoza',    pack: '1 Box',   amount: 399,  reason: 'Package arrived damaged',                requested: 'Aug 07, 2026', status: 'Requested' },
+  { orderId: '#KPY10176', customer: 'Rico Fernandez',  pack: '10 Boxes',amount: 3790, reason: 'Wrong pack delivered',                   requested: 'Aug 03, 2026', status: 'Requested' },
+  { orderId: '#KPY10142', customer: 'Ana Bautista',    pack: '3 Boxes', amount: 1097, reason: 'No longer wanted, past return window',   requested: 'Jul 28, 2026', status: 'Rejected' },
+];
+
+// ---------- Helpers ----------
+const peso = n => '₱' + n.toLocaleString('en-PH');
+const statusStyle = {
+  Paid:      { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
+  Published: { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
+  Pending:   { bg: '#FEF3C7', text: '#B45309', dot: '#F59E0B' },
+  Shipped:   { bg: '#DBEAFE', text: '#1D4ED8', dot: '#3B82F6' },
+  Cancelled: { bg: '#FEE2E2', text: '#B91C1C', dot: '#EF4444' },
+  Active:    { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
+  Scheduled: { bg: '#DBEAFE', text: '#1D4ED8', dot: '#3B82F6' },
+  Expired:   { bg: '#F3E1CC', text: '#6F4423', dot: '#B98247' },
+  Requested: { bg: '#FEF3C7', text: '#B45309', dot: '#F59E0B' },
+  Approved:  { bg: '#DBEAFE', text: '#1D4ED8', dot: '#3B82F6' },
+  Refunded:  { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
+  Rejected:  { bg: '#FEE2E2', text: '#B91C1C', dot: '#EF4444' },
+};
+function statusPill(status) {
+  const s = statusStyle[status] || statusStyle.Pending;
+  return `<span class="status-pill" style="background:${s.bg};color:${s.text}"><span class="status-dot" style="background:${s.dot}"></span>${status}</span>`;
+}
+
+// ---------- Render: recent orders (Home) ----------
+function renderRecentOrders() {
+  const tbody = document.querySelector('#recent-orders-table tbody');
+  tbody.innerHTML = orders.slice(0, 5).map(o => `
+    <tr>
+      <td class="font-semibold text-coffee-800">${o.id}</td>
+      <td>${o.customer}</td>
+      <td class="text-coffee-500">${o.pack}</td>
+      <td class="font-semibold">${peso(o.total)}</td>
+      <td>${statusPill(o.status)}</td>
+    </tr>`).join('');
+}
+
+// ---------- Render: orders table (with search + filter) ----------
+let ordersStatusFilter = 'all';
+function renderOrders() {
+  const q = document.getElementById('orders-search').value.trim().toLowerCase();
+  const rows = orders.filter(o =>
+    (ordersStatusFilter === 'all' || o.status === ordersStatusFilter) &&
+    (o.id.toLowerCase().includes(q) || o.customer.toLowerCase().includes(q))
+  );
+  const tbody = document.querySelector('#orders-table tbody');
+  tbody.innerHTML = rows.map(o => `
+    <tr>
+      <td class="font-semibold text-coffee-800">${o.id}</td>
+      <td>${o.customer}</td>
+      <td class="text-coffee-500">${o.pack}</td>
+      <td class="text-coffee-500">${o.date}</td>
+      <td class="font-semibold">${peso(o.total)}</td>
+      <td>${statusPill(o.status)}</td>
+    </tr>`).join('');
+  document.getElementById('orders-empty').classList.toggle('hidden', rows.length > 0);
+}
+document.getElementById('orders-search').addEventListener('input', renderOrders);
+document.querySelectorAll('#orders-status-filter .status-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    ordersStatusFilter = btn.dataset.status;
+    document.querySelectorAll('#orders-status-filter .status-filter-btn').forEach(b => {
+      b.classList.remove('bg-coffee-800', 'text-white');
+      b.classList.add('text-coffee-500');
+    });
+    btn.classList.add('bg-coffee-800', 'text-white');
+    btn.classList.remove('text-coffee-500');
+    renderOrders();
+  });
+});
+
+// ---------- Render: products table ----------
+function renderProducts() {
+  const q = document.getElementById('products-search').value.trim().toLowerCase();
+  const rows = products.filter(p => p.name.toLowerCase().includes(q) || p.sub.toLowerCase().includes(q));
+  const tbody = document.querySelector('#products-table tbody');
+  tbody.innerHTML = rows.map(p => `
+    <tr>
+      <td>
+        <div class="flex items-center gap-3">
+          <img src="${p.img}" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="${p.name}">
+          <div>
+            <p class="font-semibold text-coffee-900">${p.name}</p>
+            <p class="text-xs text-coffee-400">${p.sub}</p>
+          </div>
+        </div>
+      </td>
+      <td class="font-semibold">${peso(p.price)}</td>
+      <td>${p.stock.toLocaleString('en-PH')}</td>
+      <td class="text-coffee-500">${p.sold.toLocaleString('en-PH')}</td>
+      <td>${statusPill(p.status)}</td>
+    </tr>`).join('');
+}
+document.getElementById('products-search').addEventListener('input', renderProducts);
+
+// ---------- Render: customers table ----------
+function renderCustomers() {
+  const q = document.getElementById('customers-search').value.trim().toLowerCase();
+  const rows = customers.filter(c => c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
+  const initials = n => n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const palette = ['#3B2114', '#6F4423', '#B47A15'];
+  const tbody = document.querySelector('#customers-table tbody');
+  tbody.innerHTML = rows.map((c, i) => `
+    <tr>
+      <td>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style="background:${palette[i % palette.length]}">${initials(c.name)}</div>
+          <p class="font-semibold text-coffee-900">${c.name}</p>
+        </div>
+      </td>
+      <td class="text-coffee-500">${c.email}</td>
+      <td>${c.orders}</td>
+      <td class="font-semibold">${peso(c.spent)}</td>
+      <td class="text-coffee-500">${c.joined}</td>
+    </tr>`).join('');
+}
+document.getElementById('customers-search').addEventListener('input', renderCustomers);
+
+// ---------- Render: distributor applications ----------
+let distributorsChannelFilter = 'all';
+function renderDistributors() {
+  const q = document.getElementById('distributors-search').value.trim().toLowerCase();
+  const rows = distributors.filter(d =>
+    (distributorsChannelFilter === 'all' || d.channel === distributorsChannelFilter) &&
+    (d.name.toLowerCase().includes(q) || d.email.toLowerCase().includes(q) || d.address.toLowerCase().includes(q))
+  );
+  const channelStyle = {
+    Lazada:  { bg: '#FFE4E0', text: '#C2410C' },
+    Shopee:  { bg: '#FFE4E9', text: '#BE185D' },
+    TikTok:  { bg: '#E9E9EA', text: '#18181B' },
+    Offline: { bg: '#F3E1CC', text: '#6F4423' },
+  };
+  const tbody = document.querySelector('#distributors-table tbody');
+  tbody.innerHTML = rows.map(d => {
+    const c = channelStyle[d.channel] || channelStyle.Offline;
+    return `
+    <tr>
+      <td class="font-semibold text-coffee-900">${d.name}</td>
+      <td>
+        <p class="text-coffee-800">${d.email}</p>
+        <p class="text-coffee-400 text-xs">${d.mobile}</p>
+      </td>
+      <td class="text-coffee-500">${d.address}</td>
+      <td><span class="status-pill" style="background:${c.bg};color:${c.text}">${d.channel}</span></td>
+      <td class="text-coffee-500">${d.applied}</td>
+      <td>
+        <a href="mailto:${d.email}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-coffee-50 text-coffee-500" title="Email ${d.name}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 6h18v12H3V6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m3 6 9 7 9-7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </a>
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('distributors-empty').classList.toggle('hidden', rows.length > 0);
+}
+document.getElementById('distributors-search').addEventListener('input', renderDistributors);
+document.querySelectorAll('#distributors-channel-filter .channel-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    distributorsChannelFilter = btn.dataset.channel;
+    document.querySelectorAll('#distributors-channel-filter .channel-filter-btn').forEach(b => {
+      b.classList.remove('bg-coffee-800', 'text-white');
+      b.classList.add('text-coffee-500');
+    });
+    btn.classList.add('bg-coffee-800', 'text-white');
+    btn.classList.remove('text-coffee-500');
+    renderDistributors();
+  });
+});
+
+// ---------- Render: vouchers ----------
+function voucherStatus(v) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (today < v.validFrom) return 'Scheduled';
+  if (today > v.validUntil) return 'Expired';
+  return 'Active';
+}
+function fmtDateRange(from, until) {
+  const opts = { month: 'short', day: 'numeric', year: 'numeric' };
+  const f = new Date(from + 'T00:00:00').toLocaleDateString('en-US', opts);
+  const u = new Date(until + 'T00:00:00').toLocaleDateString('en-US', opts);
+  return `${f} &ndash; ${u}`;
+}
+let vouchersStatusFilter = 'all';
+function renderVouchers() {
+  const q = document.getElementById('vouchers-search').value.trim().toLowerCase();
+  const rows = vouchers.filter(v => {
+    const status = voucherStatus(v);
+    return (vouchersStatusFilter === 'all' || status === vouchersStatusFilter) && v.code.toLowerCase().includes(q);
+  });
+  const tbody = document.querySelector('#vouchers-table tbody');
+  tbody.innerHTML = rows.map(v => {
+    const status = voucherStatus(v);
+    const discount = v.type === 'Percentage' ? `${v.amount}% off` : `${peso(v.amount)} off`;
+    return `
+    <tr>
+      <td class="font-mono font-bold text-coffee-900 tracking-wide">${v.code}</td>
+      <td class="text-coffee-700">${discount}</td>
+      <td class="text-coffee-500">${v.minSpend ? peso(v.minSpend) : '&mdash;'}</td>
+      <td class="text-coffee-500">${v.used} / ${v.limit}</td>
+      <td class="text-coffee-500">${fmtDateRange(v.validFrom, v.validUntil)}</td>
+      <td>${statusPill(status)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('vouchers-empty').classList.toggle('hidden', rows.length > 0);
+}
+document.getElementById('vouchers-search').addEventListener('input', renderVouchers);
+document.querySelectorAll('#vouchers-status-filter .voucher-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    vouchersStatusFilter = btn.dataset.status;
+    document.querySelectorAll('#vouchers-status-filter .voucher-filter-btn').forEach(b => {
+      b.classList.remove('bg-coffee-800', 'text-white');
+      b.classList.add('text-coffee-500');
+    });
+    btn.classList.add('bg-coffee-800', 'text-white');
+    btn.classList.remove('text-coffee-500');
+    renderVouchers();
+  });
+});
+
+// ---------- Create voucher (modal, in-memory only) ----------
+document.getElementById('voucher-create-btn').addEventListener('click', () => {
+  const code = prompt('Voucher code (e.g. HOLIDAY15):');
+  if (!code || !code.trim()) return;
+  const amountStr = prompt('Discount amount — a plain number.\nEnter a percent like 15 for 15% off, or a peso amount like 100 for ₱100 off:');
+  const amount = parseFloat(amountStr);
+  if (!amountStr || isNaN(amount) || amount <= 0) { alert('Enter a valid discount amount.'); return; }
+  const isPercent = confirm('Click OK for a Percentage discount, or Cancel for a Fixed ₱ amount off.');
+  const today = new Date().toISOString().slice(0, 10);
+  const untilDate = new Date();
+  untilDate.setDate(untilDate.getDate() + 14);
+  vouchers.unshift({
+    code: code.trim().toUpperCase(),
+    type: isPercent ? 'Percentage' : 'Fixed',
+    amount,
+    minSpend: 0,
+    used: 0,
+    limit: 100,
+    validFrom: today,
+    validUntil: untilDate.toISOString().slice(0, 10),
+  });
+  renderVouchers();
+});
+
+// ---------- Render: refunds & cancelled orders ----------
+let refundsStatusFilter = 'all';
+function renderRefunds() {
+  const q = document.getElementById('refunds-search').value.trim().toLowerCase();
+  const rows = refunds.filter(r =>
+    (refundsStatusFilter === 'all' || r.status === refundsStatusFilter) &&
+    (r.orderId.toLowerCase().includes(q) || r.customer.toLowerCase().includes(q))
+  );
+  const tbody = document.querySelector('#refunds-table tbody');
+  tbody.innerHTML = rows.map((r, i) => {
+    const idx = refunds.indexOf(r);
+    const actions = r.status === 'Requested'
+      ? `<div class="flex gap-2">
+           <button data-refund-approve="${idx}" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">Approve</button>
+           <button data-refund-reject="${idx}" class="text-xs font-bold text-red-600 hover:text-red-700">Reject</button>
+         </div>`
+      : '';
+    return `
+    <tr>
+      <td class="font-semibold text-coffee-800">${r.orderId}</td>
+      <td>${r.customer}</td>
+      <td class="text-coffee-500">${r.reason}</td>
+      <td class="font-semibold">${peso(r.amount)}</td>
+      <td class="text-coffee-500">${r.requested}</td>
+      <td>${statusPill(r.status)}</td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('refunds-empty').classList.toggle('hidden', rows.length > 0);
+  document.getElementById('refunds-nav-count').textContent = refunds.filter(r => r.status === 'Requested').length;
+
+  document.querySelectorAll('[data-refund-approve]').forEach(btn => {
+    btn.addEventListener('click', () => { refunds[+btn.dataset.refundApprove].status = 'Approved'; renderRefunds(); });
+  });
+  document.querySelectorAll('[data-refund-reject]').forEach(btn => {
+    btn.addEventListener('click', () => { refunds[+btn.dataset.refundReject].status = 'Rejected'; renderRefunds(); });
+  });
+}
+document.getElementById('refunds-search').addEventListener('input', renderRefunds);
+document.querySelectorAll('#refunds-status-filter .refund-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    refundsStatusFilter = btn.dataset.status;
+    document.querySelectorAll('#refunds-status-filter .refund-filter-btn').forEach(b => {
+      b.classList.remove('bg-coffee-800', 'text-white');
+      b.classList.add('text-coffee-500');
+    });
+    btn.classList.add('bg-coffee-800', 'text-white');
+    btn.classList.remove('text-coffee-500');
+    renderRefunds();
+  });
+});
+
+// ---------- Revenue bar chart ----------
+function renderChart(data) {
+  const svg = document.getElementById('revenue-chart');
+  const W = 560, H = 220, padL = 40, padB = 28, padT = 10;
+  const plotW = W - padL - 10, plotH = H - padB - padT;
+  const max = Math.max(...data.map(d => d.v));
+  const niceMax = Math.ceil(max / 2000) * 2000 || 1000;
+  const barW = data.length <= 6 ? 32 : 24;
+  const gap = (plotW - barW * data.length) / (data.length - 1 + 2);
+
+  const isDark = document.documentElement.classList.contains('dark');
+  const gridColor = isDark ? '#54331C' : '#F3E1CC';
+  const tickColor = isDark ? '#B98247' : '#B98247';
+  const labelColor = isDark ? '#D2A66B' : '#8B5A2B';
+
+  let gridSvg = '';
+  const ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const val = (niceMax / ticks) * i;
+    const y = padT + plotH - (val / niceMax) * plotH;
+    gridSvg += `<line x1="${padL}" y1="${y}" x2="${W - 6}" y2="${y}" stroke="${gridColor}" stroke-width="1"/>`;
+    gridSvg += `<text x="${padL - 8}" y="${y + 4}" font-size="10" fill="${tickColor}" text-anchor="end">${val >= 1000 ? (val/1000) + 'k' : val}</text>`;
+  }
+
+  let barsSvg = '';
+  data.forEach((d, i) => {
+    const x = padL + gap + i * (barW + gap);
+    const barH = (d.v / niceMax) * plotH;
+    const y = padT + plotH - barH;
+    barsSvg += `
+      <rect data-i="${i}" x="${x}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="#D4941F" class="chart-bar" style="cursor:pointer"/>
+      <text x="${x + barW/2}" y="${H - 8}" font-size="11" fill="${labelColor}" text-anchor="middle" font-weight="600">${d.label}</text>
+    `;
+  });
+
+  svg.innerHTML = gridSvg + barsSvg;
+
+  const tooltip = document.getElementById('bar-tooltip');
+  svg.querySelectorAll('.chart-bar').forEach(bar => {
+    bar.addEventListener('mouseenter', () => {
+      const i = +bar.dataset.i;
+      const d = data[i];
+      tooltip.textContent = `${d.label}: ${peso(d.v)}`;
+      tooltip.classList.remove('hidden');
+      const rect = bar.getBoundingClientRect();
+      const wrapRect = document.getElementById('chart-wrap').getBoundingClientRect();
+      tooltip.style.left = (rect.left - wrapRect.left + rect.width / 2) + 'px';
+      tooltip.style.top = (rect.top - wrapRect.top) + 'px';
+    });
+    bar.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
+  });
+}
+
+// ---------- Period switching (Daily / Weekly / Monthly reporting) ----------
+function fmtDelta(n) {
+  if (n === 0) return { text: '— 0.0%', color: '#8B5A2B' };
+  const arrow = n > 0 ? '↑' : '↓';
+  const color = n > 0 ? '#059669' : '#DC2626';
+  return { text: `${arrow} ${Math.abs(n).toFixed(1)}%`, color };
+}
+function applyPeriod(period) {
+  currentPeriod = period;
+  const p = PERIODS[period];
+
+  document.getElementById('home-subtitle').textContent = p.subtitle;
+  document.getElementById('chart-title').textContent = p.chart.title;
+  document.getElementById('chart-note').textContent = p.chart.note;
+
+  const statMap = { revenue: 'stat-revenue', orders: 'stat-orders', customers: 'stat-customers', boxes: 'stat-boxes' };
+  Object.entries(statMap).forEach(([key, idPrefix]) => {
+    const s = p.stats[key];
+    const valueEl = document.getElementById(idPrefix);
+    valueEl.textContent = key === 'revenue' ? peso(s.value) : s.value.toLocaleString('en-PH');
+    const deltaEl = document.getElementById(idPrefix + '-delta');
+    const { text, color } = fmtDelta(s.delta);
+    deltaEl.textContent = text;
+    deltaEl.style.color = color;
+    document.getElementById(idPrefix + '-period').textContent = p.periodLabel;
+  });
+
+  document.querySelectorAll('#period-filter .period-btn').forEach(b => b.classList.toggle('active', b.dataset.period === period));
+  renderChart(p.chart.data);
+}
+document.querySelectorAll('#period-filter .period-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyPeriod(btn.dataset.period));
+});
+
+// ---------- Nav switching ----------
+const navBtns = document.querySelectorAll('.nav-btn[data-view]');
+const views = {
+  home: document.getElementById('view-home'),
+  orders: document.getElementById('view-orders'),
+  products: document.getElementById('view-products'),
+  customers: document.getElementById('view-customers'),
+  distributors: document.getElementById('view-distributors'),
+  vouchers: document.getElementById('view-vouchers'),
+  refunds: document.getElementById('view-refunds'),
+  settings: document.getElementById('view-settings'),
+};
+function goToView(name) {
+  if (!views[name]) return;
+  navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  Object.entries(views).forEach(([k, el]) => el.classList.toggle('hidden', k !== name));
+  window.scrollTo({ top: 0 });
+}
+navBtns.forEach(btn => {
+  if (btn.hasAttribute('disabled')) return;
+  btn.addEventListener('click', () => goToView(btn.dataset.view));
+});
+document.querySelectorAll('[data-goto]').forEach(btn => {
+  btn.addEventListener('click', () => goToView(btn.dataset.goto));
+});
+
+// ---------- Theme (Light / Dark) ----------
+const THEME_KEY = 'kopify-admin-theme';
+function applyTheme(mode, opts = {}) {
+  document.documentElement.classList.toggle('dark', mode === 'dark');
+  localStorage.setItem(THEME_KEY, mode);
+  document.getElementById('theme-icon-sun').classList.toggle('hidden', mode === 'dark');
+  document.getElementById('theme-icon-moon').classList.toggle('hidden', mode !== 'dark');
+  document.querySelectorAll('.theme-choice-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === mode));
+  if (!opts.skipChartRedraw && PERIODS[currentPeriod]) renderChart(PERIODS[currentPeriod].chart.data);
+}
+const storedTheme = localStorage.getItem(THEME_KEY);
+const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(storedTheme || (systemPrefersDark ? 'dark' : 'light'), { skipChartRedraw: true });
+document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+  applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+});
+document.querySelectorAll('.theme-choice-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+});
+
+// ---------- Init ----------
+renderRecentOrders();
+renderOrders();
+renderProducts();
+renderCustomers();
+renderDistributors();
+renderVouchers();
+renderRefunds();
+applyPeriod('monthly');
+document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
+document.getElementById('dist-nav-count').textContent = distributors.length;
+
+// ---------- Auth ----------
+document.getElementById('settings-account-email').textContent = localStorage.getItem('kopify-admin-email') || 'admin@kopify.ph';
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('kopify-admin-authed');
+  window.location.href = 'admin-login.html';
+});
+</script>
+</body>
+</html>

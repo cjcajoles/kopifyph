@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout | Kopify PH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Poppins', 'sans-serif'] },
+        colors: {
+          coffee: {
+            50:  '#FBF3EA', 100: '#F3E1CC', 200: '#E4C79E', 300: '#D2A66B', 400: '#B98247',
+            500: '#8B5A2B', 600: '#6F4423', 700: '#54331C', 800: '#3B2114', 900: '#2A170D'
+          },
+          gold: { 50: '#FDF7EC', 100: '#FBF0DC', 300: '#F1D28C', 400: '#E8B35C', 500: '#D4941F', 600: '#B47A15' }
+        },
+        boxShadow: { card: '0 10px 30px -10px rgba(59, 33, 20, 0.12)' }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Poppins', sans-serif; }
+  select:disabled, input:disabled { background:#F9F5EF; color:#B98247; cursor:not-allowed; }
+  .field-label { display:block; font-size:.8125rem; font-weight:600; color:#54331C; margin-bottom:.25rem; }
+  .field-input { width:100%; border-radius:.75rem; border:1px solid #E4C79E; padding:.7rem 1rem; font-size:.875rem; background:#fff; }
+  .field-input:focus { outline:none; box-shadow:0 0 0 2px #E8B35C; border-color:#E8B35C; }
+  .pay-option { border:1.5px solid #E4C79E; border-radius:1rem; padding:.9rem 1rem; display:flex; align-items:center; gap:.75rem; cursor:pointer; transition:border-color .15s,background .15s; }
+  .pay-option:has(input:checked) { border-color:#D4941F; background:#FDF7EC; }
+</style>
+</head>
+<body class="bg-coffee-50 text-coffee-900">
+
+<header class="w-full py-4 px-4 flex items-center justify-center bg-coffee-900 relative">
+  <a href="index.html" class="flex items-center gap-2.5">
+    <div class="rounded-full w-10 h-10 shrink-0 flex items-center justify-center p-1.5" style="background:#C79A5D">
+      <svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.55"/>
+        <path d="M40 28c-3-4 3-6 0-10M50 26c-3-4 3-6 0-10M60 28c-3-4 3-6 0-10" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M28 40h36v15a18 18 0 0 1-18 18 18 18 0 0 1-18-18V40Z" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M64 44h6.5a7.5 7.5 0 0 1 0 15H64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        <path d="M22 68h48" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="text-left leading-tight">
+      <span class="block text-lg font-extrabold tracking-tight text-white">Kopify</span>
+      <span class="block text-[10px] tracking-wide text-gold-300 font-bold">How coffee should be</span>
+    </span>
+  </a>
+  <span class="hidden sm:flex items-center gap-1.5 absolute right-4 text-gold-300 text-xs font-bold">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8"/></svg>
+    Secure Checkout
+  </span>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 py-8 sm:py-12">
+
+  <!-- ============ ORDER FORM (default state) ============ -->
+  <div id="checkout-form-state">
+    <a href="index.html" class="inline-flex items-center gap-1.5 text-coffee-500 hover:text-coffee-700 text-sm font-semibold mb-6">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Kopify
+    </a>
+
+    <div class="grid lg:grid-cols-5 gap-8 items-start">
+
+      <!-- Left: form -->
+      <form id="checkout-form" novalidate class="lg:col-span-3 space-y-6">
+
+        <div class="bg-white rounded-3xl shadow-card p-6 sm:p-7">
+          <h2 class="font-extrabold text-lg text-coffee-900 mb-4">Contact Information</h2>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="field-label" for="co-name">Full Name*</label>
+              <input id="co-name" name="name" type="text" required class="field-input" placeholder="Juan Dela Cruz">
+            </div>
+            <div>
+              <label class="field-label" for="co-email">Email*</label>
+              <input id="co-email" name="email" type="email" required class="field-input" placeholder="juan@email.com">
+            </div>
+            <div>
+              <label class="field-label" for="co-mobile">Cell Number*</label>
+              <input id="co-mobile" name="mobile" type="tel" required class="field-input" placeholder="0917 123 4567">
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-card p-6 sm:p-7">
+          <h2 class="font-extrabold text-lg text-coffee-900 mb-1">Shipping Address</h2>
+          <p class="text-xs text-coffee-400 mb-4">Choose your Region, then Province, then City/Municipality, then Barangay &mdash; each list narrows once its parent is picked.</p>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="field-label" for="co-address">House / Unit No., Street, Subdivision*</label>
+              <input id="co-address" name="address" type="text" required class="field-input" placeholder="e.g. 12A Magnolia Street">
+            </div>
+            <div>
+              <label class="field-label" for="co-region">Region*</label>
+              <select id="co-region" name="region" required class="field-input">
+                <option value="" selected disabled>Loading regions&hellip;</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="co-province">Province*</label>
+              <select id="co-province" name="province" required class="field-input" disabled>
+                <option value="" selected disabled>Select Region first</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="co-city">City / Municipality*</label>
+              <select id="co-city" name="city" required class="field-input" disabled>
+                <option value="" selected disabled>Select Province first</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="co-barangay">Barangay*</label>
+              <select id="co-barangay" name="barangay" required class="field-input" disabled>
+                <option value="" selected disabled>Select City first</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="co-zip">ZIP Code <span class="font-normal text-coffee-400">(optional)</span></label>
+              <input id="co-zip" name="zip" type="text" inputmode="numeric" maxlength="4" class="field-input" placeholder="1870">
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-card p-6 sm:p-7">
+          <h2 class="font-extrabold text-lg text-coffee-900 mb-4">Payment Method</h2>
+          <div class="space-y-3">
+            <label class="pay-option">
+              <input type="radio" name="payment" value="GCash" checked class="accent-gold-500 w-4 h-4">
+              <span class="text-sm font-semibold flex-1">GCash</span>
+              <span class="text-xs text-coffee-400">Instant e-wallet</span>
+            </label>
+            <label class="pay-option">
+              <input type="radio" name="payment" value="Bank Transfer" class="accent-gold-500 w-4 h-4">
+              <span class="text-sm font-semibold flex-1">Bank Transfer</span>
+              <span class="text-xs text-coffee-400">BPI / BDO / UnionBank</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 active:scale-[0.98] transition rounded-full text-white font-bold py-4 text-lg shadow-card">
+          Place My Order &rarr;
+        </button>
+        <p class="text-xs text-coffee-400 text-center">By placing your order, you agree to Kopify's Terms and Privacy Policy.</p>
+      </form>
+
+      <!-- Right: order summary -->
+      <div class="lg:col-span-2 lg:sticky lg:top-8">
+        <div class="bg-white rounded-3xl shadow-card p-6 sm:p-7">
+          <h2 class="font-extrabold text-lg text-coffee-900 mb-4">Order Summary</h2>
+          <div class="flex items-center gap-4 pb-4 border-b border-coffee-100">
+            <img id="summary-img" src="./assets/pack-1box.jpg" alt="" class="w-16 h-16 rounded-xl object-contain bg-coffee-50 border border-coffee-100 shrink-0">
+            <div class="flex-1 min-w-0">
+              <p id="summary-name" class="font-bold text-coffee-900">1 x Box</p>
+              <p id="summary-sub" class="text-xs text-coffee-400">10 Sachets Inside</p>
+            </div>
+            <p id="summary-price" class="font-bold text-coffee-900">&#8369;399</p>
+          </div>
+          <div class="py-4 space-y-2 text-sm border-b border-coffee-100">
+            <div class="flex justify-between text-coffee-600">
+              <span>Subtotal</span>
+              <span id="summary-subtotal">&#8369;399</span>
+            </div>
+            <div class="flex justify-between text-coffee-600">
+              <span>Shipping</span>
+              <span id="summary-shipping">&#8369;80</span>
+            </div>
+          </div>
+          <div class="flex justify-between items-center pt-4">
+            <span class="font-bold text-coffee-900">Total</span>
+            <span id="summary-total" class="text-2xl font-extrabold text-coffee-900">&#8369;479</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ CONFIRMATION (post-submit state) ============ -->
+  <div id="checkout-confirm-state" class="hidden max-w-lg mx-auto text-center py-10">
+    <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-5">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" class="text-emerald-600"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h1 class="text-2xl font-extrabold text-coffee-900 mb-2">Salamat, <span id="confirm-name">Juan</span>!</h1>
+    <p class="text-coffee-500 mb-6">Your order <span id="confirm-order-id" class="font-bold text-coffee-800">#KPY10232</span> has been placed. We'll text/email you once it ships to <span id="confirm-address" class="font-semibold text-coffee-700"></span>.</p>
+    <div class="bg-white rounded-2xl shadow-card p-6 text-left mb-6">
+      <div class="flex justify-between text-sm mb-2"><span class="text-coffee-500">Pack</span><span id="confirm-pack" class="font-semibold text-coffee-900">1 x Box</span></div>
+      <div class="flex justify-between text-sm mb-2"><span class="text-coffee-500">Payment</span><span id="confirm-payment" class="font-semibold text-coffee-900">GCash</span></div>
+      <div class="flex justify-between text-sm pt-2 border-t border-coffee-100"><span class="text-coffee-700 font-bold">Total</span><span id="confirm-total" class="font-bold text-coffee-900">&#8369;479</span></div>
+    </div>
+    <a href="index.html" class="inline-block bg-coffee-800 hover:bg-coffee-700 transition rounded-full text-white font-bold px-8 py-3.5">Back to Kopify</a>
+  </div>
+
+</main>
+
+<script>
+  // ===== Pack data (mirrors the 3 pricing cards on index.html) =====
+  const PACKS = {
+    '1':  { label: '1 x Box',   sub: '10 Sachets Inside',            price: 399,  img: './assets/pack-1box.jpg' },
+    '3':  { label: '3 Boxes',   sub: 'Family Pack',                  price: 1097, img: './assets/pack-3boxes.jpg' },
+    '10': { label: '10 Boxes',  sub: 'Kopifyholic Bundle',           price: 3790, img: './assets/pack-10boxes.jpg' },
+  };
+  const SHIPPING_FEE = 80;
+  const peso = n => '₱' + n.toLocaleString('en-PH');
+
+  const params = new URLSearchParams(window.location.search);
+  const packKey = PACKS[params.get('pack')] ? params.get('pack') : '1';
+  const pack = PACKS[packKey];
+
+  document.getElementById('summary-img').src = pack.img;
+  document.getElementById('summary-img').alt = pack.label;
+  document.getElementById('summary-name').textContent = pack.label;
+  document.getElementById('summary-sub').textContent = pack.sub;
+  document.getElementById('summary-price').textContent = peso(pack.price);
+  document.getElementById('summary-subtotal').textContent = peso(pack.price);
+  document.getElementById('summary-shipping').textContent = peso(SHIPPING_FEE);
+  document.getElementById('summary-total').textContent = peso(pack.price + SHIPPING_FEE);
+
+  // ===== PH Region / Province / City / Barangay cascading dropdowns =====
+  const regionSel = document.getElementById('co-region');
+  const provinceSel = document.getElementById('co-province');
+  const citySel = document.getElementById('co-city');
+  const barangaySel = document.getElementById('co-barangay');
+
+  // Options are {value, label} pairs — value is the PSGC code (stable, collision-free join
+  // key), label is what the shopper sees. Selecting by code avoids the classic bug where two
+  // different provinces both have a city/municipality named e.g. "San Juan" or "San Isidro".
+  function setOptions(select, items, placeholder) {
+    select.innerHTML = `<option value="" selected disabled>${placeholder}</option>` +
+      items.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+  }
+  function selectedLabel(select) {
+    return select.options[select.selectedIndex]?.textContent || '';
+  }
+  function resetDownstream(fromLevel) {
+    if (fromLevel <= 2) { provinceSel.disabled = true; setOptions(provinceSel, [], 'Select Region first'); }
+    if (fromLevel <= 3) { citySel.disabled = true; setOptions(citySel, [], 'Select Province first'); }
+    if (fromLevel <= 4) { barangaySel.disabled = true; setOptions(barangaySel, [], 'Select City first'); }
+  }
+
+  let PH = null;
+  const NCR_MARKER = 'NCR_NO_PROVINCE';
+
+  function initAddressData(data) {
+    PH = data;
+    const regionItems = PH.regions
+      .map(r => ({ value: r.code, label: r.name }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    setOptions(regionSel, regionItems, 'Select Region');
+    regionSel.disabled = false;
+  }
+
+  regionSel.addEventListener('change', () => {
+    resetDownstream(2);
+    const provinces = PH.provinces.filter(p => p.regionCode === regionSel.value);
+    // A handful of regions (NCR chief among them) have no province tier at all — their
+    // cities sit directly under the region. Surface that as a single pass-through option
+    // rather than leaving Province looking broken with nothing to pick.
+    const provinceItems = provinces.length
+      ? provinces.map(p => ({ value: p.code, label: p.name })).sort((a, b) => a.label.localeCompare(b.label))
+      : [{ value: NCR_MARKER + '|' + regionSel.value, label: `${selectedLabel(regionSel)} (no province tier)` }];
+    setOptions(provinceSel, provinceItems, 'Select Province');
+    provinceSel.disabled = false;
+  });
+
+  provinceSel.addEventListener('change', () => {
+    resetDownstream(3);
+    const provinceCode = provinceSel.value.startsWith(NCR_MARKER) ? provinceSel.value.split('|')[1] : provinceSel.value;
+    const cityItems = PH.municipalities
+      .filter(m => m.provinceCode === provinceCode)
+      .map(m => ({ value: m.code, label: m.name }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    setOptions(citySel, cityItems, 'Select City / Municipality');
+    citySel.disabled = false;
+  });
+
+  citySel.addEventListener('change', () => {
+    resetDownstream(4);
+    let barangayItems = PH.barangays
+      .filter(b => b.code === citySel.value)
+      .map(b => ({ value: b.name, label: b.name }));
+    // Manila (and a couple of similarly-structured highly-urbanized cities) has no barangays
+    // hanging directly off the city itself — its 16 districts (Tondo, Sampaloc, Ermita, ...)
+    // are modeled as their own PSGC level in between, each holding the real barangays. When a
+    // city has no direct barangays, pull its districts' barangays instead and label each with
+    // its district so the list still reads clearly.
+    if (!barangayItems.length) {
+      const districts = PH.municipalities.filter(m => m.provinceCode === citySel.value);
+      barangayItems = districts.flatMap(d =>
+        PH.barangays.filter(b => b.code === d.code).map(b => ({ value: b.name, label: `${b.name} (${d.name})` }))
+      );
+    }
+    barangayItems.sort((a, b) => a.label.localeCompare(b.label));
+    if (!barangayItems.length) {
+      barangayItems = [{ value: '(see Address field)', label: 'Not listed — I typed it in the Address field above' }];
+    }
+    setOptions(barangaySel, barangayItems, 'Select Barangay');
+    barangaySel.disabled = false;
+  });
+
+  // Preview builds inline the ~1.8MB PH address dataset directly into the page (see build
+  // script); the real deployed site instead fetches it lazily so index.html/checkout.html's
+  // own initial payload stays lightweight.
+  const inlineData = document.getElementById('ph-address-data');
+  if (inlineData) {
+    initAddressData(JSON.parse(inlineData.textContent));
+  } else {
+    fetch('./assets/ph-address.json')
+      .then(r => r.json())
+      .then(initAddressData)
+      .catch(() => setOptions(regionSel, [], 'Could not load regions — refresh?'));
+  }
+
+  // ===== Submit =====
+  const form = document.getElementById('checkout-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    let valid = true;
+    [form.name, form.email, form.mobile, form.address, regionSel, provinceSel, citySel, barangaySel].forEach((field) => {
+      if (!field.value || !field.value.trim()) {
+        valid = false;
+        field.classList.add('ring-2', 'ring-red-400');
+      } else {
+        field.classList.remove('ring-2', 'ring-red-400');
+      }
+    });
+    if (!valid) return;
+
+    const provinceLabel = provinceSel.value.startsWith(NCR_MARKER) ? selectedLabel(regionSel) : selectedLabel(provinceSel);
+    const fullAddress = `${form.address.value.trim()}, Brgy. ${barangaySel.value}, ${selectedLabel(citySel)}, ${provinceLabel}`;
+    const orderId = '#KPY' + Math.floor(10000 + Math.random() * 89999);
+    const paymentMethod = form.querySelector('input[name="payment"]:checked').value;
+
+    document.getElementById('confirm-name').textContent = form.name.value.trim().split(' ')[0];
+    document.getElementById('confirm-order-id').textContent = orderId;
+    document.getElementById('confirm-address').textContent = fullAddress;
+    document.getElementById('confirm-pack').textContent = pack.label;
+    document.getElementById('confirm-payment').textContent = paymentMethod;
+    document.getElementById('confirm-total').textContent = peso(pack.price + SHIPPING_FEE);
+
+    document.getElementById('checkout-form-state').classList.add('hidden');
+    document.getElementById('checkout-confirm-state').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>

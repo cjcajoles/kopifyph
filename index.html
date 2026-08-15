@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Kopify">
-<link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
-<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAACt0lEQVR42u3cwQ2DMBQFQRdBA6mDVuiSptJFIopAGO8g7T16/nPNGBN9+2f7qdEofh5eKSAeUkkQHkxJCB5ISQgeRFkIHkFJBIZXFoKxlUVgZGURGFdZBEZVFoExlUVgRGURGE9pBIZTFoDRlEVgLKURGEpZAEZSGoGBlAVgHKURGEZZAEZRGoFBBIAEgBQDYAylERhCAEgASABIAEgASABICwMwggCQAJAAkACQAJAAkACQAJAAeLDvedxa8fFtBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICDBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwEEDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABzA/BPFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAswO4+/cAAAAADhQAAAQAAAIAAAEAgAAAQAAAIAAAEAAACAAABIB/hRAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAACAAAAABgleMBBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgfgw2AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQDpCQDXZwgBIAEgASABIAEgASABIK0LAAKljx8AAWAQASBFAUCg9PEDoDwACJQ+fgCUBwCB0scPgPIAIFD6+CFQ/vgBUB4ABEofPwTKHz8Eyh8/BMofPwTKHz8Eyh8/BMofPwjKHz4EcvwgyOGDIIcPghw+EHrbwf8BL1b5yLDV27gAAAAASUVORK5CYII=">
+<link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAACt0lEQVR42u3cwQ2DMBQFQRdBA6mDVuiSptJFIopAGO8g7T16/nPNGBN9+2f7qdEofh5eKSAeUkkQHkxJCB5ISQgeRFkIHkFJBIZXFoKxlUVgZGURGFdZBEZVFoExlUVgRGURGE9pBIZTFoDRlEVgLKURGEpZAEZSGoGBlAVgHKURGEZZAEZRGoFBBIAEgBQDYAylERhCAEgASABIAEgASABICwMwggCQAJAAkACQAJAAkACQAJAAeLDvedxa8fFtBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICDBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwEEDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABzA/BPFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAswO4+/cAAAAADhQAAAQAAAIAAAEAgAAAQAAAIAAAEAAACAAABIB/hRAAAAgAAAQAAAIAAAEAgAAAQAAAIAAAEAAACAAAAABgleMBBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgfgw2AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQDpCQDXZwgBIAEgASABIAEgASABIK0LAAKljx8AAWAQASBFAUCg9PEDoDwACJQ+fgCUBwCB0scPgPIAIFD6+CFQ/vgBUB4ABEofPwTKHz8Eyh8/BMofPwTKHz8Eyh8/BMofPwjKHz4EcvwgyOGDIIcPghw+EHrbwf8BL1b5yLDV27gAAAAASUVORK5CYII=">
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,6 +46,9 @@
             400: '#E8B35C',
             500: '#D4941F',
             600: '#B47A15'
+          },
+          band: {
+            DEFAULT: '#F6C445'
           }
         },
         boxShadow: {
@@ -104,10 +107,22 @@
 <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=REPLACE_ME&ev=PageView&noscript=1" /></noscript>
 
 <!-- ================= NAV / LOGO BAR ================= -->
-<header class="w-full py-4 px-4 flex justify-center border-b border-coffee-100">
-  <a href="#top" class="flex items-center gap-2">
-    <div class="placeholder-img rounded-full w-11 h-11 text-[10px] shrink-0"><!-- TODO: swap for logo CDN image 66d8a361f7a6d74b9c9eb22b.png -->LOGO</div>
-    <span class="text-xl font-extrabold tracking-tight text-coffee-800">Kopify<span class="text-gold-500">PH</span></span>
+<!-- TODO: logo icon below is a hand-recreated SVG approximation of the real Kopify mark (built from a screenshot, not the source file) — swap for the real logo asset if/when you can share it as an uploaded file rather than a pasted image, for a pixel-exact match. -->
+<header class="w-full py-4 px-4 flex justify-center bg-coffee-900">
+  <a href="#top" class="flex items-center gap-2.5">
+    <div class="rounded-full w-11 h-11 shrink-0 flex items-center justify-center p-1.5" style="background:#C79A5D">
+      <svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.55"/>
+        <path d="M40 28c-3-4 3-6 0-10M50 26c-3-4 3-6 0-10M60 28c-3-4 3-6 0-10" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <path d="M28 40h36v15a18 18 0 0 1-18 18 18 18 0 0 1-18-18V40Z" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M64 44h6.5a7.5 7.5 0 0 1 0 15H64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        <path d="M22 68h48" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="text-left leading-tight">
+      <span class="block text-xl font-extrabold tracking-tight text-white">Kopify</span>
+      <span class="block text-[10px] tracking-wide text-gold-300 font-bold">How coffee should be</span>
+    </span>
   </a>
 </header>
 
@@ -121,300 +136,292 @@
   <h1 class="text-3xl sm:text-5xl font-extrabold leading-tight text-coffee-800 mb-4">
     A rich, organic coffee without the worry of palpitations or acid reflux?
   </h1>
-  <p class="text-lg sm:text-xl font-semibold text-coffee-600 mb-7">
+  <p class="text-lg sm:text-xl font-semibold text-coffee-600 italic mb-8">
     WITHOUT Junk Sugar, Low Calorie, 100% Organic!
   </p>
 
-  <a href="#pricing" class="inline-block bg-gold-500 hover:bg-gold-600 active:scale-[0.98] transition rounded-full text-white font-bold text-lg px-10 py-4 shadow-card">
-    Order Kopify Here!
+  <div class="relative max-w-sm mx-auto aspect-square rounded-3xl overflow-hidden shadow-card bg-gold-400">
+    <video id="hero-video" class="w-full h-full object-cover" poster="./assets/hero-video-poster.jpg" playsinline preload="metadata"></video>
+    <button id="hero-video-play" type="button" aria-label="Play video" class="absolute inset-0 flex items-center justify-center">
+      <span class="w-14 h-14 rounded-xl bg-black/40 flex items-center justify-center">
+        <svg viewBox="0 0 24 24" class="w-6 h-6 text-white ml-0.5"><path d="M8 5v14l11-7Z" fill="currentColor"/></svg>
+      </span>
+    </button>
+  </div>
+
+  <a href="#pricing" class="mt-6 block max-w-sm mx-auto rounded-2xl bg-coffee-900 hover:bg-coffee-800 active:scale-[0.98] transition shadow-card overflow-hidden">
+    <span class="block px-6 py-4">
+      <span class="block text-white font-extrabold text-lg leading-snug">Your coffee is boring. Kopify to the rescue!</span>
+      <span class="block text-gold-300 text-sm font-semibold mt-1">Order Kopify Here!</span>
+    </span>
+    <span class="block h-1.5 bg-gold-500"></span>
   </a>
-  <p class="mt-3 text-sm text-coffee-500 font-medium">
+
+  <p class="mt-5 text-sm text-coffee-500 font-medium">
     Alert! Kopify is flying off the shelves &ndash; grab yours before it's gone!
   </p>
-
-  <div class="mt-10 max-w-sm mx-auto aspect-square rounded-3xl overflow-hidden shadow-card">
-    <img src="" alt="Kopify hero product" class="w-full h-full object-cover placeholder-img"
-         onerror="this.classList.add('placeholder-img')"
-         data-fallback-label="Hero Product GIF">
-    <!-- TODO: swap src for CDN gif 66b1968edd126b4b7fe1b20e.gif -->
-  </div>
+  <div class="mt-3 max-w-xs mx-auto scarcity-bar" data-filled="17" data-total="18"></div>
 </section>
 
 <!-- ================= 2. PRODUCT INTRO ================= -->
-<section class="px-4 py-12 bg-coffee-50">
+<section class="px-4 py-12 bg-band">
   <div class="max-w-3xl mx-auto text-center">
-    <h2 class="text-2xl sm:text-3xl font-bold text-coffee-800 leading-snug mb-8">
+    <h2 class="text-2xl sm:text-3xl font-bold italic text-coffee-900 leading-snug mb-8">
       Experience the perfect cup with Kopify &ndash; an organic coffee blend crafted with rich flavor without the jitters or acidity, designed to keep your heart and taste buds happy!
     </h2>
-    <div class="max-w-md mx-auto aspect-[4/3] rounded-3xl placeholder-img shadow-card">
-      Product Image
-      <!-- TODO: swap for CDN product image -->
+    <div class="max-w-md mx-auto rounded-3xl shadow-card overflow-hidden">
+      <img src="./assets/product-intro.jpg" alt="Kopify 20-in-1 Coffee Mix pouch with scattered coffee beans — Not Your Ordinary Coffee" class="w-full h-auto">
     </div>
   </div>
 </section>
 
 <!-- ================= 3. BENEFITS GRID ================= -->
-<section class="px-4 py-14 max-w-6xl mx-auto">
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<section class="px-4 py-14 bg-band">
+  <div class="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
 
     <!-- Card 1 -->
-    <div class="rounded-2xl border border-coffee-100 p-6 text-center shadow-sm hover:shadow-card transition">
-      <div class="mx-auto mb-4 w-14 h-14 rounded-full bg-coffee-800 flex items-center justify-center text-gold-400">
-        <svg viewBox="0 0 24 24" fill="none" class="w-7 h-7"><path d="M4 14c0-4 3-8 8-10 5 2 8 6 8 10a8 8 0 1 1-16 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-      </div>
-      <h3 class="font-bold text-lg mb-1">Low Calorie Coffee</h3>
-      <p class="text-coffee-600 text-sm">Low calorie coffee that helps manage daily caloric intake without sacrificing flavor</p>
+    <div class="text-center">
+      <img src="./assets/benefit-lowcalorie.jpg" alt="Steaming cup of Kopify coffee" class="mx-auto mb-4 w-36 h-24 sm:w-40 sm:h-28 object-cover shadow-card" style="border-radius:50%">
+      <h3 class="font-extrabold text-lg mb-1 text-coffee-900">Low Calorie Coffee</h3>
+      <p class="text-coffee-800 text-sm">Low calorie coffee that helps manage daily caloric intake without sacrificing flavor</p>
     </div>
 
     <!-- Card 2 -->
-    <div class="rounded-2xl border border-coffee-100 p-6 text-center shadow-sm hover:shadow-card transition">
-      <div class="mx-auto mb-4 w-14 h-14 rounded-full bg-coffee-800 flex items-center justify-center text-gold-400">
-        <svg viewBox="0 0 24 24" fill="none" class="w-7 h-7"><path d="M12 21s-7-4.35-9.5-9C.7 8.2 2.6 4 6.5 4 9 4 11 5.7 12 7c1-1.3 3-3 5.5-3 3.9 0 5.8 4.2 4 8-2.5 4.65-9.5 9-9.5 9Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      </div>
-      <h3 class="font-bold text-lg mb-1">No Acid Reflux</h3>
-      <p class="text-coffee-600 text-sm">Gentle on the stomach kaya nababawasan ang acid reflux</p>
+    <div class="text-center">
+      <img src="./assets/benefit-acidreflux.jpg" alt="Stomach-friendly Kopify coffee" class="mx-auto mb-4 w-36 h-24 sm:w-40 sm:h-28 object-cover shadow-card" style="border-radius:50%">
+      <h3 class="font-extrabold text-lg mb-1 text-coffee-900">No Acid Reflux</h3>
+      <p class="text-coffee-800 text-sm">Gentle on the stomach kaya nababawasan ang acid reflux</p>
     </div>
 
     <!-- Card 3 -->
-    <div class="rounded-2xl border border-coffee-100 p-6 text-center shadow-sm hover:shadow-card transition">
-      <div class="mx-auto mb-4 w-14 h-14 rounded-full bg-coffee-800 flex items-center justify-center text-gold-400">
-        <svg viewBox="0 0 24 24" fill="none" class="w-7 h-7"><path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 1 0-7.6 7.6L12 20.8l8.8-8.6a5.4 5.4 0 0 0 0-7.6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 11h4l1.5-3L11 14l1.5-4 1.5 2h4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-      </div>
-      <h3 class="font-bold text-lg mb-1">No Palpitation</h3>
-      <p class="text-coffee-600 text-sm">Reduces heart palpitations from caffeine</p>
+    <div class="text-center">
+      <img src="./assets/benefit-palpitation.jpg" alt="Heart-friendly Kopify coffee" class="mx-auto mb-4 w-36 h-24 sm:w-40 sm:h-28 object-cover shadow-card" style="border-radius:50%">
+      <h3 class="font-extrabold text-lg mb-1 text-coffee-900">No Palpitation</h3>
+      <p class="text-coffee-800 text-sm">Reduces heart palpitations from caffeine</p>
     </div>
 
     <!-- Card 4 -->
-    <div class="rounded-2xl border border-coffee-100 p-6 text-center shadow-sm hover:shadow-card transition">
-      <div class="mx-auto mb-4 w-14 h-14 rounded-full bg-coffee-800 flex items-center justify-center text-gold-400">
-        <svg viewBox="0 0 24 24" fill="none" class="w-7 h-7"><circle cx="12" cy="13" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M9 7c0-2 1.3-3.5 3-4M9.5 13a2.5 2.5 0 0 0 5 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      </div>
-      <h3 class="font-bold text-lg mb-1">No More Bloating</h3>
-      <p class="text-coffee-600 text-sm">Helps prevent bloating and stomach upset commonly associated with other coffees.</p>
+    <div class="text-center">
+      <img src="./assets/benefit-bloating.jpg" alt="No more bloating icon" class="mx-auto mb-4 w-36 h-24 sm:w-40 sm:h-28 object-contain bg-white shadow-card" style="border-radius:50%">
+      <h3 class="font-extrabold text-lg mb-1 text-coffee-900">No More Bloating</h3>
+      <p class="text-coffee-800 text-sm">Helps prevent bloating and stomach upset commonly associated with other coffees.</p>
     </div>
 
     <!-- Card 5 -->
-    <div class="rounded-2xl border border-coffee-100 p-6 text-center shadow-sm hover:shadow-card transition">
-      <div class="mx-auto mb-4 w-14 h-14 rounded-full bg-coffee-800 flex items-center justify-center text-gold-400">
-        <svg viewBox="0 0 24 24" fill="none" class="w-7 h-7"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-      </div>
-      <h3 class="font-bold text-lg mb-1">No More Jitters</h3>
-      <p class="text-coffee-600 text-sm">Provides a smooth caffeine boost without the shaky feeling often caused by regular coffee</p>
+    <div class="text-center">
+      <img src="./assets/benefit-jitters.jpg" alt="No jitters icon" class="mx-auto mb-4 w-36 h-24 sm:w-40 sm:h-28 object-contain bg-white shadow-card" style="border-radius:50%">
+      <h3 class="font-extrabold text-lg mb-1 text-coffee-900">No More Jitters</h3>
+      <p class="text-coffee-800 text-sm">Provides a smooth caffeine boost without the shaky feeling often caused by regular coffee</p>
     </div>
 
     <!-- Card 6 -->
-    <div class="rounded-2xl border border-coffee-100 p-6 text-center shadow-sm hover:shadow-card transition">
-      <div class="mx-auto mb-4 w-14 h-14 rounded-full bg-coffee-800 flex items-center justify-center text-gold-400">
-        <svg viewBox="0 0 24 24" fill="none" class="w-7 h-7"><path d="M12 3c3 3 6 6.5 6 10.5a6 6 0 1 1-12 0C6 9.5 9 6 12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 22h5M12 19v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      </div>
-      <h3 class="font-bold text-lg mb-1">No Sugar Cravings</h3>
-      <p class="text-coffee-600 text-sm">No added sugars, helping to reduce sugar cravings often triggered by sugary coffees.</p>
+    <div class="text-center">
+      <img src="./assets/benefit-nosugar.jpg" alt="No sugar icon" class="mx-auto mb-4 w-36 h-24 sm:w-40 sm:h-28 object-contain bg-white shadow-card" style="border-radius:50%">
+      <h3 class="font-extrabold text-lg mb-1 text-coffee-900">No Sugar Cravings</h3>
+      <p class="text-coffee-800 text-sm">No added sugars, helping to reduce sugar cravings often triggered by sugary coffees.</p>
     </div>
 
   </div>
 
-  <div class="text-center mt-10">
-    <a href="#pricing" class="inline-block bg-coffee-800 hover:bg-coffee-700 active:scale-[0.98] transition rounded-full text-white font-bold px-8 py-3.5">
+  <div class="text-center mt-12">
+    <a href="#pricing" class="inline-block bg-coffee-900 hover:bg-coffee-800 active:scale-[0.98] transition rounded-full text-white font-bold px-8 py-3.5 shadow-card">
       Try Kopify today!
     </a>
+    <p class="mt-3 text-sm text-coffee-800 max-w-md mx-auto">
+      If coffee could talk, it'd say, &lsquo;Choose Kopify!&rsquo; Try us today to make your cup happy!
+    </p>
+    <div class="mt-3 max-w-xs mx-auto scarcity-bar" data-filled="15" data-total="18"></div>
   </div>
+
+  <hr class="mt-14 max-w-2xl mx-auto border-t-4 border-coffee-900 rounded-full">
 </section>
 
 <!-- ================= 4. TESTIMONIALS ================= -->
-<section class="px-4 py-14 bg-coffee-50">
+<section class="px-4 py-14 bg-band">
   <div class="max-w-5xl mx-auto text-center">
-    <h2 class="text-2xl sm:text-3xl font-bold text-coffee-800 mb-10">
+    <h2 class="text-2xl sm:text-3xl font-bold text-coffee-900 mb-6">
       Thousands of happy customers can't be just random... Are you ready to be next Kopify-holic?
     </h2>
 
+    <div class="inline-flex flex-wrap justify-center items-center gap-x-5 gap-y-1 mb-8 bg-white rounded-2xl shadow-card px-6 py-3">
+      <span class="flex items-baseline gap-1 text-red-500 font-extrabold text-lg">5.0 <span class="text-base">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span>
+      <span class="hidden sm:block w-px h-6 bg-coffee-100"></span>
+      <span class="text-coffee-900 font-bold text-sm">10K+ <span class="text-coffee-400 font-medium">Ratings</span></span>
+      <span class="hidden sm:block w-px h-6 bg-coffee-100"></span>
+      <span class="text-coffee-900 font-bold text-sm">10K+ <span class="text-coffee-400 font-medium">Sold</span></span>
+    </div>
+
+    <img src="./assets/testimonial-collage.jpg" alt="Kopify customers sharing their orders and testimonials" class="max-w-2xl w-full mx-auto rounded-3xl shadow-card mb-10">
+
+    <!-- TODO: All 6 testimonial photos are real. Cathy's and Direk Paul's quotes are client-confirmed verbatim — Ots's, Mara's, Joana's, and Cilebritee's quotes are still best-effort transcriptions, please sanity-check against the live page -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
 
-      <!-- TODO: testimonial quotes below are placeholder copy — sync exact wording from live site before launch -->
       <article class="bg-white rounded-2xl shadow-sm p-6">
         <div class="flex items-center gap-3 mb-3">
-          <div class="placeholder-img w-12 h-12 rounded-full text-[8px] shrink-0">Photo</div>
+          <img src="./assets/testimonial-cathy.jpg" alt="Miss Cathy Lim Domingo" class="w-12 h-12 rounded-full object-cover shrink-0">
           <div>
-            <p class="font-bold text-sm">Miss Cathy Lim-Domingo</p>
+            <p class="font-bold text-sm">Miss Cathy Lim Domingo</p>
             <p class="text-gold-500 text-sm" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
           </div>
         </div>
-        <p class="text-coffee-600 text-sm">"Sobrang sarap and I love na wala akong na-feel na palpitations kahit two cups a day. Kopify-holic na talaga ako!"</p>
+        <p class="text-coffee-600 text-sm">"I noticed everyday ako nagddetox. Also love it na healthy coffee with all the added ingredients, especially for us who are coffee lovers."</p>
       </article>
 
       <article class="bg-white rounded-2xl shadow-sm p-6">
         <div class="flex items-center gap-3 mb-3">
-          <div class="placeholder-img w-12 h-12 rounded-full text-[8px] shrink-0">Photo</div>
+          <img src="./assets/testimonial-ots.jpg" alt="Ots Jimenez" class="w-12 h-12 rounded-full object-cover shrink-0">
           <div>
             <p class="font-bold text-sm">Ots Jimenez</p>
             <p class="text-gold-500 text-sm" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
           </div>
         </div>
-        <p class="text-coffee-600 text-sm">"Coffee lover ako pero laging may acid reflux. Sa Kopify wala akong problema. Panalo talaga!"</p>
+        <p class="text-coffee-600 text-sm">"This is my go-to coffee kasi kahit gaano karaming cups ko, wala akong palpitations. Kaya sobrang bilis ko na bumili ulit."</p>
       </article>
 
       <article class="bg-white rounded-2xl shadow-sm p-6">
         <div class="flex items-center gap-3 mb-3">
-          <div class="placeholder-img w-12 h-12 rounded-full text-[8px] shrink-0">Photo</div>
+          <img src="./assets/testimonial-mara.jpg" alt="Mara Gaviola" class="w-12 h-12 rounded-full object-cover shrink-0">
           <div>
             <p class="font-bold text-sm">Mara Gaviola</p>
             <p class="text-gold-500 text-sm" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
           </div>
         </div>
-        <p class="text-coffee-600 text-sm">"Ang sarap ng lasa at hindi ako nagja-jitters. Go-to coffee ko na ito every morning."</p>
+        <p class="text-coffee-600 text-sm">"Sobrang sarap ng Kopify! Nagulat pa nga ako sa dami ng benefits nito. Kopify na lang talaga ang iinumin ko."</p>
       </article>
 
       <article class="bg-white rounded-2xl shadow-sm p-6">
         <div class="flex items-center gap-3 mb-3">
-          <div class="placeholder-img w-12 h-12 rounded-full text-[8px] shrink-0">Photo</div>
+          <img src="./assets/testimonial-direkpaul.jpg" alt="Direk Paul" class="w-12 h-12 rounded-full object-cover shrink-0">
           <div>
             <p class="font-bold text-sm">Direk Paul</p>
             <p class="text-gold-500 text-sm" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
           </div>
         </div>
-        <p class="text-coffee-600 text-sm">"Busy schedule pero kailangan ko pa rin ng energy. Kopify keeps me going without the crash."</p>
+        <p class="text-coffee-600 text-sm">"Ang kasama ko sa puyatan sa live selling. Hindi ka magugutom or aantukin pag ito ang kasama mo. At sobrang sarap talaga, parang hindi sya herbal coffee. So love this brand!"</p>
       </article>
 
       <article class="bg-white rounded-2xl shadow-sm p-6">
         <div class="flex items-center gap-3 mb-3">
-          <div class="placeholder-img w-12 h-12 rounded-full text-[8px] shrink-0">Photo</div>
+          <img src="./assets/testimonial-joana.jpg" alt="Joana Lazaro" class="w-12 h-12 rounded-full object-cover shrink-0">
           <div>
             <p class="font-bold text-sm">Joana Lazaro</p>
             <p class="text-gold-500 text-sm" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
           </div>
         </div>
-        <p class="text-coffee-600 text-sm">"Finally, coffee na hindi nagpapataas ng heart rate ko. Highly recommended!"</p>
+        <p class="text-coffee-600 text-sm">"I rarely drink coffee kasi hindi maganda sa akin ang regular blends. Highly recommended ang Kopify, walang palpitations at acid reflux."</p>
       </article>
 
       <article class="bg-white rounded-2xl shadow-sm p-6">
         <div class="flex items-center gap-3 mb-3">
-          <div class="placeholder-img w-12 h-12 rounded-full text-[8px] shrink-0">Photo</div>
+          <img src="./assets/testimonial-cilebritee.jpg" alt="Cilebritee Shop" class="w-12 h-12 rounded-full object-cover shrink-0">
           <div>
             <p class="font-bold text-sm">Cilebritee Shop</p>
             <p class="text-gold-500 text-sm" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
           </div>
         </div>
-        <p class="text-coffee-600 text-sm">"Best seller sa amin ang Kopify dahil sa dami ng repeat customers. Sobrang sarap talaga!"</p>
+        <p class="text-coffee-600 text-sm">"Best seller po namin sa Shopee ang Kopify! Salamat sa daming orders, laging preselling na madalas ubos agad."</p>
       </article>
 
     </div>
 
     <div class="text-center mt-10">
-      <a href="#pricing" class="inline-block bg-gold-500 hover:bg-gold-600 active:scale-[0.98] transition rounded-full text-white font-bold px-8 py-3.5">
+      <a href="#pricing" class="inline-block bg-coffee-900 hover:bg-coffee-800 active:scale-[0.98] transition rounded-full text-white font-bold px-8 py-3.5">
         I want to try Kopify for myself!
       </a>
+      <p class="mt-3 text-sm text-coffee-800 max-w-md mx-auto">
+        Kopify is flying off the shelves &ndash; almost sold out &ndash; order yours now!
+      </p>
+      <div class="mt-3 max-w-xs mx-auto scarcity-bar" data-filled="16" data-total="18"></div>
     </div>
   </div>
 </section>
 
 <!-- ================= 5. INGREDIENTS (20-in-1) ================= -->
-<section class="px-4 py-14 max-w-5xl mx-auto">
+<section class="px-4 py-14 bg-band">
+  <div class="max-w-3xl mx-auto text-center mb-12">
+    <p class="text-xl sm:text-2xl font-bold text-coffee-900 leading-snug">
+      Kopify is made with organic ingredients and a deep love for a better coffee experience. Kopify is here to remind you that you don't have to sacrifice enjoyment for well-being.
+    </p>
+  </div>
+
+  <div class="max-w-5xl mx-auto">
   <h2 class="text-2xl sm:text-3xl font-bold text-center text-coffee-800 mb-10">
     Kopify is made of 20 active ingredients
   </h2>
 
-  <!-- TODO: ingredient groupings below reflect Kopify's published 20-ingredient list, grouped for MVP layout — verify exact grouping/imagery against live site -->
   <div class="grid sm:grid-cols-2 gap-6 mb-12">
 
-    <div class="rounded-2xl border border-coffee-100 overflow-hidden shadow-sm">
-      <div class="aspect-video placeholder-img">Moringa Group</div>
-      <div class="p-5">
-        <h3 class="font-bold mb-2">Moringa Group</h3>
-        <ul class="text-sm text-coffee-600 space-y-1 list-disc list-inside">
-          <li>Moringa / Malunggay</li>
-          <li>Glutathione</li>
-          <li>Collagen</li>
-          <li>Mangosteen</li>
-          <li>L-Carnitine</li>
-        </ul>
-      </div>
+    <div class="rounded-2xl border border-coffee-100 overflow-hidden shadow-sm bg-white">
+      <img src="./assets/ingredient-moringa.jpg" alt="Moringa Group: Moringa/Malunggay, Glutathione, Collagen, Stevia, Acai Berry" class="w-full h-auto">
     </div>
 
-    <div class="rounded-2xl border border-coffee-100 overflow-hidden shadow-sm">
-      <div class="aspect-video placeholder-img">Turmeric Group</div>
-      <div class="p-5">
-        <h3 class="font-bold mb-2">Turmeric Group</h3>
-        <ul class="text-sm text-coffee-600 space-y-1 list-disc list-inside">
-          <li>Turmeric</li>
-          <li>Garcinia Cambogia</li>
-          <li>Inulin Fiber</li>
-          <li>Green Coffee Extract</li>
-          <li>Lemon</li>
-        </ul>
-      </div>
+    <div class="rounded-2xl border border-coffee-100 overflow-hidden shadow-sm bg-white">
+      <img src="./assets/ingredient-turmeric.jpg" alt="Turmeric Group: Turmeric, Mangosteen, L-Carnitine, Non-Dairy Creamer, Garcinia Cambogia" class="w-full h-auto">
     </div>
 
-    <div class="rounded-2xl border border-coffee-100 overflow-hidden shadow-sm">
-      <div class="aspect-video placeholder-img">Barley Group</div>
-      <div class="p-5">
-        <h3 class="font-bold mb-2">Barley Group</h3>
-        <ul class="text-sm text-coffee-600 space-y-1 list-disc list-inside">
-          <li>Barley</li>
-          <li>Coffee</li>
-          <li>Non-Dairy Creamer</li>
-          <li>Chlorella</li>
-          <li>Vitamin C</li>
-        </ul>
-      </div>
+    <div class="rounded-2xl border border-coffee-100 overflow-hidden shadow-sm bg-white">
+      <img src="./assets/ingredient-barley.jpg" alt="Barley Group: Barley, Green Coffee Extract, Inulin Fiber, Chlorella, Lemon" class="w-full h-auto">
     </div>
 
-    <div class="rounded-2xl border border-coffee-100 overflow-hidden shadow-sm">
-      <div class="aspect-video placeholder-img">Goji Berry Group</div>
-      <div class="p-5">
-        <h3 class="font-bold mb-2">Goji Berry Group</h3>
-        <ul class="text-sm text-coffee-600 space-y-1 list-disc list-inside">
-          <li>Goji Berry</li>
-          <li>Grape Seed</li>
-          <li>Spirulina</li>
-          <li>Acai Berry</li>
-          <li>Stevia</li>
-        </ul>
-      </div>
+    <div class="rounded-2xl border border-coffee-100 overflow-hidden shadow-sm bg-white">
+      <img src="./assets/ingredient-gojiberry.jpg" alt="Goji Berry Group: Goji Berry, Coffee, Grape Seed, Spirulina, Vitamin C" class="w-full h-auto">
     </div>
   </div>
 
   <div class="bg-coffee-800 rounded-3xl px-6 py-10 text-center text-white">
     <h3 class="text-xl sm:text-2xl font-bold text-gold-400 mb-6">It's not just coffee... It's Kopify</h3>
     <ul class="max-w-xl mx-auto space-y-3 text-left text-coffee-50">
-      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> 20 active ingredients working together in every sip</li>
-      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> No junk sugar &ndash; naturally sweetened, low calorie</li>
-      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> Gentle on the heart &ndash; no palpitations, no jitters</li>
-      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> Easy on the stomach &ndash; no acid reflux, no bloating</li>
-      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> 100% organic, made for everyday coffee lovers</li>
+      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> Boosts immunity with superfoods</li>
+      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> Increases energy naturally</li>
+      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> Helps weight and calorie management</li>
+      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> Enhances skin health and radiance</li>
+      <li class="flex gap-2"><span class="text-gold-400 font-bold">&#10003;</span> Supports overall wellness and vitality</li>
     </ul>
   </div>
 
   <div class="text-center mt-10">
-    <a href="#pricing" class="inline-block bg-gold-500 hover:bg-gold-600 active:scale-[0.98] transition rounded-full text-white font-bold px-8 py-3.5">
+    <a href="#pricing" class="inline-block bg-coffee-900 hover:bg-coffee-800 active:scale-[0.98] transition rounded-full text-white font-bold px-8 py-3.5">
       Elevate your health today&mdash;try Kopify now!
     </a>
+    <p class="mt-3 text-sm text-coffee-800 max-w-md mx-auto">
+      Kopify is in high demand &ndash; order now while supplies last!
+    </p>
+    <div class="mt-3 max-w-xs mx-auto scarcity-bar" data-filled="15" data-total="18"></div>
+  </div>
   </div>
 </section>
 
-<!-- ================= 6. FOUNDERS LETTER ================= -->
+<!-- ================= 5b. 20-IN-1 SUMMARY GRAPHIC ================= -->
+<section class="px-4 py-14 bg-white">
+  <div class="max-w-4xl mx-auto rounded-3xl border border-coffee-100 shadow-card overflow-hidden">
+    <img src="./assets/ingredients-summary.jpg" alt="Kopify 20-in-1, Powered by Nature: full ingredient breakdown by group, plus key benefits (energy &amp; focus, immunity, digestion, natural extracts, no artificial flavors, with stevia)" class="w-full h-auto">
+  </div>
+</section>
+
+<!-- ================= 6b. FDA APPROVED ================= -->
+<!-- Real FDA Certificate of Product Registration (FR-4000015029346), provided by the client as a PDF and rendered to image.
+     The manufacturer name/address has been pixelated out per the client's instruction — do not restore it. -->
 <section class="px-4 py-14 bg-coffee-50">
-  <div class="max-w-3xl mx-auto">
-    <h2 class="text-2xl sm:text-3xl font-bold text-center text-coffee-800 mb-8">
-      From the Creators of Kopify: Discover the Secret to Enjoying Coffee Without the Jitters or Heartburn!
-    </h2>
+  <div class="max-w-2xl mx-auto text-center">
+    <p class="uppercase tracking-widest text-gold-600 font-bold text-xs sm:text-sm mb-3">Peace of Mind</p>
+    <h2 class="text-2xl sm:text-3xl font-bold text-coffee-800 mb-10">This coffee is FDA Approved</h2>
 
-    <div class="bg-white rounded-3xl shadow-card p-6 sm:p-10">
-      <div class="flex justify-center mb-6">
-        <div class="placeholder-img w-28 h-28 rounded-full text-[9px]">Founders Photo</div>
-        <!-- TODO: swap for CDN founders photo 66d8267bab806ec7bc318074.jpeg -->
+    <div class="inline-block text-center">
+      <div class="inline-flex items-center gap-2 bg-white border-2 border-gold-500 rounded-full pl-2.5 pr-4 py-2 shadow-card mb-1">
+        <svg viewBox="0 0 24 24" class="w-6 h-6 text-gold-500 shrink-0" fill="none">
+          <circle cx="12" cy="12" r="10" fill="currentColor"/>
+          <path d="M7 12.5l3 3 7-7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="text-sm font-bold text-coffee-800">FDA registered &amp; approved!</span>
       </div>
 
-      <!-- TODO: founders letter body below is placeholder copy — sync exact wording from live site before launch -->
-      <div class="space-y-4 text-coffee-700 leading-relaxed">
-        <p>Dear Kabarkada,</p>
-        <p>We are Randave and CJ, and like you, we are coffee lovers. But every cup used to come with a price &ndash; palpitations, acid reflux, jitters, bloating. We knew we weren't the only ones dealing with this, so we set out to create a coffee that lets you enjoy every sip without the worry.</p>
-        <p>After months of research and testing, Kopify was born &ndash; a 20-in-1 organic coffee blend that's gentle on your heart and your stomach, low in calories, and free from junk sugar. No more choosing between your love for coffee and your health.</p>
-        <p>Thousands of Filipinos have already made the switch and we'd love for you to be next. Here's to guilt-free coffee, everyday.</p>
-        <p class="font-semibold">Mabuhay at cheers to your next cup,</p>
-      </div>
+      <svg viewBox="0 0 60 60" class="w-12 h-12 mx-auto text-gold-500 -mb-1" fill="none">
+        <path d="M15 8 C 15 30, 30 45, 45 50" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <path d="M45 50 L32 46 M45 50 L40 37" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
 
-      <div class="mt-6 flex justify-center">
-        <div class="placeholder-img w-40 h-16 rounded-lg text-[9px]">Signature</div>
-      </div>
+      <img src="./assets/fda-certificate.jpg" alt="Kopify FDA Certificate of Product Registration, FDA Reg. No. FR-4000015029346"
+           class="w-72 sm:w-80 mx-auto rounded-2xl shadow-card border border-coffee-100">
     </div>
   </div>
 </section>
@@ -430,7 +437,7 @@
 
     <!-- Card 1: 1 Pack -->
     <div class="rounded-3xl border border-coffee-100 p-6 flex flex-col items-center text-center shadow-sm">
-      <div class="w-full aspect-square max-w-[180px] mb-5 placeholder-img rounded-2xl text-[10px]">1 Box Image</div>
+      <img src="./assets/pack-1box.jpg" alt="Kopify 1 Box (10 sachets)" class="w-full aspect-square max-w-[180px] mb-5 rounded-2xl object-contain">
       <p class="font-bold text-lg text-coffee-800">1 x Box</p>
       <p class="text-coffee-500 text-sm mb-1">10 Sachets Inside</p>
       <p class="text-coffee-500 text-xs mb-4">Best If You Want To Try Kopify for the First Time</p>
@@ -441,28 +448,34 @@
       </a>
     </div>
 
-    <!-- Card 2: 3 Packs (Most Popular) -->
+    <!-- Card 2: 3 Packs (Best Seller) -->
     <div class="relative rounded-3xl border-2 border-gold-500 p-6 flex flex-col items-center text-center shadow-card sm:-translate-y-3">
-      <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wide">Most Popular</span>
-      <div class="w-full aspect-square max-w-[180px] mb-5 mt-2 placeholder-img rounded-2xl text-[10px]">3 Boxes Image</div>
+      <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wide">Best Seller</span>
+      <img src="./assets/pack-3boxes.jpg" alt="Kopify 3 Boxes (Family Pack)" class="w-full aspect-square max-w-[180px] mb-5 mt-2 rounded-2xl object-contain">
       <p class="font-bold text-lg text-coffee-800">3 Boxes</p>
       <p class="text-coffee-500 text-sm mb-3">Family Pack</p>
       <p class="text-3xl font-extrabold text-coffee-800">&#8369;1,097</p>
-      <p class="inline-block bg-gold-100 text-gold-600 text-xs font-bold px-3 py-1 rounded-full mt-2 mb-5" style="background-color:#FBF0DC">Save &#8369;100</p>
+      <p class="inline-block bg-gold-100 text-gold-600 text-xs font-bold px-3 py-1 rounded-full mt-2 mb-5" style="background-color:#FBF0DC">Save &#8369;100 vs 3 individual boxes</p>
       <a href="#" data-checkout="3" data-pack-label="3 Boxes"
          class="mt-auto w-full bg-gold-500 hover:bg-gold-600 active:scale-[0.98] transition rounded-full text-white font-bold py-3.5">
         ORDER 3 BOXES
       </a>
     </div>
 
-    <!-- Card 3: 10 Packs -->
-    <div class="rounded-3xl border border-coffee-100 p-6 flex flex-col items-center text-center shadow-sm">
-      <span class="inline-block bg-coffee-100 text-coffee-700 text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wide mb-3">Biggest Savings</span>
-      <div class="w-full aspect-square max-w-[180px] mb-5 placeholder-img rounded-2xl text-[10px]">10 Boxes Image</div>
+    <!-- Card 3: 10 Packs (Best Value / Free Shipping) -->
+    <div class="relative rounded-3xl border-2 border-coffee-800 p-6 flex flex-col items-center text-center shadow-card">
+      <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-coffee-800 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wide">Best Value</span>
+      <img src="./assets/pack-10boxes.jpg" alt="Kopify 10 Boxes (Kopifyholic Bundle)" class="w-full aspect-square max-w-[180px] mb-5 mt-2 rounded-2xl object-contain">
       <p class="font-bold text-lg text-coffee-800">10 Boxes</p>
       <p class="text-coffee-500 text-sm mb-3">Kopifyholic Bundle</p>
       <p class="text-3xl font-extrabold text-coffee-800">&#8369;3,790</p>
-      <p class="inline-block text-gold-600 text-xs font-bold px-3 py-1 rounded-full mt-2 mb-5" style="background-color:#FBF0DC">Save &#8369;200</p>
+      <div class="flex flex-col items-center gap-1.5 mt-2 mb-5">
+        <p class="inline-block text-gold-600 text-xs font-bold px-3 py-1 rounded-full" style="background-color:#FBF0DC">Save &#8369;200 vs 10 individual boxes</p>
+        <p class="inline-flex items-center gap-1 bg-coffee-800 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide whitespace-nowrap">
+          <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none"><path d="M3 7h11v9H3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 10h4l3 3v3h-7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7" cy="18" r="1.6" fill="currentColor"/><circle cx="17.5" cy="18" r="1.6" fill="currentColor"/></svg>
+          Free Shipping
+        </p>
+      </div>
       <a href="#" data-checkout="10" data-pack-label="10 Boxes"
          class="mt-auto w-full bg-coffee-800 hover:bg-coffee-700 active:scale-[0.98] transition rounded-full text-white font-bold py-3.5">
         ORDER 10 BOXES
@@ -509,7 +522,7 @@
                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400">
         </div>
         <div class="mb-4">
-          <label for="dist-mobile" class="block text-sm font-semibold text-coffee-700 mb-1">Mobile*</label>
+          <label for="dist-mobile" class="block text-sm font-semibold text-coffee-700 mb-1">Cell Number*</label>
           <input id="dist-mobile" name="mobile" type="tel" required
                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400">
         </div>
@@ -519,14 +532,20 @@
                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400">
         </div>
         <div class="mb-4">
-          <label for="dist-city" class="block text-sm font-semibold text-coffee-700 mb-1">City / Province*</label>
-          <input id="dist-city" name="city" type="text" required
+          <label for="dist-address" class="block text-sm font-semibold text-coffee-700 mb-1">Address*</label>
+          <input id="dist-address" name="address" type="text" required
                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400">
         </div>
         <div class="mb-5">
-          <label for="dist-message" class="block text-sm font-semibold text-coffee-700 mb-1">Message <span class="font-normal text-coffee-400">(optional)</span></label>
-          <textarea id="dist-message" name="message" rows="3" placeholder="Tell us why you want to distribute Kopify..."
-                    class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400"></textarea>
+          <label for="dist-channel" class="block text-sm font-semibold text-coffee-700 mb-1">Where do you plan to sell?*</label>
+          <select id="dist-channel" name="channel" required
+                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-gold-400">
+            <option value="" disabled selected>Select a channel</option>
+            <option value="Lazada">Lazada</option>
+            <option value="Shopee">Shopee</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Offline">Offline</option>
+          </select>
         </div>
 
         <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 active:scale-[0.98] transition rounded-full text-white font-bold py-3.5">
@@ -549,16 +568,16 @@
     Frequently Asked Questions About Kopify 20 in 1 Organic Coffee
   </h2>
 
-  <!-- TODO: FAQ answers are best-effort placeholder copy (except the distributor answer, which matches the spec exactly) — sync exact wording from live site before launch -->
+  <!-- TODO: Q1 is transcribed verbatim from a screenshot of the live FAQ (high confidence). The rest are still best-effort copy (except the distributor answer, which matches the spec exactly) — sync exact wording from live site before launch -->
   <div id="faq-list" class="space-y-3">
 
     <div class="accordion-item border border-coffee-100 rounded-2xl overflow-hidden" data-open="false">
       <button type="button" class="accordion-trigger w-full flex items-center justify-between text-left px-5 py-4 font-semibold text-coffee-800">
-        <span>What are the 20 active ingredients in Kopify?</span>
+        <span>Ano ang difference ng Kopify sa ibang coffee? 20 in 1 ba talaga sya?</span>
         <span class="accordion-icon text-gold-500 text-xl leading-none">+</span>
       </button>
       <div class="accordion-panel px-5 text-coffee-600 text-sm">
-        <p class="pb-4">Kopify blends 20 active ingredients &ndash; including Moringa, Turmeric, Barley, and Goji Berry &ndash; carefully combined so every sip supports your heart, digestion, and overall wellness without giving up your daily coffee ritual.</p>
+        <p class="pb-4">Yes, 20 in 1 dahil ito ang mga active ingredients: Moringa, Glutathione, Collagen, Stevia, Mangosteen, L-Carnitine, Coffee, Non Dairy Creamer, Garcinia Cambogia, Green Coffee Extract, Inulin Fiber, Goji Berry, Grape Seed, Spirulina, Barley, Chlorella, Turmeric, Lemon, Vitamin C, Acai Berry.</p>
       </div>
     </div>
 
@@ -666,7 +685,21 @@
 <!-- ================= 10. FOOTER ================= -->
 <footer class="px-4 py-12 bg-coffee-900 text-coffee-100">
   <div class="max-w-4xl mx-auto flex flex-col items-center text-center gap-4">
-    <div class="placeholder-img rounded-full w-12 h-12 text-[9px]">LOGO</div>
+    <div class="flex items-center gap-2.5">
+      <div class="rounded-full w-11 h-11 shrink-0 flex items-center justify-center p-1.5" style="background:#C79A5D">
+        <svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.55"/>
+          <path d="M40 28c-3-4 3-6 0-10M50 26c-3-4 3-6 0-10M60 28c-3-4 3-6 0-10" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M28 40h36v15a18 18 0 0 1-18 18 18 18 0 0 1-18-18V40Z" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M64 44h6.5a7.5 7.5 0 0 1 0 15H64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+          <path d="M22 68h48" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="text-left leading-tight">
+        <span class="block text-xl font-extrabold tracking-tight text-white">Kopify</span>
+        <span class="block text-[10px] tracking-wide text-gold-300 font-bold">How coffee should be</span>
+      </span>
+    </div>
     <p class="text-sm">
       Email: <a href="mailto:support@kopify.ph" class="hover:text-gold-400 transition">support@kopify.ph</a>
     </p>
@@ -686,11 +719,34 @@
 <div class="h-20 sm:hidden"></div>
 
 <script>
+  // ===== Scarcity bar renderer =====
+  // Renders the segmented "stock almost gone" bar used under CTA buttons.
+  // Usage: <div class="scarcity-bar" data-filled="16" data-total="18"></div>
+  document.querySelectorAll('.scarcity-bar').forEach((bar) => {
+    const total = parseInt(bar.dataset.total || '18', 10);
+    const filled = parseInt(bar.dataset.filled || String(total - 1), 10);
+    bar.classList.add('flex', 'items-center', 'gap-1');
+    for (let i = 0; i < total; i++) {
+      const seg = document.createElement('span');
+      const isLast = i === filled - 1;
+      seg.className = 'flex-1 h-3 rounded-sm ' + (
+        i < filled
+          ? (isLast ? 'bg-red-500 flex items-center justify-center' : 'bg-coffee-300')
+          : 'bg-coffee-100'
+      );
+      if (isLast) {
+        seg.innerHTML = '<svg viewBox="0 0 24 24" class="w-2.5 h-2.5 text-white"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      }
+      bar.appendChild(seg);
+    }
+  });
+
   // ===== Checkout URL configuration =====
-  // Swap these to Xendit payment links later without touching layout/markup.
-  const CHECKOUT_URL_1  = "https://kopify.shop/1-x-box-checkout";
-  const CHECKOUT_URL_3  = "https://kopify.shop/3-boxes-checkout";
-  const CHECKOUT_URL_10 = "https://kopify.shop/10-boxes-checkout";
+  // Points at our own checkout.html (with the PH address form) for now.
+  // Swap these to a real payment gateway's hosted checkout link later without touching layout/markup.
+  const CHECKOUT_URL_1  = "checkout.html?pack=1";
+  const CHECKOUT_URL_3  = "checkout.html?pack=3";
+  const CHECKOUT_URL_10 = "checkout.html?pack=10";
 
   const CHECKOUT_URLS = { "1": CHECKOUT_URL_1, "3": CHECKOUT_URL_3, "10": CHECKOUT_URL_10 };
 
@@ -711,6 +767,26 @@
       item.setAttribute('data-open', isOpen ? 'false' : 'true');
     });
   });
+
+  // ===== Hero video: mobile/desktop source switch + click-to-play =====
+  (function () {
+    const video = document.getElementById('hero-video');
+    const playBtn = document.getElementById('hero-video-play');
+    if (!video || !playBtn) return;
+
+    const isMobile = window.matchMedia('(max-width: 640px)').matches;
+    const source = document.createElement('source');
+    source.src = isMobile ? './assets/hero-video-mobile.mp4' : './assets/hero-video.mp4';
+    source.type = 'video/mp4';
+    video.appendChild(source);
+    video.load();
+
+    playBtn.addEventListener('click', () => {
+      video.controls = true;
+      video.play();
+      playBtn.classList.add('hidden');
+    });
+  })();
 
   // ===== Placeholder image fallback =====
   document.querySelectorAll('img').forEach((img) => {
@@ -742,11 +818,11 @@
     const name = distForm.name.value.trim();
     const mobile = distForm.mobile.value.trim();
     const email = distForm.email.value.trim();
-    const city = distForm.city.value.trim();
-    const message = distForm.message.value.trim();
+    const address = distForm.address.value.trim();
+    const channel = distForm.channel.value;
 
     let valid = true;
-    [distForm.name, distForm.mobile, distForm.email, distForm.city].forEach((field) => {
+    [distForm.name, distForm.mobile, distForm.email, distForm.address, distForm.channel].forEach((field) => {
       if (!field.value.trim()) {
         valid = false;
         field.classList.add('ring-2', 'ring-red-400');
@@ -759,7 +835,7 @@
 
     const subject = encodeURIComponent('Kopify Distributor Application');
     const body = encodeURIComponent(
-      `Full Name: ${name}\nMobile: ${mobile}\nEmail: ${email}\nCity / Province: ${city}\nMessage: ${message || '(none)'}`
+      `Full Name: ${name}\nCell Number: ${mobile}\nEmail: ${email}\nAddress: ${address}\nWhere they plan to sell: ${channel}`
     );
     window.location.href = `mailto:support@kopify.ph?subject=${subject}&body=${body}`;
 
