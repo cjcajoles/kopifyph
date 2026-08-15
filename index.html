@@ -516,7 +516,7 @@
                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400">
         </div>
         <div class="mb-4">
-          <label for="dist-mobile" class="block text-sm font-semibold text-coffee-700 mb-1">Mobile*</label>
+          <label for="dist-mobile" class="block text-sm font-semibold text-coffee-700 mb-1">Cell Number*</label>
           <input id="dist-mobile" name="mobile" type="tel" required
                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400">
         </div>
@@ -526,14 +526,20 @@
                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400">
         </div>
         <div class="mb-4">
-          <label for="dist-city" class="block text-sm font-semibold text-coffee-700 mb-1">City / Province*</label>
-          <input id="dist-city" name="city" type="text" required
+          <label for="dist-address" class="block text-sm font-semibold text-coffee-700 mb-1">Address*</label>
+          <input id="dist-address" name="address" type="text" required
                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400">
         </div>
         <div class="mb-5">
-          <label for="dist-message" class="block text-sm font-semibold text-coffee-700 mb-1">Message <span class="font-normal text-coffee-400">(optional)</span></label>
-          <textarea id="dist-message" name="message" rows="3" placeholder="Tell us why you want to distribute Kopify..."
-                    class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400"></textarea>
+          <label for="dist-channel" class="block text-sm font-semibold text-coffee-700 mb-1">Where do you plan to sell?*</label>
+          <select id="dist-channel" name="channel" required
+                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-gold-400">
+            <option value="" disabled selected>Select a channel</option>
+            <option value="Lazada">Lazada</option>
+            <option value="Shopee">Shopee</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Offline">Offline</option>
+          </select>
         </div>
 
         <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 active:scale-[0.98] transition rounded-full text-white font-bold py-3.5">
@@ -805,11 +811,11 @@
     const name = distForm.name.value.trim();
     const mobile = distForm.mobile.value.trim();
     const email = distForm.email.value.trim();
-    const city = distForm.city.value.trim();
-    const message = distForm.message.value.trim();
+    const address = distForm.address.value.trim();
+    const channel = distForm.channel.value;
 
     let valid = true;
-    [distForm.name, distForm.mobile, distForm.email, distForm.city].forEach((field) => {
+    [distForm.name, distForm.mobile, distForm.email, distForm.address, distForm.channel].forEach((field) => {
       if (!field.value.trim()) {
         valid = false;
         field.classList.add('ring-2', 'ring-red-400');
@@ -822,7 +828,7 @@
 
     const subject = encodeURIComponent('Kopify Distributor Application');
     const body = encodeURIComponent(
-      `Full Name: ${name}\nMobile: ${mobile}\nEmail: ${email}\nCity / Province: ${city}\nMessage: ${message || '(none)'}`
+      `Full Name: ${name}\nCell Number: ${mobile}\nEmail: ${email}\nAddress: ${address}\nWhere they plan to sell: ${channel}`
     );
     window.location.href = `mailto:support@kopify.ph?subject=${subject}&body=${body}`;
 

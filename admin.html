@@ -6,13 +6,13 @@
 <title>Kopify Admin | Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
     theme: {
       extend: {
-        fontFamily: { sans: ['Poppins', 'sans-serif'] },
+        fontFamily: { sans: ['Inter', 'sans-serif'] },
         colors: {
           coffee: {
             50:  '#FBF3EA',
@@ -36,25 +36,27 @@
           }
         },
         boxShadow: {
-          card: '0 10px 30px -10px rgba(59, 33, 20, 0.12)'
+          card: '0 1px 2px 0 rgba(42, 23, 13, 0.04), 0 1px 6px -2px rgba(42, 23, 13, 0.06)'
         }
       }
     }
   }
 </script>
 <style>
-  body { font-family: 'Poppins', sans-serif; }
-  .nav-btn { display:flex; align-items:center; gap:.75rem; width:100%; padding:.625rem .875rem; border-radius:.75rem; font-size:.875rem; font-weight:600; color:#6F4423; transition:background .15s, color .15s; }
+  body { font-family: 'Inter', sans-serif; letter-spacing: -0.01em; }
+  .nav-btn { display:flex; align-items:center; gap:.75rem; width:100%; padding:.625rem .875rem; border-radius:.625rem; font-size:.875rem; font-weight:500; color:#6F4423; transition:background .15s, color .15s; }
   .nav-btn:hover { background:#FBF3EA; }
   .nav-btn.active { background:#3B2114; color:#fff; }
   .nav-btn.active svg { color:#F1D28C; }
   .nav-btn svg { color:#B98247; flex-shrink:0; }
   .nav-btn.active:hover { background:#3B2114; }
-  .status-pill { display:inline-flex; align-items:center; gap:.375rem; font-size:.75rem; font-weight:700; padding:.25rem .625rem; border-radius:9999px; }
+  .status-pill { display:inline-flex; align-items:center; gap:.375rem; font-size:.75rem; font-weight:600; padding:.25rem .625rem; border-radius:9999px; }
   .status-dot { width:6px; height:6px; border-radius:9999px; }
-  th { font-size:.75rem; text-transform:uppercase; letter-spacing:.03em; color:#B98247; font-weight:700; text-align:left; padding:.75rem 1rem; }
+  th { font-size:.6875rem; text-transform:uppercase; letter-spacing:.04em; color:#B98247; font-weight:600; text-align:left; padding:.75rem 1rem; }
   td { padding:1rem; font-size:.875rem; border-top:1px solid #F3E1CC; }
   #bar-tooltip { pointer-events:none; }
+  .period-btn { padding:.5rem 1rem; border-radius:9999px; font-size:.8125rem; font-weight:600; color:#8B5A2B; transition:background .15s,color .15s,box-shadow .15s; }
+  .period-btn.active { background:#fff; color:#3B2114; box-shadow:0 1px 2px 0 rgba(42,23,13,.08); }
 </style>
 </head>
 <body class="bg-coffee-50 text-coffee-900">
@@ -87,7 +89,7 @@
       <button class="nav-btn" data-view="orders">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 3.5h6a1 1 0 0 1 1 1V6H8V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Orders
-        <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">3</span>
+        <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center" id="orders-nav-count">3</span>
       </button>
       <button class="nav-btn" data-view="products">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m3.5 8 8.5-4.5L20.5 8v8L12 20.5 3.5 16V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 8 12 12.5 20.5 8M12 12.5V20.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
@@ -96,6 +98,11 @@
       <button class="nav-btn" data-view="customers">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8.5" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M15.2 5.7a3.2 3.2 0 0 1 0 6.2M17.5 14.3c2.3.4 4 2.7 4 5.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Customers
+      </button>
+      <button class="nav-btn" data-view="distributors">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="9.5" width="17" height="11" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 9.5V7a4.5 4.5 0 0 1 9 0v2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 13.5v3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Distributors
+        <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center" id="dist-nav-count">2</span>
       </button>
     </nav>
 
@@ -135,73 +142,80 @@
 
       <!-- ================= HOME ================= -->
       <section id="view-home">
-        <div class="mb-6">
-          <h1 class="text-2xl font-extrabold text-coffee-900">Welcome back, Store Owner 👋</h1>
-          <p class="text-coffee-500 text-sm mt-1">Here's how Kopify is doing over the last 30 days.</p>
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Welcome back, Store Owner 👋</h1>
+            <p class="text-coffee-500 text-sm mt-1" id="home-subtitle">Here's how Kopify is doing today.</p>
+          </div>
+          <div class="flex gap-1 bg-coffee-100 rounded-full p-1" id="period-filter">
+            <button data-period="daily" class="period-btn">Daily</button>
+            <button data-period="weekly" class="period-btn">Weekly</button>
+            <button data-period="monthly" class="period-btn active">Monthly</button>
+          </div>
         </div>
 
         <!-- Stat cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-          <div class="bg-white rounded-2xl shadow-card p-5">
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
             <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Total Revenue</span>
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Revenue</span>
               <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><path d="M12 3v18M17 7.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3 5 3.5c2.8.5 5 1.6 5 3.5s-2.2 3.5-5 3.5-5-1.6-5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               </div>
             </div>
-            <p class="text-2xl font-extrabold text-coffee-900">&#8369;182,450</p>
+            <p class="text-2xl font-extrabold text-coffee-900" id="stat-revenue">&#8369;182,450</p>
             <div class="flex items-center justify-between mt-2">
-              <span class="text-xs font-bold text-emerald-600">&#8593; 18.2%</span>
-              <span class="text-xs text-coffee-400">Last 30 days</span>
+              <span class="text-xs font-bold" id="stat-revenue-delta">&#8593; 18.2%</span>
+              <span class="text-xs text-coffee-400" id="stat-revenue-period">Last 30 days</span>
             </div>
           </div>
-          <div class="bg-white rounded-2xl shadow-card p-5">
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
             <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Total Orders</span>
+              <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Orders</span>
               <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><rect x="4" y="4" width="16" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               </div>
             </div>
-            <p class="text-2xl font-extrabold text-coffee-900">214</p>
+            <p class="text-2xl font-extrabold text-coffee-900" id="stat-orders">214</p>
             <div class="flex items-center justify-between mt-2">
-              <span class="text-xs font-bold text-emerald-600">&#8593; 9.4%</span>
-              <span class="text-xs text-coffee-400">Last 30 days</span>
+              <span class="text-xs font-bold" id="stat-orders-delta">&#8593; 9.4%</span>
+              <span class="text-xs text-coffee-400" id="stat-orders-period">Last 30 days</span>
             </div>
           </div>
-          <div class="bg-white rounded-2xl shadow-card p-5">
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Customers</span>
               <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5M15.5 6a2.8 2.8 0 0 1 0 5.4M17.5 13.2c2 .4 3.5 2.4 3.5 5.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               </div>
             </div>
-            <p class="text-2xl font-extrabold text-coffee-900">187</p>
+            <p class="text-2xl font-extrabold text-coffee-900" id="stat-customers">187</p>
             <div class="flex items-center justify-between mt-2">
-              <span class="text-xs font-bold text-emerald-600">&#8593; 12.5%</span>
-              <span class="text-xs text-coffee-400">Last 30 days</span>
+              <span class="text-xs font-bold" id="stat-customers-delta">&#8593; 12.5%</span>
+              <span class="text-xs text-coffee-400" id="stat-customers-period">Last 30 days</span>
             </div>
           </div>
-          <div class="bg-white rounded-2xl shadow-card p-5">
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Boxes Sold</span>
               <div class="w-8 h-8 rounded-lg bg-gold-100 flex items-center justify-center">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-gold-600"><path d="m3.5 8 8.5-4.5L20.5 8v8L12 20.5 3.5 16V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
               </div>
             </div>
-            <p class="text-2xl font-extrabold text-coffee-900">512</p>
+            <p class="text-2xl font-extrabold text-coffee-900" id="stat-boxes">512</p>
             <div class="flex items-center justify-between mt-2">
-              <span class="text-xs font-bold text-emerald-600">&#8593; 22.0%</span>
-              <span class="text-xs text-coffee-400">Last 30 days</span>
+              <span class="text-xs font-bold" id="stat-boxes-delta">&#8593; 22.0%</span>
+              <span class="text-xs text-coffee-400" id="stat-boxes-period">Last 30 days</span>
             </div>
           </div>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
           <!-- Chart -->
-          <div class="xl:col-span-2 bg-white rounded-2xl shadow-card p-5">
+          <div class="xl:col-span-2 bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
             <div class="flex items-center justify-between mb-1">
-              <h2 class="font-bold text-coffee-900">Revenue, last 7 days</h2>
-              <span class="text-xs text-coffee-400">In &#8369;, per day</span>
+              <h2 class="font-bold text-coffee-900" id="chart-title">Revenue, last 5 weeks</h2>
+              <span class="text-xs text-coffee-400" id="chart-note">In &#8369;, per week</span>
             </div>
             <div class="relative mt-4" id="chart-wrap">
               <svg id="revenue-chart" viewBox="0 0 560 220" class="w-full h-[220px]" preserveAspectRatio="none"></svg>
@@ -210,7 +224,7 @@
           </div>
 
           <!-- Best sellers -->
-          <div class="bg-white rounded-2xl shadow-card p-5">
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
             <h2 class="font-bold text-coffee-900 mb-4">Best sellers</h2>
             <div class="space-y-4">
               <div class="flex items-center gap-3">
@@ -242,7 +256,7 @@
         </div>
 
         <!-- Recent orders -->
-        <div class="bg-white rounded-2xl shadow-card mt-4 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 mt-4 overflow-hidden">
           <div class="flex items-center justify-between px-5 pt-5 pb-2">
             <h2 class="font-bold text-coffee-900">Recent orders</h2>
             <button data-goto="orders" class="text-sm font-bold text-gold-600 hover:text-gold-500">View all &rarr;</button>
@@ -279,7 +293,7 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full" id="orders-table">
               <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
@@ -306,7 +320,7 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full" id="products-table">
               <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Units sold</th><th>Status</th></tr></thead>
@@ -332,13 +346,47 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full" id="customers-table">
               <thead><tr><th>Customer</th><th>Email</th><th>Orders</th><th>Total spent</th><th>Joined</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      <!-- ================= DISTRIBUTORS ================= -->
+      <section id="view-distributors" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Distributor Applications</h1>
+            <p class="text-coffee-500 text-sm mt-1">Everyone who applied through the "Become a Distributor" form on the site.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="distributors-search" type="text" placeholder="Search by name, email, or address" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="distributors-channel-filter">
+            <button data-channel="all" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
+            <button data-channel="Lazada" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Lazada</button>
+            <button data-channel="Shopee" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Shopee</button>
+            <button data-channel="TikTok" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">TikTok</button>
+            <button data-channel="Offline" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Offline</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="distributors-table">
+              <thead><tr><th>Applicant</th><th>Contact</th><th>Address</th><th>Plans to sell on</th><th>Applied</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="distributors-empty" class="hidden text-center text-sm text-coffee-400 py-10">No applications match your search.</p>
         </div>
       </section>
 
@@ -382,9 +430,71 @@ const customers = [
   { name: 'Liza Mendoza',      email: 'liza.mendoza@gmail.com',   orders: 2, spent: 1496, joined: 'Jun 18, 2026' },
 ];
 
-const revenue7d = [
-  { day: 'Wed', v: 4820 }, { day: 'Thu', v: 6140 }, { day: 'Fri', v: 5390 },
-  { day: 'Sat', v: 8920 }, { day: 'Sun', v: 7460 }, { day: 'Mon', v: 5980 }, { day: 'Tue', v: 9310 },
+const PERIODS = {
+  daily: {
+    subtitle: "Here's how Kopify is doing today.",
+    periodLabel: 'vs yesterday',
+    stats: {
+      revenue: { value: 6980,  delta: -4.6 },
+      orders:  { value: 9,     delta: 12.5 },
+      customers: { value: 7,   delta: 0 },
+      boxes:   { value: 19,    delta: 8.0 },
+    },
+    chart: {
+      title: 'Revenue, today',
+      note: 'In ₱, per 3-hour block',
+      data: [
+        { label: '6AM',  v: 320  }, { label: '9AM',  v: 980  }, { label: '12PM', v: 1640 },
+        { label: '3PM',  v: 890  }, { label: '6PM',  v: 1720 }, { label: '9PM',  v: 1430 },
+      ],
+    },
+  },
+  weekly: {
+    subtitle: "Here's how Kopify is doing this week.",
+    periodLabel: 'vs last week',
+    stats: {
+      revenue: { value: 47990, delta: 15.3 },
+      orders:  { value: 51,    delta: 6.8  },
+      customers: { value: 41,  delta: 9.2  },
+      boxes:   { value: 121,   delta: 18.4 },
+    },
+    chart: {
+      title: 'Revenue, last 7 days',
+      note: 'In ₱, per day',
+      data: [
+        { label: 'Wed', v: 4820 }, { label: 'Thu', v: 6140 }, { label: 'Fri', v: 5390 },
+        { label: 'Sat', v: 8920 }, { label: 'Sun', v: 7460 }, { label: 'Mon', v: 5980 }, { label: 'Tue', v: 9310 },
+      ],
+    },
+  },
+  monthly: {
+    subtitle: "Here's how Kopify is doing this month.",
+    periodLabel: 'vs last month',
+    stats: {
+      revenue: { value: 182450, delta: 18.2 },
+      orders:  { value: 214,    delta: 9.4  },
+      customers: { value: 187,  delta: 12.5 },
+      boxes:   { value: 512,    delta: 22.0 },
+    },
+    chart: {
+      title: 'Revenue, last 5 weeks',
+      note: 'In ₱, per week',
+      data: [
+        { label: 'Wk 1', v: 38200 }, { label: 'Wk 2', v: 41800 }, { label: 'Wk 3', v: 33900 },
+        { label: 'Wk 4', v: 44100 }, { label: 'Wk 5', v: 24450 },
+      ],
+    },
+  },
+};
+let currentPeriod = 'monthly';
+
+const distributors = [
+  { name: 'Cilebritee Shop',    address: 'Unit 4B, Alabang, Muntinlupa City',      email: 'orders@cilebriteeshop.ph',   mobile: '0917 234 5678', channel: 'Shopee',  applied: 'Aug 12, 2026' },
+  { name: 'Jasmine Uy',         address: 'Brgy. Poblacion, Davao City',            email: 'jasmine.uy@gmail.com',       mobile: '0928 812 3344', channel: 'TikTok',  applied: 'Aug 10, 2026' },
+  { name: 'Mark Villanueva',    address: '25 Kalayaan St, Quezon City',            email: 'mark.villanueva@gmail.com',  mobile: '0915 667 2210', channel: 'Lazada',  applied: 'Aug 08, 2026' },
+  { name: 'Grace Tolentino',    address: 'Purok 3, Bacolod City',                  email: 'gtolentino.biz@gmail.com',   mobile: '0906 441 7789', channel: 'Offline', applied: 'Aug 05, 2026' },
+  { name: 'Kevin Ang',          address: 'San Fernando, Pampanga',                 email: 'kevin.ang@yahoo.com',        mobile: '0933 220 9981', channel: 'Shopee',  applied: 'Aug 03, 2026' },
+  { name: 'Precious Del Rosario', address: 'Lapu-Lapu City, Cebu',                 email: 'precious.delrosario@gmail.com', mobile: '0919 556 3312', channel: 'TikTok', applied: 'Jul 30, 2026' },
 ];
 
 // ---------- Helpers ----------
@@ -495,15 +605,65 @@ function renderCustomers() {
 }
 document.getElementById('customers-search').addEventListener('input', renderCustomers);
 
+// ---------- Render: distributor applications ----------
+let distributorsChannelFilter = 'all';
+function renderDistributors() {
+  const q = document.getElementById('distributors-search').value.trim().toLowerCase();
+  const rows = distributors.filter(d =>
+    (distributorsChannelFilter === 'all' || d.channel === distributorsChannelFilter) &&
+    (d.name.toLowerCase().includes(q) || d.email.toLowerCase().includes(q) || d.address.toLowerCase().includes(q))
+  );
+  const channelStyle = {
+    Lazada:  { bg: '#FFE4E0', text: '#C2410C' },
+    Shopee:  { bg: '#FFE4E9', text: '#BE185D' },
+    TikTok:  { bg: '#E9E9EA', text: '#18181B' },
+    Offline: { bg: '#F3E1CC', text: '#6F4423' },
+  };
+  const tbody = document.querySelector('#distributors-table tbody');
+  tbody.innerHTML = rows.map(d => {
+    const c = channelStyle[d.channel] || channelStyle.Offline;
+    return `
+    <tr>
+      <td class="font-semibold text-coffee-900">${d.name}</td>
+      <td>
+        <p class="text-coffee-800">${d.email}</p>
+        <p class="text-coffee-400 text-xs">${d.mobile}</p>
+      </td>
+      <td class="text-coffee-500">${d.address}</td>
+      <td><span class="status-pill" style="background:${c.bg};color:${c.text}">${d.channel}</span></td>
+      <td class="text-coffee-500">${d.applied}</td>
+      <td>
+        <a href="mailto:${d.email}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-coffee-50 text-coffee-500" title="Email ${d.name}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 6h18v12H3V6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m3 6 9 7 9-7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </a>
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('distributors-empty').classList.toggle('hidden', rows.length > 0);
+}
+document.getElementById('distributors-search').addEventListener('input', renderDistributors);
+document.querySelectorAll('#distributors-channel-filter .channel-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    distributorsChannelFilter = btn.dataset.channel;
+    document.querySelectorAll('#distributors-channel-filter .channel-filter-btn').forEach(b => {
+      b.classList.remove('bg-coffee-800', 'text-white');
+      b.classList.add('text-coffee-500');
+    });
+    btn.classList.add('bg-coffee-800', 'text-white');
+    btn.classList.remove('text-coffee-500');
+    renderDistributors();
+  });
+});
+
 // ---------- Revenue bar chart ----------
-function renderChart() {
+function renderChart(data) {
   const svg = document.getElementById('revenue-chart');
   const W = 560, H = 220, padL = 40, padB = 28, padT = 10;
   const plotW = W - padL - 10, plotH = H - padB - padT;
-  const max = Math.max(...revenue7d.map(d => d.v));
-  const niceMax = Math.ceil(max / 2000) * 2000;
-  const barW = 24;
-  const gap = (plotW - barW * revenue7d.length) / (revenue7d.length - 1 + 2);
+  const max = Math.max(...data.map(d => d.v));
+  const niceMax = Math.ceil(max / 2000) * 2000 || 1000;
+  const barW = data.length <= 6 ? 32 : 24;
+  const gap = (plotW - barW * data.length) / (data.length - 1 + 2);
 
   let gridSvg = '';
   const ticks = 4;
@@ -515,13 +675,13 @@ function renderChart() {
   }
 
   let barsSvg = '';
-  revenue7d.forEach((d, i) => {
+  data.forEach((d, i) => {
     const x = padL + gap + i * (barW + gap);
     const barH = (d.v / niceMax) * plotH;
     const y = padT + plotH - barH;
     barsSvg += `
       <rect data-i="${i}" x="${x}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="#D4941F" class="chart-bar" style="cursor:pointer"/>
-      <text x="${x + barW/2}" y="${H - 8}" font-size="11" fill="#8B5A2B" text-anchor="middle" font-weight="600">${d.day}</text>
+      <text x="${x + barW/2}" y="${H - 8}" font-size="11" fill="#8B5A2B" text-anchor="middle" font-weight="600">${d.label}</text>
     `;
   });
 
@@ -531,8 +691,8 @@ function renderChart() {
   svg.querySelectorAll('.chart-bar').forEach(bar => {
     bar.addEventListener('mouseenter', () => {
       const i = +bar.dataset.i;
-      const d = revenue7d[i];
-      tooltip.textContent = `${d.day}: ${peso(d.v)}`;
+      const d = data[i];
+      tooltip.textContent = `${d.label}: ${peso(d.v)}`;
       tooltip.classList.remove('hidden');
       const rect = bar.getBoundingClientRect();
       const wrapRect = document.getElementById('chart-wrap').getBoundingClientRect();
@@ -543,6 +703,40 @@ function renderChart() {
   });
 }
 
+// ---------- Period switching (Daily / Weekly / Monthly reporting) ----------
+function fmtDelta(n) {
+  if (n === 0) return { text: '— 0.0%', color: '#8B5A2B' };
+  const arrow = n > 0 ? '↑' : '↓';
+  const color = n > 0 ? '#059669' : '#DC2626';
+  return { text: `${arrow} ${Math.abs(n).toFixed(1)}%`, color };
+}
+function applyPeriod(period) {
+  currentPeriod = period;
+  const p = PERIODS[period];
+
+  document.getElementById('home-subtitle').textContent = p.subtitle;
+  document.getElementById('chart-title').textContent = p.chart.title;
+  document.getElementById('chart-note').textContent = p.chart.note;
+
+  const statMap = { revenue: 'stat-revenue', orders: 'stat-orders', customers: 'stat-customers', boxes: 'stat-boxes' };
+  Object.entries(statMap).forEach(([key, idPrefix]) => {
+    const s = p.stats[key];
+    const valueEl = document.getElementById(idPrefix);
+    valueEl.textContent = key === 'revenue' ? peso(s.value) : s.value.toLocaleString('en-PH');
+    const deltaEl = document.getElementById(idPrefix + '-delta');
+    const { text, color } = fmtDelta(s.delta);
+    deltaEl.textContent = text;
+    deltaEl.style.color = color;
+    document.getElementById(idPrefix + '-period').textContent = p.periodLabel;
+  });
+
+  document.querySelectorAll('#period-filter .period-btn').forEach(b => b.classList.toggle('active', b.dataset.period === period));
+  renderChart(p.chart.data);
+}
+document.querySelectorAll('#period-filter .period-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyPeriod(btn.dataset.period));
+});
+
 // ---------- Nav switching ----------
 const navBtns = document.querySelectorAll('.nav-btn[data-view]');
 const views = {
@@ -550,6 +744,7 @@ const views = {
   orders: document.getElementById('view-orders'),
   products: document.getElementById('view-products'),
   customers: document.getElementById('view-customers'),
+  distributors: document.getElementById('view-distributors'),
 };
 function goToView(name) {
   if (!views[name]) return;
@@ -570,7 +765,10 @@ renderRecentOrders();
 renderOrders();
 renderProducts();
 renderCustomers();
-renderChart();
+renderDistributors();
+applyPeriod('monthly');
+document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
+document.getElementById('dist-nav-count').textContent = distributors.length;
 </script>
 </body>
 </html>
