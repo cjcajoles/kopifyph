@@ -448,10 +448,15 @@
           </div>
         </div>
 
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+          <span class="text-xs font-bold uppercase tracking-wide text-coffee-400 mr-1">By region</span>
+          <div class="flex flex-wrap gap-1.5" id="distributors-region-filter"></div>
+        </div>
+
         <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full" id="distributors-table">
-              <thead><tr><th>Applicant</th><th>Contact</th><th>Address</th><th>Plans to sell on</th><th>Applied</th><th></th></tr></thead>
+              <thead><tr><th>Applicant</th><th>Contact</th><th>Address</th><th>Region</th><th>Plans to sell on</th><th>Applied</th><th></th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -565,10 +570,15 @@
           </div>
         </div>
 
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+          <span class="text-xs font-bold uppercase tracking-wide text-coffee-400 mr-1">By region</span>
+          <div class="flex flex-wrap gap-1.5" id="affiliates-region-filter"></div>
+        </div>
+
         <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full" id="affiliates-table">
-              <thead><tr><th>Affiliate</th><th>Referral Link</th><th>Orders</th><th>Boxes Sold</th><th>Commission Earned</th><th>Status</th></tr></thead>
+              <thead><tr><th>Affiliate</th><th>Region</th><th>Referral Link</th><th>Orders</th><th>Boxes Sold</th><th>Commission Earned</th><th>Status</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -697,13 +707,21 @@ const PERIODS = {
 };
 let currentPeriod = 'monthly';
 
+// PH regions, matching the checkout page's address dataset — used to label
+// and filter/count distributors and affiliates by where they're based.
+const PH_REGIONS = [
+  'NCR', 'CAR', 'Region I', 'Region II', 'Region III', 'Region IV-A', 'MIMAROPA',
+  'Region V', 'Region VI', 'Region VII', 'Region VIII', 'Region IX', 'Region X',
+  'Region XI', 'Region XII', 'Region XIII', 'BARMM', 'NIR',
+];
+
 const distributors = [
-  { name: 'Cilebritee Shop',    address: 'Unit 4B, Alabang, Muntinlupa City',      email: 'orders@cilebriteeshop.ph',   mobile: '0917 234 5678', channel: 'Shopee',  applied: 'Aug 12, 2026' },
-  { name: 'Jasmine Uy',         address: 'Brgy. Poblacion, Davao City',            email: 'jasmine.uy@gmail.com',       mobile: '0928 812 3344', channel: 'TikTok',  applied: 'Aug 10, 2026' },
-  { name: 'Mark Villanueva',    address: '25 Kalayaan St, Quezon City',            email: 'mark.villanueva@gmail.com',  mobile: '0915 667 2210', channel: 'Lazada',  applied: 'Aug 08, 2026' },
-  { name: 'Grace Tolentino',    address: 'Purok 3, Bacolod City',                  email: 'gtolentino.biz@gmail.com',   mobile: '0906 441 7789', channel: 'Offline', applied: 'Aug 05, 2026' },
-  { name: 'Kevin Ang',          address: 'San Fernando, Pampanga',                 email: 'kevin.ang@yahoo.com',        mobile: '0933 220 9981', channel: 'Shopee',  applied: 'Aug 03, 2026' },
-  { name: 'Precious Del Rosario', address: 'Lapu-Lapu City, Cebu',                 email: 'precious.delrosario@gmail.com', mobile: '0919 556 3312', channel: 'TikTok', applied: 'Jul 30, 2026' },
+  { name: 'Cilebritee Shop',    address: 'Unit 4B, Alabang, Muntinlupa City',      email: 'orders@cilebriteeshop.ph',   mobile: '0917 234 5678', channel: 'Shopee',  region: 'NCR',        applied: 'Aug 12, 2026' },
+  { name: 'Jasmine Uy',         address: 'Brgy. Poblacion, Davao City',            email: 'jasmine.uy@gmail.com',       mobile: '0928 812 3344', channel: 'TikTok',  region: 'Region XI',  applied: 'Aug 10, 2026' },
+  { name: 'Mark Villanueva',    address: '25 Kalayaan St, Quezon City',            email: 'mark.villanueva@gmail.com',  mobile: '0915 667 2210', channel: 'Lazada',  region: 'NCR',        applied: 'Aug 08, 2026' },
+  { name: 'Grace Tolentino',    address: 'Purok 3, Bacolod City',                  email: 'gtolentino.biz@gmail.com',   mobile: '0906 441 7789', channel: 'Offline', region: 'NIR',        applied: 'Aug 05, 2026' },
+  { name: 'Kevin Ang',          address: 'San Fernando, Pampanga',                 email: 'kevin.ang@yahoo.com',        mobile: '0933 220 9981', channel: 'Shopee',  region: 'Region III', applied: 'Aug 03, 2026' },
+  { name: 'Precious Del Rosario', address: 'Lapu-Lapu City, Cebu',                 email: 'precious.delrosario@gmail.com', mobile: '0919 556 3312', channel: 'TikTok', region: 'Region VII', applied: 'Jul 30, 2026' },
 ];
 
 let vouchers = [
@@ -726,22 +744,22 @@ const COMMISSION_PER_BOX = 60;
 const boxesInPack = { '1 Box': 1, '3 Boxes': 3, '10 Boxes': 10 };
 
 let affiliates = [
-  { name: 'Bea Santos',      email: 'bea.santos@gmail.com',      code: 'BEA10',   status: 'Active', joined: 'Jul 10, 2026',
+  { name: 'Bea Santos',      email: 'bea.santos@gmail.com',      code: 'BEA10',   status: 'Active', region: 'NCR',        joined: 'Jul 10, 2026',
     orders: [
       { orderId: '#KPY10231', customer: 'Maria Santos', pack: '3 Boxes',  date: 'Aug 14, 2026' },
       { orderId: '#KPY10224', customer: 'Joana Lazaro',  pack: '10 Boxes', date: 'Aug 11, 2026' },
       { orderId: '#KPY10198', customer: 'Liza Mendoza',  pack: '1 Box',   date: 'Aug 07, 2026' },
     ] },
-  { name: 'Marco Villareal', email: 'marco.villareal@gmail.com', code: 'MARCO15', status: 'Active', joined: 'Jul 22, 2026',
+  { name: 'Marco Villareal', email: 'marco.villareal@gmail.com', code: 'MARCO15', status: 'Active', region: 'Region VII', joined: 'Jul 22, 2026',
     orders: [
       { orderId: '#KPY10229', customer: 'Cathy Lim Domingo', pack: '10 Boxes', date: 'Aug 13, 2026' },
       { orderId: '#KPY10220', customer: 'Diego Ramos',       pack: '3 Boxes',  date: 'Aug 09, 2026' },
     ] },
-  { name: 'Jamie Cruz',      email: 'jamie.cruz@gmail.com',      code: 'JAMIE5',  status: 'Active', joined: 'Aug 01, 2026',
+  { name: 'Jamie Cruz',      email: 'jamie.cruz@gmail.com',      code: 'JAMIE5',  status: 'Active', region: 'Region III', joined: 'Aug 01, 2026',
     orders: [
       { orderId: '#KPY10227', customer: 'Ots Jimenez',   pack: '1 Box',   date: 'Aug 12, 2026' },
     ] },
-  { name: 'Rhea Domingo',    email: 'rhea.domingo@yahoo.com',    code: 'RHEA20',  status: 'Inactive', joined: 'Jun 15, 2026',
+  { name: 'Rhea Domingo',    email: 'rhea.domingo@yahoo.com',    code: 'RHEA20',  status: 'Inactive', region: 'Region IV-A', joined: 'Jun 15, 2026',
     orders: [] },
 ];
 
@@ -764,6 +782,23 @@ const statusStyle = {
 function statusPill(status) {
   const s = statusStyle[status] || statusStyle.Pending;
   return `<span class="status-pill" style="background:${s.bg};color:${s.text}"><span class="status-dot" style="background:${s.dot}"></span>${status}</span>`;
+}
+
+// Renders "All (N)" + one pill per region actually present in `list` (each labeled
+// with its own count), so admins can see and filter distributor/affiliate counts
+// by area (e.g. "how many do we have in NCR?") without a separate summary panel.
+function renderRegionPills(containerId, list, activeRegion, onSelect) {
+  const counts = {};
+  list.forEach(item => { counts[item.region] = (counts[item.region] || 0) + 1; });
+  const present = PH_REGIONS.filter(r => counts[r]);
+  const container = document.getElementById(containerId);
+  const pillClass = (active) => `region-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold ${active ? 'bg-coffee-800 text-white' : 'bg-white border border-coffee-100 text-coffee-500'}`;
+  container.innerHTML =
+    `<button data-region="all" class="${pillClass(activeRegion === 'all')}">All (${list.length})</button>` +
+    present.map(r => `<button data-region="${r}" class="${pillClass(activeRegion === r)}">${r} (${counts[r]})</button>`).join('');
+  container.querySelectorAll('[data-region]').forEach(btn => {
+    btn.addEventListener('click', () => onSelect(btn.dataset.region));
+  });
 }
 
 // ---------- Render: recent orders (Home) ----------
@@ -929,10 +964,12 @@ async function loadRealData() {
 
 // ---------- Render: distributor applications ----------
 let distributorsChannelFilter = 'all';
+let distributorsRegionFilter = 'all';
 function renderDistributors() {
   const q = document.getElementById('distributors-search').value.trim().toLowerCase();
   const rows = distributors.filter(d =>
     (distributorsChannelFilter === 'all' || d.channel === distributorsChannelFilter) &&
+    (distributorsRegionFilter === 'all' || d.region === distributorsRegionFilter) &&
     (d.name.toLowerCase().includes(q) || d.email.toLowerCase().includes(q) || d.address.toLowerCase().includes(q))
   );
   const channelStyle = {
@@ -952,6 +989,7 @@ function renderDistributors() {
         <p class="text-coffee-400 text-xs">${d.mobile}</p>
       </td>
       <td class="text-coffee-500">${d.address}</td>
+      <td class="text-coffee-500">${d.region}</td>
       <td><span class="status-pill" style="background:${c.bg};color:${c.text}">${d.channel}</span></td>
       <td class="text-coffee-500">${d.applied}</td>
       <td>
@@ -962,6 +1000,10 @@ function renderDistributors() {
     </tr>`;
   }).join('');
   document.getElementById('distributors-empty').classList.toggle('hidden', rows.length > 0);
+  renderRegionPills('distributors-region-filter', distributors, distributorsRegionFilter, (region) => {
+    distributorsRegionFilter = region;
+    renderDistributors();
+  });
 }
 document.getElementById('distributors-search').addEventListener('input', renderDistributors);
 document.querySelectorAll('#distributors-channel-filter .channel-filter-btn').forEach(btn => {
@@ -1108,9 +1150,13 @@ function affiliateStats(a) {
   const boxes = a.orders.reduce((sum, o) => sum + (boxesInPack[o.pack] || 0), 0);
   return { orders: a.orders.length, boxes, commission: boxes * COMMISSION_PER_BOX };
 }
+let affiliatesRegionFilter = 'all';
 function renderAffiliates() {
   const q = document.getElementById('affiliates-search').value.trim().toLowerCase();
-  const rows = affiliates.filter(a => a.name.toLowerCase().includes(q) || a.code.toLowerCase().includes(q));
+  const rows = affiliates.filter(a =>
+    (affiliatesRegionFilter === 'all' || a.region === affiliatesRegionFilter) &&
+    (a.name.toLowerCase().includes(q) || a.code.toLowerCase().includes(q))
+  );
   const tbody = document.querySelector('#affiliates-table tbody');
   tbody.innerHTML = rows.map((a, i) => {
     const s = affiliateStats(a);
@@ -1122,6 +1168,7 @@ function renderAffiliates() {
         <p class="font-semibold text-coffee-900">${a.name}</p>
         <p class="text-xs text-coffee-400">${a.email}</p>
       </td>
+      <td class="text-coffee-500">${a.region}</td>
       <td>
         <div class="flex items-center gap-2">
           <span class="font-mono text-xs bg-coffee-50 text-coffee-700 px-2 py-1 rounded-lg">${link}</span>
@@ -1137,6 +1184,10 @@ function renderAffiliates() {
     </tr>`;
   }).join('');
   document.getElementById('affiliates-empty').classList.toggle('hidden', rows.length > 0);
+  renderRegionPills('affiliates-region-filter', affiliates, affiliatesRegionFilter, (region) => {
+    affiliatesRegionFilter = region;
+    renderAffiliates();
+  });
 
   const totals = affiliates.reduce((acc, a) => {
     const s = affiliateStats(a);
@@ -1165,8 +1216,10 @@ document.getElementById('affiliate-create-btn').addEventListener('click', () => 
   if (!name || !name.trim()) return;
   const email = prompt('Affiliate email:');
   if (!email || !email.trim()) return;
+  const region = prompt('Region (e.g. NCR, Region IV-A):');
+  if (!region || !region.trim()) return;
   const code = (name.trim().split(' ')[0] + Math.floor(Math.random() * 90 + 10)).toUpperCase();
-  affiliates.unshift({ name: name.trim(), email: email.trim(), code, status: 'Active', joined: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), orders: [] });
+  affiliates.unshift({ name: name.trim(), email: email.trim(), code, status: 'Active', region: region.trim(), joined: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), orders: [] });
   renderAffiliates();
 });
 
