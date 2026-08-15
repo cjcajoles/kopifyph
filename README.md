@@ -29,12 +29,11 @@ This build could not reach `kopify.shop` (network egress to that domain — and 
 
 ## PWA
 
-`manifest.json` + meta tags make the site installable to a home screen. App icons are generated placeholder brand marks at `assets/icons/`.
+`manifest.json` + meta tags make the site installable to a home screen. App icons are generated placeholder brand marks, inlined as base64 `data:` URIs directly in `manifest.json` and `index.html` (no separate binary asset files, keeping the whole site push/deploy-friendly as plain text).
 
 ## Structure
 
 ```
-index.html        — entire site (single file, Tailwind via CDN)
-manifest.json      — PWA manifest
-assets/icons/      — generated PWA icons (192, 512)
+index.html      — entire site (single file, Tailwind via CDN)
+manifest.json   — PWA manifest
 ```
