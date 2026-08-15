@@ -31,15 +31,35 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 
 ## FDA Approved section
 
-New section added after the founders' letter, per client request, showing the certificate with an arrow callout. Registration details (FDA Reg. No. FR-4000015029346, brand/product name, packaging, validity 13 Mar 2026 – 13 Mar 2029) are transcribed from the certificate the client shared and are real. The **manufacturer name and address are intentionally left redacted** — the client said this is not allowed to be shown publicly. The certificate itself is still a placeholder card (text only); swap in the real certificate image when available, and keep the manufacturer field blurred/cropped out of that image too, not just the text summary.
+New section added after the founders' letter, per client request, showing the real certificate with an arrow callout. `assets/fda-certificate.jpg` is the actual FDA Certificate of Product Registration (Reg. No. FR-4000015029346, valid 13 Mar 2026 – 13 Mar 2029), rendered from the PDF the client uploaded. The **manufacturer name and address are pixelated out** in the image itself, per the client's instruction that this must not be shown publicly — do not restore it or re-render from the original PDF without re-applying the redaction.
+
+## Known limitation: most photos are still placeholders
+
+This build could not reach `kopify.shop` directly (network egress to that domain, and its related `kopify.ph` / `buy.kopify.ph` domains, was blocked in the build environment). Most of the real copy was instead transcribed from screenshots of the live page the client provided partway through the build. What's real vs. still-uncertain:
+
+**Real / high confidence:**
+- All hero, product intro, benefits grid, distributor section, and pricing copy — from Spec.md.
+- Founders' letter (Randave & CJ), hero callout ("Your coffee is boring..."), benefits/testimonials/ingredients CTA taglines and stats row (5.0★, 10K+ Ratings, 10K+ Sold), and the "It's not just coffee...It's Kopify" benefits list — transcribed from client screenshots.
+- The 20-ingredient list and its 4 groupings (Moringa, Turmeric, Barley, Goji Berry groups) — transcribed and cross-checked against public search results, and confirmed again by the FAQ Q1 screenshot.
+- FAQ Q1 (ingredients) — verbatim from a live-site screenshot. FAQ distributor answer — verbatim from spec.
+- FDA certificate — the real document (see above).
+- Testimonial names (Cathy Lim-Domingo, Ots Jimenez, Mara Gaviola, Direk Paul, Joana Lazaro, Cilebritee Shop) — from spec.
+
+**Needs a final proofread — search for `TODO` in `index.html`:**
+- The 6 testimonial quotes were transcribed from small print in a screenshot and may have small wording errors.
+- FAQ answers 2–10 (everything except Q1 and the distributor one) are still best-effort copy in the site's voice, not transcribed from a source.
+
+**Still placeholder:**
+- Hero/product/testimonial/founder/collage/benefit photos are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
 
 ## PWA
 
-`manifest.json` + meta tags make the site installable to a home screen. App icons are generated placeholder brand marks, inlined as base64 `data:` URIs directly in `manifest.json` and `index.html` (no separate binary asset files, keeping the whole site push/deploy-friendly as plain text).
+`manifest.json` + meta tags make the site installable to a home screen. App icons are generated placeholder brand marks, inlined as base64 `data:` URIs directly in `manifest.json` and `index.html`.
 
 ## Structure
 
 ```
-index.html      — entire site (single file, Tailwind via CDN)
-manifest.json   — PWA manifest
+index.html                     — entire site (Tailwind via CDN)
+manifest.json                  — PWA manifest
+assets/fda-certificate.jpg     — real FDA certificate (manufacturer redacted)
 ```
