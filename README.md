@@ -2,6 +2,19 @@
 
 Standalone, self-hosted rebuild of the Kopify PH sales page. Plain HTML + Tailwind CSS (CDN) + vanilla JS. No build step — deploy by dragging this folder into [Netlify Drop](https://app.netlify.com/drop).
 
+## Next steps (paused here — resume when ready)
+
+Status as of the last work session, checked against the 4-item launch checklist:
+
+1. **Real backend — mostly done.** Supabase is live; Products, Customers, and Orders are real (checkout writes real orders, admin reads them). Still mock/placeholder: Distributors, Vouchers, Refunds, Affiliates tabs, and the Home dashboard's daily/weekly/monthly stat cards.
+2. **Real login — admin confirmed, affiliate untested.** `support@kopify.ph` admin login is real and confirmed working. Affiliate login code is written the same way and passed automated tests, but no real affiliate account has been created yet to confirm it live.
+3. **Real payments — not started.** Checkout only *records* which payment method was picked (GCash / Bank Transfer); no money moves through the site yet. Orders would need manual verification + marking "Paid" by hand in admin for now. A real gateway (e.g. PayMongo or Xendit, common for PH GCash/card) isn't wired in.
+4. **Hosting and domain — not started.** The site only exists in this repo — there's no live URL yet. Needs: (a) a host (Vercel is a natural fit for this static site), and (b) a domain (`kopify.ph` or similar — confirm whether it's already owned or still needs buying).
+
+**Also parked, lower priority than the above:** wiring Distributors and Affiliates to real submissions (the "Become a Distributor" form currently just opens an email draft instead of saving to the database; the Affiliates admin tab still shows sample names). A `region` column already exists on both tables for the area-filter feature, ready for when this gets wired up. Decide affiliate account creation approach first (admin creates each login manually vs. self-serve signup) before building this out.
+
+Suggested order when resuming: **hosting + domain first** (nothing above is visible to real customers until the site is live somewhere), payments next (can launch manually at first), then Distributors/Affiliates real-data wiring.
+
 ## Before launch — config to update
 
 All in `index.html`:
