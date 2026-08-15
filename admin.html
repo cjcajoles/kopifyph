@@ -630,43 +630,14 @@ let currentAdminEmail = '';
   currentAdminEmail = session.user.email;
   const emailEl = document.getElementById('settings-account-email');
   if (emailEl) emailEl.textContent = currentAdminEmail;
+  await loadRealData();
   document.body.setAttribute('data-auth-checked', '1');
 })();
 
-// ---------- Mock data ----------
-const orders = [
-  { id: '#KPY10231', customer: 'Maria Santos',     pack: '3 Boxes',  date: 'Aug 14, 2026', total: 1097, status: 'Paid' },
-  { id: '#KPY10230', customer: 'Jonas Reyes',       pack: '1 Box',    date: 'Aug 14, 2026', total: 399,  status: 'Pending' },
-  { id: '#KPY10229', customer: 'Cathy Lim Domingo', pack: '10 Boxes', date: 'Aug 13, 2026', total: 3790, status: 'Shipped' },
-  { id: '#KPY10228', customer: 'Ana Bautista',      pack: '3 Boxes',  date: 'Aug 13, 2026', total: 1097, status: 'Paid' },
-  { id: '#KPY10227', customer: 'Ots Jimenez',       pack: '1 Box',    date: 'Aug 12, 2026', total: 399,  status: 'Shipped' },
-  { id: '#KPY10226', customer: 'Mara Gaviola',      pack: '3 Boxes',  date: 'Aug 12, 2026', total: 1097, status: 'Paid' },
-  { id: '#KPY10225', customer: 'Paulo Dela Cruz',   pack: '1 Box',    date: 'Aug 11, 2026', total: 399,  status: 'Cancelled' },
-  { id: '#KPY10224', customer: 'Joana Lazaro',      pack: '10 Boxes', date: 'Aug 11, 2026', total: 3790, status: 'Paid' },
-  { id: '#KPY10223', customer: 'Rico Fernandez',    pack: '3 Boxes',  date: 'Aug 10, 2026', total: 1097, status: 'Shipped' },
-  { id: '#KPY10222', customer: 'Liza Mendoza',      pack: '1 Box',    date: 'Aug 10, 2026', total: 399,  status: 'Pending' },
-  { id: '#KPY10221', customer: 'Cilebritee Shop',   pack: '10 Boxes', date: 'Aug 09, 2026', total: 3790, status: 'Paid' },
-  { id: '#KPY10220', customer: 'Diego Ramos',       pack: '3 Boxes',  date: 'Aug 09, 2026', total: 1097, status: 'Cancelled' },
-];
-
-const products = [
-  { name: '1 Box',   sub: '10 Sachets Inside',      img: './assets/pack-1box.jpg',    price: 399,  stock: 340, sold: 198, status: 'Published' },
-  { name: '3 Boxes', sub: 'Family Pack – Best Seller', img: './assets/pack-3boxes.jpg', price: 1097, stock: 128, sold: 241, status: 'Published' },
-  { name: '10 Boxes',sub: 'Kopifyholic Bundle',      img: './assets/pack-10boxes.jpg', price: 3790, stock: 22,  sold: 73,  status: 'Published' },
-];
-
-const customers = [
-  { name: 'Maria Santos',      email: 'maria.santos@gmail.com',   orders: 5, spent: 4485, joined: 'Feb 12, 2026' },
-  { name: 'Cathy Lim Domingo', email: 'cathylim.d@gmail.com',     orders: 8, spent: 9720, joined: 'Jan 03, 2026' },
-  { name: 'Ots Jimenez',       email: 'ots.jimenez@gmail.com',    orders: 3, spent: 1197, joined: 'Mar 20, 2026' },
-  { name: 'Mara Gaviola',      email: 'mara.gaviola@yahoo.com',   orders: 6, spent: 6582, joined: 'Jan 28, 2026' },
-  { name: 'Joana Lazaro',      email: 'joana.lazaro@gmail.com',   orders: 2, spent: 4189, joined: 'Apr 09, 2026' },
-  { name: 'Ana Bautista',      email: 'ana.bautista21@gmail.com', orders: 4, spent: 3188, joined: 'Feb 27, 2026' },
-  { name: 'Paulo Dela Cruz',   email: 'paulo.delacruz@outlook.com', orders: 1, spent: 399, joined: 'Jul 30, 2026' },
-  { name: 'Cilebritee Shop',   email: 'orders@cilebriteeshop.ph', orders: 11, spent: 22990, joined: 'Nov 14, 2025' },
-  { name: 'Rico Fernandez',    email: 'rico.fernandez@gmail.com', orders: 3, spent: 2691, joined: 'May 05, 2026' },
-  { name: 'Liza Mendoza',      email: 'liza.mendoza@gmail.com',   orders: 2, spent: 1496, joined: 'Jun 18, 2026' },
-];
+// ---------- Real data (fetched from Supabase — see loadRealData()) ----------
+let orders = [];
+let products = [];
+let customers = [];
 
 const PERIODS = {
   daily: {
@@ -888,6 +859,73 @@ function renderCustomers() {
     </tr>`).join('');
 }
 document.getElementById('customers-search').addEventListener('input', renderCustomers);
+
+// ---------- Real data: orders, products, customers ----------
+// Customers aren't a separate fetch — they're derived from the real orders by
+// grouping on email, so order count/total spent can never drift out of sync
+// with the orders table itself.
+function fmtAdminDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+}
+
+async function loadRealData() {
+  const { data: orderRows, error: ordersError } = await sb
+    .from('orders')
+    .select('order_number, customer_name, customer_email, pack, total, status, created_at')
+    .order('created_at', { ascending: false });
+
+  if (ordersError) {
+    console.error(ordersError);
+  } else {
+    orders = orderRows.map(o => ({
+      id: o.order_number,
+      customer: o.customer_name,
+      email: o.customer_email,
+      pack: o.pack,
+      date: fmtAdminDate(o.created_at),
+      dateRaw: o.created_at,
+      total: o.total,
+      status: o.status,
+    }));
+
+    const byEmail = new Map();
+    orders.forEach(o => {
+      const existing = byEmail.get(o.email);
+      if (existing) {
+        existing.orders += 1;
+        existing.spent += o.total;
+        if (o.dateRaw < existing.joinedRaw) { existing.joinedRaw = o.dateRaw; existing.joined = o.date; }
+      } else {
+        byEmail.set(o.email, { name: o.customer, email: o.email, orders: 1, spent: o.total, joined: o.date, joinedRaw: o.dateRaw });
+      }
+    });
+    customers = Array.from(byEmail.values());
+  }
+
+  const { data: productRows, error: productsError } = await sb
+    .from('products')
+    .select('name, subtitle, price, stock, units_sold, status, image_path');
+
+  if (productsError) {
+    console.error(productsError);
+  } else {
+    products = productRows.map(p => ({
+      name: p.name,
+      sub: p.subtitle,
+      img: p.image_path,
+      price: p.price,
+      stock: p.stock,
+      sold: p.units_sold,
+      status: p.status,
+    }));
+  }
+
+  renderRecentOrders();
+  renderOrders();
+  renderProducts();
+  renderCustomers();
+  document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
+}
 
 // ---------- Render: distributor applications ----------
 let distributorsChannelFilter = 'all';
