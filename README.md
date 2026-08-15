@@ -31,7 +31,7 @@ Real photos added for all 6 testimonials: `assets/testimonial-{cathy,ots,mara,di
 
 ## Benefits grid photos
 
-`assets/benefit-lowcalorie.jpg` (steaming cup + coffee splash), `assets/benefit-acidreflux.jpg` (stomach shield icon + hand on belly), `assets/benefit-palpitation.jpg` (heart shield icon, "Heart Friendly" badge), `assets/benefit-jitters.jpg` (crossed-out brain icon), and `assets/benefit-bloating.jpg` (stomach outline icon, cropped from a source image that had "NO MORE BLOATING" baked in as text — cropped it out since the card's own `<h3>` heading already says that) are real images from client-supplied PDFs. Only "No Sugar Cravings" is still a placeholder.
+`assets/benefit-lowcalorie.jpg` (steaming cup + coffee splash), `assets/benefit-acidreflux.jpg` (stomach shield icon + hand on belly), `assets/benefit-palpitation.jpg` (heart shield icon, "Heart Friendly" badge), `assets/benefit-jitters.jpg` (crossed-out brain icon), `assets/benefit-bloating.jpg` (stomach outline icon, cropped from a source image that had "NO MORE BLOATING" baked in as text — cropped it out since the card's own `<h3>` heading already says that), and `assets/benefit-nosugar.jpg` (crossed-out sugar cubes icon, also cropped to remove baked-in "NO SUGAR" text) are real images from client-supplied PDFs. All 6 of 6 benefit-grid icons are now real.
 
 ## Hero video
 
@@ -58,7 +58,7 @@ This build could not reach `kopify.shop` directly (network egress to that domain
 - FAQ answers 2–10 (everything except Q1 and the distributor one) are still best-effort copy in the site's voice, not transcribed from a source.
 
 **Still placeholder:**
-- Product-intro photo and 1 of 6 benefit-grid photos (No Sugar Cravings) are labeled brown/gold placeholder shapes (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
+- Product-intro photo is a labeled brown/gold placeholder shape (per spec's fallback instruction). The Kopify logo is a hand-recreated SVG, not the source file. If you can share individual image files (not full-page screenshots), they can be dropped in directly.
 
 ## PWA
 
@@ -83,6 +83,7 @@ assets/benefit-acidreflux.jpg  — real photo, "No Acid Reflux" benefit card
 assets/benefit-palpitation.jpg — real photo, "No Palpitation" benefit card
 assets/benefit-jitters.jpg      — real icon, "No More Jitters" benefit card
 assets/benefit-bloating.jpg     — real icon, "No More Bloating" benefit card
+assets/benefit-nosugar.jpg      — real icon, "No Sugar Cravings" benefit card
 assets/testimonial-collage.jpg — real customer photo collage
 assets/testimonial-direkpaul.jpg — real photo, Direk Paul
 assets/testimonial-joana.jpg    — real photo, Joana Lazaro
