@@ -139,7 +139,7 @@ create table if not exists public.orders (
   pack text not null check (pack in ('1 Box', '3 Boxes', '10 Boxes')),
   boxes integer not null,
   total integer not null,
-  status text not null default 'Pending' check (status in ('Pending', 'Paid', 'Shipped', 'Cancelled')),
+  status text not null default 'Pending' check (status in ('Pending', 'Paid', 'Fulfilled', 'Shipped', 'Returned to Sender', 'Cancelled')),
   payment_method text,
   address_line text,
   region text,
