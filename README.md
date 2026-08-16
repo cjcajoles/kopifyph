@@ -8,10 +8,28 @@ Status as of the last work session, checked against the 4-item launch checklist:
 
 1. **Real backend — mostly done.** Supabase is live; Products, Customers, and Orders are real (checkout writes real orders, admin reads them). Still mock/placeholder: Distributors, Vouchers, Refunds, Affiliates tabs, and the Home dashboard's daily/weekly/monthly stat cards.
 2. **Real login — admin confirmed, affiliate untested.** `support@kopify.ph` admin login is real and confirmed working. Affiliate login code is written the same way and passed automated tests, but no real affiliate account has been created yet to confirm it live.
-3. **Real payments — not started.** Checkout only *records* which payment method was picked (GCash / Bank Transfer); no money moves through the site yet. Orders would need manual verification + marking "Paid" by hand in admin for now. A real gateway (e.g. PayMongo or Xendit, common for PH GCash/card) isn't wired in.
-4. **Hosting and domain — not started.** The site only exists in this repo — there's no live URL yet. Needs: (a) a host (Vercel is a natural fit for this static site), and (b) a domain (`kopify.ph` or similar — confirm whether it's already owned or still needs buying).
+3. **Real payments — code written, not yet deployed/tested live.** See "Payments (Xendit)" below.
+4. **Hosting and domain — in progress.** Deploying to Vercel (owner already has `kopify.ph` on GoDaddy — DNS connection is the remaining step once the Vercel project is live).
 
 **Also parked, lower priority than the above:** wiring Distributors and Affiliates to real submissions (the "Become a Distributor" form currently just opens an email draft instead of saving to the database; the Affiliates admin tab still shows sample names). A `region` column already exists on both tables for the area-filter feature, ready for when this gets wired up. Decide affiliate account creation approach first (admin creates each login manually vs. self-serve signup) before building this out.
+
+## Payments (Xendit)
+
+`api/create-invoice.js` and `api/xendit-webhook.js` are Vercel serverless functions (plain Node, no npm dependencies — use built-in `fetch`). Checkout creates a real Supabase order first, then calls `create-invoice` to get a Xendit-hosted payment page and redirects the shopper there; Xendit redirects back to `checkout.html?paid=1` (or `paid=0` on failure) afterward.
+
+The owner's Xendit account also runs an unrelated digital product (built in Lovable) whose "Invoice Paid" webhook currently points at a Zapier catch hook. Xendit only allows **one callback URL per event type per account** — so `xendit-webhook.js` is written as a router, not a Kopify-only handler: it checks the invoice's `external_id` prefix, handles anything starting `KPY` itself (marks the matching Supabase order Paid), and forwards everything else untouched to the original Zapier URL, so the existing automation keeps working unmodified. When product #3 exists, extend the same router with another prefix branch rather than adding a second webhook (Xendit won't allow that).
+
+**Required Vercel environment variables** (Project → Settings → Environment Variables — never commit these to the repo, which is public):
+
+| Variable | Where to find it |
+|---|---|
+| `XENDIT_SECRET_KEY` | Xendit dashboard → Settings → API Keys (the **secret** key, not the public key) |
+| `XENDIT_WEBHOOK_TOKEN` | Xendit dashboard → Settings → Developers → Webhooks (the account's Webhook Verification Token, shown near the top of that page) |
+| `SUPABASE_URL` | `https://atolfcpfleujeqzxgrxz.supabase.co` (same project as `supabase-config.js`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase dashboard → Settings → API (the **service_role** key — bypasses Row Level Security, so this must only ever live server-side, never in a committed file) |
+| `ZAPIER_FORWARD_URL` | The existing Zapier catch-hook URL currently set as Xendit's "Invoice Paid" callback |
+
+After deploying with those set, update Xendit's "Invoice Paid" webhook URL (Settings → Developers → Webhooks) to point at `https://kopify.ph/api/xendit-webhook` (or the Vercel-assigned domain, until the custom domain is connected) — this is what actually switches Xendit over to the new router. Test with one real low-value order before trusting it fully; watch that the very next real digital-product sale still reaches Zapier correctly.
 
 Suggested order when resuming: **hosting + domain first** (nothing above is visible to real customers until the site is live somewhere), payments next (can launch manually at first), then Distributors/Affiliates real-data wiring.
 
