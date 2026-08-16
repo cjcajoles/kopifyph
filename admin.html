@@ -389,13 +389,27 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden mb-4">
           <div class="overflow-x-auto">
             <table class="w-full" id="products-table">
-              <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Units sold</th><th>Status</th></tr></thead>
+              <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Units sold</th><th>Status</th><th></th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="px-5 pt-5 pb-2">
+            <h2 class="font-bold text-coffee-900">Recent stock changes</h2>
+            <p class="text-xs text-coffee-400 mt-0.5">Every delivery, distributor shipment, and paid order that touched stock.</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full" id="stock-movements-table">
+              <thead><tr><th>Product</th><th>Change</th><th>Reason</th><th>Date</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="stock-movements-empty" class="hidden text-center text-sm text-coffee-400 py-10">No stock changes yet.</p>
         </div>
       </section>
 
@@ -715,21 +729,16 @@ const PH_REGIONS = [
   'Region XI', 'Region XII', 'Region XIII', 'BARMM', 'NIR',
 ];
 
-// Real distributor applications land here once the public "Become a
-// Distributor" form is wired to Supabase — empty for now, no sample data.
-const distributors = [];
+// Real distributor applications — fetched from Supabase (see loadDistributors()).
+let distributors = [];
 
 // Real vouchers — fetched from Supabase (see loadVouchers()), since checkout
 // validates codes against this same table server-side.
 let vouchers = [];
 
-let refunds = [
-  { orderId: '#KPY10225', customer: 'Paulo Dela Cruz', pack: '1 Box',   amount: 399,  reason: 'Changed mind before it shipped',        requested: 'Aug 12, 2026', status: 'Refunded' },
-  { orderId: '#KPY10220', customer: 'Diego Ramos',     pack: '3 Boxes', amount: 1097, reason: 'Ordered by mistake (duplicate order)',   requested: 'Aug 10, 2026', status: 'Approved' },
-  { orderId: '#KPY10198', customer: 'Liza Mendoza',    pack: '1 Box',   amount: 399,  reason: 'Package arrived damaged',                requested: 'Aug 07, 2026', status: 'Requested' },
-  { orderId: '#KPY10176', customer: 'Rico Fernandez',  pack: '10 Boxes',amount: 3790, reason: 'Wrong pack delivered',                   requested: 'Aug 03, 2026', status: 'Requested' },
-  { orderId: '#KPY10142', customer: 'Ana Bautista',    pack: '3 Boxes', amount: 1097, reason: 'No longer wanted, past return window',   requested: 'Jul 28, 2026', status: 'Rejected' },
-];
+// Refund requests aren't collected anywhere real yet (no customer/admin flow
+// creates one) — empty for now, no sample data.
+let refunds = [];
 
 const COMMISSION_PER_BOX = 60;
 const boxesInPack = { '1 Box': 1, '3 Boxes': 3, '10 Boxes': 10 };
@@ -843,9 +852,52 @@ function renderProducts() {
       <td>${p.stock.toLocaleString('en-PH')}</td>
       <td class="text-coffee-500">${p.sold.toLocaleString('en-PH')}</td>
       <td>${statusPill(p.status)}</td>
+      <td><button data-adjust-stock="${p.name.replace(/"/g, '&quot;')}" class="text-xs font-bold text-gold-600 hover:text-gold-500">Adjust Stock</button></td>
     </tr>`).join('');
+  document.querySelectorAll('[data-adjust-stock]').forEach(btn => {
+    btn.addEventListener('click', () => adjustStock(btn.dataset.adjustStock));
+  });
 }
 document.getElementById('products-search').addEventListener('input', renderProducts);
+
+// ---------- Inventory: manual adjustments + audit log ----------
+async function adjustStock(productName) {
+  const deltaStr = prompt(`Adjust stock for "${productName}".\nEnter a positive number for a new delivery (e.g. 5000), or negative for stock leaving (e.g. -200 for a distributor shipment):`);
+  if (!deltaStr) return;
+  const delta = parseInt(deltaStr, 10);
+  if (isNaN(delta) || delta === 0) { alert('Enter a non-zero whole number.'); return; }
+  const reason = prompt('Reason (e.g. "New delivery from supplier" or "Shipped to Distributor: Jasmine Uy"):');
+  if (!reason || !reason.trim()) return;
+
+  const product = products.find(p => p.name === productName);
+  if (!product) return;
+  const newStock = Math.max(0, product.stock + delta);
+
+  const { error: updateError } = await sb.from('products').update({ stock: newStock }).eq('name', productName);
+  if (updateError) { console.error(updateError); alert("Couldn't update stock."); return; }
+
+  const { error: logError } = await sb.from('stock_movements').insert({ product_name: productName, delta, reason: reason.trim() });
+  if (logError) console.error(logError);
+
+  await loadRealData();
+}
+
+async function loadStockMovements() {
+  const { data, error } = await sb.from('stock_movements')
+    .select('product_name, delta, reason, created_at')
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error) { console.error(error); return; }
+  const tbody = document.querySelector('#stock-movements-table tbody');
+  tbody.innerHTML = data.map(m => `
+    <tr>
+      <td class="font-semibold text-coffee-900">${m.product_name}</td>
+      <td class="font-semibold ${m.delta > 0 ? 'text-emerald-600' : 'text-red-600'}">${m.delta > 0 ? '+' : ''}${m.delta.toLocaleString('en-PH')}</td>
+      <td class="text-coffee-500">${m.reason}</td>
+      <td class="text-coffee-500">${fmtAdminDate(m.created_at)}</td>
+    </tr>`).join('');
+  document.getElementById('stock-movements-empty').classList.toggle('hidden', data.length > 0);
+}
 
 // ---------- Render: customers table ----------
 function renderCustomers() {
@@ -936,6 +988,8 @@ async function loadRealData() {
   renderCustomers();
   document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
   await loadVouchers();
+  await loadDistributors();
+  await loadStockMovements();
 }
 
 // ---------- Render: distributor applications ----------
@@ -1046,6 +1100,19 @@ document.querySelectorAll('#vouchers-status-filter .voucher-filter-btn').forEach
 });
 
 // ---------- Vouchers: real reads + creation ----------
+async function loadDistributors() {
+  const { data, error } = await sb.from('distributors')
+    .select('name, address, region, email, mobile, channel, applied_at')
+    .order('applied_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  distributors = data.map(d => ({
+    name: d.name, address: d.address, region: d.region, email: d.email,
+    mobile: d.mobile, channel: d.channel, applied: fmtAdminDate(d.applied_at),
+  }));
+  renderDistributors();
+  document.getElementById('dist-nav-count').textContent = distributors.length;
+}
+
 async function loadVouchers() {
   const { data, error } = await sb.from('vouchers')
     .select('code, type, amount, min_spend, usage_limit, used_count, valid_from, valid_until')
