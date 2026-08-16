@@ -240,6 +240,36 @@
     refEl.classList.remove('hidden');
   }
 
+  // ===== Returning from Xendit payment =====
+  // The order/customer row was already written before the redirect to Xendit;
+  // this just restores the confirmation screen using the summary we stashed
+  // in localStorage right before leaving, since anon visitors can't re-query
+  // the orders table (only admins/affiliates can, per its RLS policies).
+  const paidParam = params.get('paid');
+  if (paidParam === '1') {
+    const pending = JSON.parse(localStorage.getItem('kopify-pending-order') || 'null');
+    if (pending) {
+      document.getElementById('confirm-name').textContent = pending.firstName;
+      document.getElementById('confirm-order-id').textContent = pending.orderId;
+      document.getElementById('confirm-address').textContent = pending.address;
+      document.getElementById('confirm-pack').textContent = pending.packLabel;
+      document.getElementById('confirm-payment').textContent = 'Paid online via Xendit';
+      document.getElementById('confirm-total').textContent = peso(pending.total);
+      if (pending.refCode) {
+        document.getElementById('confirm-ref').textContent = pending.refCode;
+        document.getElementById('confirm-ref-row').classList.remove('hidden');
+        document.getElementById('confirm-ref-row').classList.add('flex');
+      }
+      localStorage.removeItem('kopify-pending-order');
+    }
+    document.getElementById('checkout-form-state').classList.add('hidden');
+    document.getElementById('checkout-confirm-state').classList.remove('hidden');
+  } else if (paidParam === '0') {
+    const errorEl = document.getElementById('checkout-error');
+    errorEl.textContent = 'Your payment was not completed. Please try again below.';
+    errorEl.classList.remove('hidden');
+  }
+
   // ===== PH Region / Province / City / Barangay cascading dropdowns =====
   const regionSel = document.getElementById('co-region');
   const provinceSel = document.getElementById('co-province');
@@ -406,23 +436,41 @@
       return;
     }
 
+    // Order is saved — stash what the confirmation screen needs so it can be
+    // restored once Xendit redirects the shopper back here after payment.
     const fullAddress = `${form.address.value.trim()}, Brgy. ${barangaySel.value}, ${selectedLabel(citySel)}, ${provinceLabel}`;
-    document.getElementById('confirm-name').textContent = name.split(' ')[0];
-    document.getElementById('confirm-order-id').textContent = orderId;
-    document.getElementById('confirm-address').textContent = fullAddress;
-    document.getElementById('confirm-pack').textContent = pack.label;
-    document.getElementById('confirm-payment').textContent = paymentMethod;
-    document.getElementById('confirm-total').textContent = peso(pack.price + SHIPPING_FEE);
-    if (activeRefCode) {
-      document.getElementById('confirm-ref').textContent = activeRefCode;
-      document.getElementById('confirm-ref-row').classList.remove('hidden');
-      document.getElementById('confirm-ref-row').classList.add('flex');
-    }
-
+    const total = pack.price + SHIPPING_FEE;
+    localStorage.setItem('kopify-pending-order', JSON.stringify({
+      orderId, firstName: name.split(' ')[0], address: fullAddress,
+      packLabel: pack.label, total, refCode: activeRefCode || null,
+    }));
     localStorage.removeItem('kopify-ref-code');
-    document.getElementById('checkout-form-state').classList.add('hidden');
-    document.getElementById('checkout-confirm-state').classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const returnBase = window.location.origin + window.location.pathname;
+    const orderIdParam = encodeURIComponent(orderId.replace(/^#/, ''));
+
+    try {
+      const invRes = await fetch('/api/create-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNumber: orderId,
+          amount: total,
+          payerEmail: email,
+          payerName: name,
+          successUrl: `${returnBase}?paid=1&order=${orderIdParam}`,
+          failureUrl: `${returnBase}?paid=0&order=${orderIdParam}`,
+        }),
+      });
+      const invData = await invRes.json();
+      if (!invRes.ok || !invData.invoiceUrl) throw new Error(invData.error || 'No invoice URL returned');
+      window.location.href = invData.invoiceUrl;
+    } catch (err) {
+      console.error(err);
+      showCheckoutError("Your order was saved, but we couldn't start the payment. Please try again or contact us.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Place My Order →';
+    }
   });
 </script>
 </body>
