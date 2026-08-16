@@ -119,11 +119,11 @@
                 <option value="" selected disabled>Select Province first</option>
               </select>
             </div>
-            <div>
-              <label class="field-label" for="co-barangay">Barangay*</label>
-              <select id="co-barangay" name="barangay" required class="field-input" disabled>
-                <option value="" selected disabled>Select City first</option>
-              </select>
+            <div class="relative">
+              <label class="field-label" for="co-barangay-search">Barangay*</label>
+              <input id="co-barangay-search" type="text" autocomplete="off" class="field-input" placeholder="Select City first" disabled>
+              <input type="hidden" id="co-barangay" name="barangay">
+              <div id="co-barangay-dropdown" class="hidden absolute z-20 left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-coffee-200 rounded-xl shadow-card"></div>
             </div>
             <div>
               <label class="field-label" for="co-zip">ZIP Code <span class="font-normal text-coffee-400">(optional)</span></label>
@@ -277,7 +277,16 @@
   const regionSel = document.getElementById('co-region');
   const provinceSel = document.getElementById('co-province');
   const citySel = document.getElementById('co-city');
+  // Barangay is a search-as-you-type combobox, not a plain <select> — some
+  // cities (Manila chief among them, ~900 barangays once its 16 districts
+  // are flattened) have far too many entries for a scrollable dropdown to
+  // be usable. #co-barangay is a hidden input holding the actual value
+  // (unchanged everywhere else in this file); #co-barangay-search is what
+  // the shopper sees and types into.
   const barangaySel = document.getElementById('co-barangay');
+  const barangaySearch = document.getElementById('co-barangay-search');
+  const barangayDropdown = document.getElementById('co-barangay-dropdown');
+  let barangayOptions = [];
 
   // Options are {value, label} pairs — value is the PSGC code (stable, collision-free join
   // key), label is what the shopper sees. Selecting by code avoids the classic bug where two
@@ -289,10 +298,19 @@
   function selectedLabel(select) {
     return select.options[select.selectedIndex]?.textContent || '';
   }
+  function hideBarangayDropdown() { barangayDropdown.classList.add('hidden'); }
+
   function resetDownstream(fromLevel) {
     if (fromLevel <= 2) { provinceSel.disabled = true; setOptions(provinceSel, [], 'Select Region first'); }
     if (fromLevel <= 3) { citySel.disabled = true; setOptions(citySel, [], 'Select Province first'); }
-    if (fromLevel <= 4) { barangaySel.disabled = true; setOptions(barangaySel, [], 'Select City first'); }
+    if (fromLevel <= 4) {
+      barangayOptions = [];
+      barangaySel.value = '';
+      barangaySearch.value = '';
+      barangaySearch.disabled = true;
+      barangaySearch.placeholder = 'Select City first';
+      hideBarangayDropdown();
+    }
   }
 
   let PH = null;
@@ -351,8 +369,40 @@
     if (!barangayItems.length) {
       barangayItems = [{ value: '(see Address field)', label: 'Not listed — I typed it in the Address field above' }];
     }
-    setOptions(barangaySel, barangayItems, 'Select Barangay');
-    barangaySel.disabled = false;
+    barangayOptions = barangayItems;
+    barangaySearch.disabled = false;
+    barangaySearch.placeholder = barangayItems.length > 30
+      ? `Type to search (${barangayItems.length} barangays)…`
+      : 'Select Barangay';
+  });
+
+  // Search-as-you-type dropdown for barangay — plain-text substring match,
+  // capped at 50 results shown at once so even Manila's ~900-entry list
+  // (16 districts flattened together) stays fast and scrollable.
+  function renderBarangayDropdown(filterText) {
+    const q = filterText.trim().toLowerCase();
+    const matches = (q ? barangayOptions.filter(o => o.label.toLowerCase().includes(q)) : barangayOptions).slice(0, 50);
+    barangayDropdown.innerHTML = matches.length
+      ? matches.map(o => `<div class="barangay-option px-4 py-2.5 text-sm cursor-pointer hover:bg-coffee-50" data-value="${o.value.replace(/"/g, '&quot;')}" data-label="${o.label.replace(/"/g, '&quot;')}">${o.label}</div>`).join('')
+      : `<div class="px-4 py-2.5 text-sm text-coffee-400">No matches — try a different spelling</div>`;
+    barangayDropdown.classList.remove('hidden');
+  }
+  barangaySearch.addEventListener('focus', () => {
+    if (!barangaySearch.disabled) renderBarangayDropdown(barangaySearch.value);
+  });
+  barangaySearch.addEventListener('input', () => {
+    barangaySel.value = ''; // typing invalidates the prior pick until a suggestion is clicked
+    renderBarangayDropdown(barangaySearch.value);
+  });
+  barangayDropdown.addEventListener('click', (e) => {
+    const opt = e.target.closest('.barangay-option');
+    if (!opt) return;
+    barangaySearch.value = opt.dataset.label;
+    barangaySel.value = opt.dataset.value;
+    hideBarangayDropdown();
+  });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#co-barangay-search') && !e.target.closest('#co-barangay-dropdown')) hideBarangayDropdown();
   });
 
   // Preview builds inline the ~1.8MB PH address dataset directly into the page (see build
@@ -436,7 +486,7 @@
     e.preventDefault();
 
     let valid = true;
-    [form.name, form.email, form.mobile, form.address, regionSel, provinceSel, citySel, barangaySel].forEach((field) => {
+    [form.name, form.email, form.mobile, form.address, regionSel, provinceSel, citySel].forEach((field) => {
       if (!field.value || !field.value.trim()) {
         valid = false;
         field.classList.add('ring-2', 'ring-red-400');
@@ -444,6 +494,15 @@
         field.classList.remove('ring-2', 'ring-red-400');
       }
     });
+    // Barangay's real value lives on the hidden #co-barangay input, but the
+    // visible field a shopper actually sees and needs the red-ring feedback
+    // on is the search box next to it.
+    if (!barangaySel.value) {
+      valid = false;
+      barangaySearch.classList.add('ring-2', 'ring-red-400');
+    } else {
+      barangaySearch.classList.remove('ring-2', 'ring-red-400');
+    }
     if (!valid) return;
 
     errorEl.classList.add('hidden');
