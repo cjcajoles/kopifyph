@@ -29,7 +29,7 @@ async function markPaidAndDeductStock(orderNumber) {
   if (!patchRes.ok) throw new Error('Could not update order: ' + await patchRes.text());
 
   const prodRes = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/products?name=eq.${encodeURIComponent(order.pack)}&select=stock`,
+    `${process.env.SUPABASE_URL}/rest/v1/products?name=eq.${encodeURIComponent(order.pack)}&select=stock,units_sold`,
     { headers: SB_HEADERS }
   );
   const products = await prodRes.json();
@@ -37,9 +37,10 @@ async function markPaidAndDeductStock(orderNumber) {
   if (!product) return; // pack name didn't match a known product — nothing to deduct
 
   const newStock = Math.max(0, product.stock - order.boxes);
+  const newUnitsSold = (product.units_sold || 0) + order.boxes;
   await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/products?name=eq.${encodeURIComponent(order.pack)}`,
-    { method: 'PATCH', headers: { ...SB_HEADERS, Prefer: 'return=minimal' }, body: JSON.stringify({ stock: newStock }) }
+    { method: 'PATCH', headers: { ...SB_HEADERS, Prefer: 'return=minimal' }, body: JSON.stringify({ stock: newStock, units_sold: newUnitsSold }) }
   );
   await fetch(`${process.env.SUPABASE_URL}/rest/v1/stock_movements`, {
     method: 'POST',
