@@ -715,14 +715,9 @@ const PH_REGIONS = [
   'Region XI', 'Region XII', 'Region XIII', 'BARMM', 'NIR',
 ];
 
-const distributors = [
-  { name: 'Cilebritee Shop',    address: 'Unit 4B, Alabang, Muntinlupa City',      email: 'orders@cilebriteeshop.ph',   mobile: '0917 234 5678', channel: 'Shopee',  region: 'NCR',        applied: 'Aug 12, 2026' },
-  { name: 'Jasmine Uy',         address: 'Brgy. Poblacion, Davao City',            email: 'jasmine.uy@gmail.com',       mobile: '0928 812 3344', channel: 'TikTok',  region: 'Region XI',  applied: 'Aug 10, 2026' },
-  { name: 'Mark Villanueva',    address: '25 Kalayaan St, Quezon City',            email: 'mark.villanueva@gmail.com',  mobile: '0915 667 2210', channel: 'Lazada',  region: 'NCR',        applied: 'Aug 08, 2026' },
-  { name: 'Grace Tolentino',    address: 'Purok 3, Bacolod City',                  email: 'gtolentino.biz@gmail.com',   mobile: '0906 441 7789', channel: 'Offline', region: 'NIR',        applied: 'Aug 05, 2026' },
-  { name: 'Kevin Ang',          address: 'San Fernando, Pampanga',                 email: 'kevin.ang@yahoo.com',        mobile: '0933 220 9981', channel: 'Shopee',  region: 'Region III', applied: 'Aug 03, 2026' },
-  { name: 'Precious Del Rosario', address: 'Lapu-Lapu City, Cebu',                 email: 'precious.delrosario@gmail.com', mobile: '0919 556 3312', channel: 'TikTok', region: 'Region VII', applied: 'Jul 30, 2026' },
-];
+// Real distributor applications land here once the public "Become a
+// Distributor" form is wired to Supabase — empty for now, no sample data.
+const distributors = [];
 
 // Real vouchers — fetched from Supabase (see loadVouchers()), since checkout
 // validates codes against this same table server-side.
@@ -739,25 +734,9 @@ let refunds = [
 const COMMISSION_PER_BOX = 60;
 const boxesInPack = { '1 Box': 1, '3 Boxes': 3, '10 Boxes': 10 };
 
-let affiliates = [
-  { name: 'Bea Santos',      email: 'bea.santos@gmail.com',      code: 'BEA10',   status: 'Active', region: 'NCR',        joined: 'Jul 10, 2026',
-    orders: [
-      { orderId: '#KPY10231', customer: 'Maria Santos', pack: '3 Boxes',  date: 'Aug 14, 2026' },
-      { orderId: '#KPY10224', customer: 'Joana Lazaro',  pack: '10 Boxes', date: 'Aug 11, 2026' },
-      { orderId: '#KPY10198', customer: 'Liza Mendoza',  pack: '1 Box',   date: 'Aug 07, 2026' },
-    ] },
-  { name: 'Marco Villareal', email: 'marco.villareal@gmail.com', code: 'MARCO15', status: 'Active', region: 'Region VII', joined: 'Jul 22, 2026',
-    orders: [
-      { orderId: '#KPY10229', customer: 'Cathy Lim Domingo', pack: '10 Boxes', date: 'Aug 13, 2026' },
-      { orderId: '#KPY10220', customer: 'Diego Ramos',       pack: '3 Boxes',  date: 'Aug 09, 2026' },
-    ] },
-  { name: 'Jamie Cruz',      email: 'jamie.cruz@gmail.com',      code: 'JAMIE5',  status: 'Active', region: 'Region III', joined: 'Aug 01, 2026',
-    orders: [
-      { orderId: '#KPY10227', customer: 'Ots Jimenez',   pack: '1 Box',   date: 'Aug 12, 2026' },
-    ] },
-  { name: 'Rhea Domingo',    email: 'rhea.domingo@yahoo.com',    code: 'RHEA20',  status: 'Inactive', region: 'Region IV-A', joined: 'Jun 15, 2026',
-    orders: [] },
-];
+// Real affiliates land here once you add them via "Add affiliate" below —
+// empty for now, no sample data.
+let affiliates = [];
 
 // ---------- Helpers ----------
 const peso = n => '₱' + n.toLocaleString('en-PH');
