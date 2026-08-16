@@ -129,6 +129,8 @@ create table if not exists public.orders (
   barangay text,
   zip_code text,
   affiliate_code text,
+  voucher_code text,
+  discount integer not null default 0,
   created_at timestamptz not null default now()
 );
 
