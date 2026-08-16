@@ -70,6 +70,11 @@
   #bar-tooltip { pointer-events:none; }
   .period-btn { padding:.5rem 1rem; border-radius:9999px; font-size:.8125rem; font-weight:600; color:#8B5A2B; transition:background .15s,color .15s,box-shadow .15s; }
   .period-btn.active { background:#fff; color:#3B2114; box-shadow:0 1px 2px 0 rgba(42,23,13,.08); }
+  .orders-view-btn { color:#8B5A2B; transition:background .15s,color .15s,box-shadow .15s; }
+  .orders-view-btn.active-view { background:#fff; color:#3B2114; box-shadow:0 1px 2px 0 rgba(42,23,13,.08); }
+  .kanban-card { cursor:grab; }
+  .kanban-card.dragging { opacity:.4; }
+  [data-kanban-column].drag-over { outline:2px dashed #D4941F; outline-offset:-2px; }
   .theme-choice-btn { color:#8B5A2B; transition:background .15s,color .15s,box-shadow .15s; }
   .theme-choice-btn.active { background:#fff; color:#3B2114; box-shadow:0 1px 2px 0 rgba(42,23,13,.08); }
 
@@ -103,8 +108,8 @@
   html.dark .nav-btn.active { background:#D4941F; color:#2A170D; }
   html.dark .nav-btn.active svg { color:#2A170D; }
   html.dark .nav-btn svg { color:#B98247; }
-  html.dark .period-btn, html.dark .theme-choice-btn { color:#E8B35C; }
-  html.dark .period-btn.active, html.dark .theme-choice-btn.active { background:#54331C; color:#FBF3EA; }
+  html.dark .period-btn, html.dark .theme-choice-btn, html.dark .orders-view-btn { color:#E8B35C; }
+  html.dark .period-btn.active, html.dark .theme-choice-btn.active, html.dark .orders-view-btn.active-view { background:#54331C; color:#FBF3EA; }
   /* Hidden until the async auth check (bottom of page) confirms an admin session,
      so a signed-out visitor never sees a flash of dashboard content before the
      redirect to admin-login.html kicks in. */
@@ -308,30 +313,58 @@
             <h1 class="text-2xl font-extrabold text-coffee-900">Orders</h1>
             <p class="text-coffee-500 text-sm mt-1">Track and manage every Kopify order.</p>
           </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3 mb-4">
-          <div class="relative flex-1 min-w-[220px] max-w-sm">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            <input id="orders-search" type="text" placeholder="Search by order ID or customer" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
-          </div>
-          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="orders-status-filter">
-            <button data-status="all" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
-            <button data-status="Pending" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Pending</button>
-            <button data-status="Paid" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Paid</button>
-            <button data-status="Shipped" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Shipped</button>
-            <button data-status="Cancelled" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Cancelled</button>
+          <div class="flex gap-1 bg-coffee-100 rounded-full p-1">
+            <button id="orders-view-table-btn" class="orders-view-btn px-4 py-1.5 rounded-full text-xs font-bold">Table</button>
+            <button id="orders-view-board-btn" class="orders-view-btn px-4 py-1.5 rounded-full text-xs font-bold">Board</button>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full" id="orders-table">
-              <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
-              <tbody></tbody>
-            </table>
+        <div id="orders-table-view">
+          <div class="flex flex-wrap items-center gap-3 mb-4">
+            <div class="relative flex-1 min-w-[220px] max-w-sm">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <input id="orders-search" type="text" placeholder="Search by order ID or customer" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+            </div>
+            <div class="flex flex-wrap gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="orders-status-filter">
+              <button data-status="all" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
+              <button data-status="Pending" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Pending</button>
+              <button data-status="Paid" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Paid</button>
+              <button data-status="Fulfilled" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Fulfilled</button>
+              <button data-status="Shipped" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Shipped</button>
+              <button data-status="Returned to Sender" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Returned</button>
+              <button data-status="Cancelled" class="status-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Cancelled</button>
+            </div>
           </div>
-          <p id="orders-empty" class="hidden text-center text-sm text-coffee-400 py-10">No orders match your search.</p>
+
+          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full" id="orders-table">
+                <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <p id="orders-empty" class="hidden text-center text-sm text-coffee-400 py-10">No orders match your search.</p>
+          </div>
+        </div>
+
+        <!-- Board view: fulfillment pipeline (New Order -> Fulfilled -> Shipped).
+             Pending (unpaid) and exceptions (Cancelled/Returned) are handled via
+             the status dropdown in Table view, not shown here. -->
+        <div id="orders-board-view" class="hidden">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-coffee-50 rounded-2xl p-3" data-kanban-column="Paid">
+              <h3 class="font-bold text-coffee-900 text-sm mb-3 px-1">New Order <span id="kanban-count-Paid" class="text-coffee-400 font-normal"></span></h3>
+              <div class="space-y-2 min-h-[80px]" id="kanban-list-Paid"></div>
+            </div>
+            <div class="bg-coffee-50 rounded-2xl p-3" data-kanban-column="Fulfilled">
+              <h3 class="font-bold text-coffee-900 text-sm mb-3 px-1">Fulfilled <span id="kanban-count-Fulfilled" class="text-coffee-400 font-normal"></span></h3>
+              <div class="space-y-2 min-h-[80px]" id="kanban-list-Fulfilled"></div>
+            </div>
+            <div class="bg-coffee-50 rounded-2xl p-3" data-kanban-column="Shipped">
+              <h3 class="font-bold text-coffee-900 text-sm mb-3 px-1">Shipped <span id="kanban-count-Shipped" class="text-coffee-400 font-normal"></span></h3>
+              <div class="space-y-2 min-h-[80px]" id="kanban-list-Shipped"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -668,7 +701,9 @@ const statusStyle = {
   Paid:      { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
   Published: { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
   Pending:   { bg: '#FEF3C7', text: '#B45309', dot: '#F59E0B' },
+  Fulfilled: { bg: '#EDE9FE', text: '#6D28D9', dot: '#8B5CF6' },
   Shipped:   { bg: '#DBEAFE', text: '#1D4ED8', dot: '#3B82F6' },
+  'Returned to Sender': { bg: '#FFEDD5', text: '#C2410C', dot: '#F97316' },
   Cancelled: { bg: '#FEE2E2', text: '#B91C1C', dot: '#EF4444' },
   Active:    { bg: '#DCFCE7', text: '#15803D', dot: '#22C55E' },
   Scheduled: { bg: '#DBEAFE', text: '#1D4ED8', dot: '#3B82F6' },
@@ -715,7 +750,7 @@ function renderRecentOrders() {
 
 // ---------- Render: orders table (with search + filter) ----------
 let ordersStatusFilter = 'all';
-const ORDER_STATUSES = ['Pending', 'Paid', 'Shipped', 'Cancelled'];
+const ORDER_STATUSES = ['Pending', 'Paid', 'Fulfilled', 'Shipped', 'Returned to Sender', 'Cancelled'];
 function renderOrders() {
   const q = document.getElementById('orders-search').value.trim().toLowerCase();
   const rows = orders.filter(o =>
@@ -764,6 +799,68 @@ document.querySelectorAll('#orders-status-filter .status-filter-btn').forEach(bt
     renderOrders();
   });
 });
+
+// ---------- Orders: Table / Board (Kanban) view toggle ----------
+let ordersView = 'table';
+function showOrdersView(view) {
+  ordersView = view;
+  document.getElementById('orders-table-view').classList.toggle('hidden', view !== 'table');
+  document.getElementById('orders-board-view').classList.toggle('hidden', view !== 'board');
+  document.getElementById('orders-view-table-btn').classList.toggle('active-view', view === 'table');
+  document.getElementById('orders-view-board-btn').classList.toggle('active-view', view === 'board');
+  if (view === 'board') renderKanban();
+}
+document.getElementById('orders-view-table-btn').addEventListener('click', () => showOrdersView('table'));
+document.getElementById('orders-view-board-btn').addEventListener('click', () => showOrdersView('board'));
+showOrdersView('table');
+
+// ---------- Orders board (Kanban): fulfillment pipeline ----------
+// Only Paid/Fulfilled/Shipped orders appear here — Pending (unpaid yet) and
+// exceptions (Cancelled/Returned to Sender) stay in Table view's dropdown,
+// since they're not part of the main fulfillment flow.
+const KANBAN_COLUMNS = [
+  { status: 'Paid', label: 'New Order' },
+  { status: 'Fulfilled', label: 'Fulfilled' },
+  { status: 'Shipped', label: 'Shipped' },
+];
+function renderKanban() {
+  KANBAN_COLUMNS.forEach(col => {
+    const items = orders.filter(o => o.status === col.status);
+    document.getElementById(`kanban-count-${col.status}`).textContent = `(${items.length})`;
+    const list = document.getElementById(`kanban-list-${col.status}`);
+    list.innerHTML = items.map(o => `
+      <div class="kanban-card bg-white rounded-xl border border-coffee-100 p-3 shadow-card" draggable="true" data-order-id="${o.id}">
+        <p class="font-semibold text-coffee-900 text-sm">${o.id}</p>
+        <p class="text-xs text-coffee-500 truncate">${o.customer}</p>
+        <div class="flex justify-between items-center mt-2">
+          <span class="text-xs text-coffee-400">${o.pack}</span>
+          <span class="text-xs font-bold text-coffee-800">${peso(o.total)}</span>
+        </div>
+      </div>`).join('');
+  });
+
+  document.querySelectorAll('.kanban-card').forEach(card => {
+    card.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', card.dataset.orderId);
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+  });
+  document.querySelectorAll('[data-kanban-column]').forEach(colEl => {
+    colEl.addEventListener('dragover', (e) => { e.preventDefault(); colEl.classList.add('drag-over'); });
+    colEl.addEventListener('dragleave', () => colEl.classList.remove('drag-over'));
+    colEl.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      colEl.classList.remove('drag-over');
+      const orderId = e.dataTransfer.getData('text/plain');
+      const newStatus = colEl.dataset.kanbanColumn;
+      const { error } = await sb.from('orders').update({ status: newStatus }).eq('order_number', orderId);
+      if (error) { console.error(error); alert("Couldn't move that order."); return; }
+      await loadRealData();
+      showOrdersView('board');
+    });
+  });
+}
 
 // ---------- Render: products table ----------
 function renderProducts() {
@@ -918,6 +1015,7 @@ async function loadRealData() {
 
   renderRecentOrders();
   renderOrders();
+  renderKanban();
   renderProducts();
   renderCustomers();
   renderBestSellers();
