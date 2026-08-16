@@ -279,49 +279,11 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <!-- Chart -->
-          <div class="xl:col-span-2 bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
-            <div class="flex items-center justify-between mb-1">
-              <h2 class="font-bold text-coffee-900" id="chart-title">Revenue, last 5 weeks</h2>
-              <span class="text-xs text-coffee-400" id="chart-note">In &#8369;, per week</span>
-            </div>
-            <div class="relative mt-4" id="chart-wrap">
-              <svg id="revenue-chart" viewBox="0 0 560 220" class="w-full h-[220px]" preserveAspectRatio="none"></svg>
-              <div id="bar-tooltip" class="absolute hidden bg-coffee-900 text-white text-xs font-semibold rounded-lg px-3 py-1.5 shadow-lg whitespace-nowrap" style="transform:translate(-50%,-115%)"></div>
-            </div>
-          </div>
-
-          <!-- Best sellers -->
-          <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
-            <h2 class="font-bold text-coffee-900 mb-4">Best sellers</h2>
-            <div class="space-y-4">
-              <div class="flex items-center gap-3">
-                <img src="./assets/pack-3boxes.jpg" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="3 Boxes">
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-coffee-900 truncate">3 Boxes &ndash; Family Pack</p>
-                  <p class="text-xs text-coffee-400">241 sold</p>
-                </div>
-                <p class="text-sm font-bold text-coffee-900">&#8369;1,145</p>
-              </div>
-              <div class="flex items-center gap-3">
-                <img src="./assets/pack-1box.jpg" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="1 Box">
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-coffee-900 truncate">1 Box</p>
-                  <p class="text-xs text-coffee-400">198 sold</p>
-                </div>
-                <p class="text-sm font-bold text-coffee-900">&#8369;415</p>
-              </div>
-              <div class="flex items-center gap-3">
-                <img src="./assets/pack-10boxes.jpg" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="10 Boxes">
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-coffee-900 truncate">10 Boxes &ndash; Bundle</p>
-                  <p class="text-xs text-coffee-400">73 sold</p>
-                </div>
-                <p class="text-sm font-bold text-coffee-900">&#8369;3,940</p>
-              </div>
-            </div>
-          </div>
+        <!-- Best sellers -->
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+          <h2 class="font-bold text-coffee-900 mb-4">Best sellers</h2>
+          <div class="space-y-4" id="best-sellers-list"></div>
+          <p id="best-sellers-empty" class="hidden text-sm text-coffee-400 text-center py-6">No sales yet.</p>
         </div>
 
         <!-- Recent orders -->
@@ -663,61 +625,14 @@ let orders = [];
 let products = [];
 let customers = [];
 
-const PERIODS = {
-  daily: {
-    subtitle: "Here's how Kopify is doing today.",
-    periodLabel: 'vs yesterday',
-    stats: {
-      revenue: { value: 6980,  delta: -4.6 },
-      orders:  { value: 9,     delta: 12.5 },
-      customers: { value: 7,   delta: 0 },
-      boxes:   { value: 19,    delta: 8.0 },
-    },
-    chart: {
-      title: 'Revenue, today',
-      note: 'In ₱, per 3-hour block',
-      data: [
-        { label: '6AM',  v: 320  }, { label: '9AM',  v: 980  }, { label: '12PM', v: 1640 },
-        { label: '3PM',  v: 890  }, { label: '6PM',  v: 1720 }, { label: '9PM',  v: 1430 },
-      ],
-    },
-  },
-  weekly: {
-    subtitle: "Here's how Kopify is doing this week.",
-    periodLabel: 'vs last week',
-    stats: {
-      revenue: { value: 47990, delta: 15.3 },
-      orders:  { value: 51,    delta: 6.8  },
-      customers: { value: 41,  delta: 9.2  },
-      boxes:   { value: 121,   delta: 18.4 },
-    },
-    chart: {
-      title: 'Revenue, last 7 days',
-      note: 'In ₱, per day',
-      data: [
-        { label: 'Wed', v: 4820 }, { label: 'Thu', v: 6140 }, { label: 'Fri', v: 5390 },
-        { label: 'Sat', v: 8920 }, { label: 'Sun', v: 7460 }, { label: 'Mon', v: 5980 }, { label: 'Tue', v: 9310 },
-      ],
-    },
-  },
-  monthly: {
-    subtitle: "Here's how Kopify is doing this month.",
-    periodLabel: 'vs last month',
-    stats: {
-      revenue: { value: 182450, delta: 18.2 },
-      orders:  { value: 214,    delta: 9.4  },
-      customers: { value: 187,  delta: 12.5 },
-      boxes:   { value: 512,    delta: 22.0 },
-    },
-    chart: {
-      title: 'Revenue, last 5 weeks',
-      note: 'In ₱, per week',
-      data: [
-        { label: 'Wk 1', v: 38200 }, { label: 'Wk 2', v: 41800 }, { label: 'Wk 3', v: 33900 },
-        { label: 'Wk 4', v: 44100 }, { label: 'Wk 5', v: 24450 },
-      ],
-    },
-  },
+// Real Home dashboard stats — computed from the real `orders` array (see
+// applyPeriod() below), comparing the current period against the one right
+// before it (today vs yesterday, last 7 days vs the 7 before that, this
+// calendar month vs last). No mock numbers.
+const PERIOD_META = {
+  daily:   { subtitle: "Here's how Kopify is doing today.",      periodLabel: 'vs yesterday' },
+  weekly:  { subtitle: "Here's how Kopify is doing this week.",  periodLabel: 'vs last week' },
+  monthly: { subtitle: "Here's how Kopify is doing this month.", periodLabel: 'vs last month' },
 };
 let currentPeriod = 'monthly';
 
@@ -800,6 +715,7 @@ function renderRecentOrders() {
 
 // ---------- Render: orders table (with search + filter) ----------
 let ordersStatusFilter = 'all';
+const ORDER_STATUSES = ['Pending', 'Paid', 'Shipped', 'Cancelled'];
 function renderOrders() {
   const q = document.getElementById('orders-search').value.trim().toLowerCase();
   const rows = orders.filter(o =>
@@ -807,16 +723,33 @@ function renderOrders() {
     (o.id.toLowerCase().includes(q) || o.customer.toLowerCase().includes(q))
   );
   const tbody = document.querySelector('#orders-table tbody');
-  tbody.innerHTML = rows.map(o => `
+  tbody.innerHTML = rows.map(o => {
+    const s = statusStyle[o.status] || statusStyle.Pending;
+    return `
     <tr>
       <td class="font-semibold text-coffee-800">${o.id}</td>
       <td>${o.customer}</td>
       <td class="text-coffee-500">${o.pack}</td>
       <td class="text-coffee-500">${o.date}</td>
       <td class="font-semibold">${peso(o.total)}</td>
-      <td>${statusPill(o.status)}</td>
-    </tr>`).join('');
+      <td>
+        <select data-order-status="${o.id}" class="text-xs font-bold rounded-full pl-3 pr-6 py-1.5 border-0 focus:outline-none focus:ring-2 focus:ring-gold-400" style="background-color:${s.bg};color:${s.text}">
+          ${ORDER_STATUSES.map(st => `<option value="${st}" ${st === o.status ? 'selected' : ''}>${st}</option>`).join('')}
+        </select>
+      </td>
+    </tr>`;
+  }).join('');
   document.getElementById('orders-empty').classList.toggle('hidden', rows.length > 0);
+  document.querySelectorAll('[data-order-status]').forEach(sel => {
+    sel.addEventListener('change', async () => {
+      const orderId = sel.dataset.orderStatus;
+      const newStatus = sel.value;
+      sel.disabled = true;
+      const { error } = await sb.from('orders').update({ status: newStatus }).eq('order_number', orderId);
+      if (error) { console.error(error); alert("Couldn't update that order's status."); sel.disabled = false; return; }
+      await loadRealData();
+    });
+  });
 }
 document.getElementById('orders-search').addEventListener('input', renderOrders);
 document.querySelectorAll('#orders-status-filter .status-filter-btn').forEach(btn => {
@@ -933,7 +866,7 @@ function fmtAdminDate(iso) {
 async function loadRealData() {
   const { data: orderRows, error: ordersError } = await sb
     .from('orders')
-    .select('order_number, customer_name, customer_email, pack, total, status, created_at')
+    .select('order_number, customer_name, customer_email, pack, boxes, total, status, created_at')
     .order('created_at', { ascending: false });
 
   if (ordersError) {
@@ -944,6 +877,7 @@ async function loadRealData() {
       customer: o.customer_name,
       email: o.customer_email,
       pack: o.pack,
+      boxes: o.boxes,
       date: fmtAdminDate(o.created_at),
       dateRaw: o.created_at,
       total: o.total,
@@ -986,7 +920,11 @@ async function loadRealData() {
   renderOrders();
   renderProducts();
   renderCustomers();
-  document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
+  renderBestSellers();
+  applyPeriod(currentPeriod);
+  // Badge = orders that need action from here (paid, waiting to be shipped) —
+  // not "Pending" (those are just waiting on the customer to pay).
+  document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Paid').length;
   await loadVouchers();
   await loadDistributors();
   await loadStockMovements();
@@ -1283,92 +1221,89 @@ document.getElementById('affiliate-create-btn').addEventListener('click', () => 
   renderAffiliates();
 });
 
-// ---------- Revenue bar chart ----------
-function renderChart(data) {
-  const svg = document.getElementById('revenue-chart');
-  const W = 560, H = 220, padL = 40, padB = 28, padT = 10;
-  const plotW = W - padL - 10, plotH = H - padB - padT;
-  const max = Math.max(...data.map(d => d.v));
-  const niceMax = Math.ceil(max / 2000) * 2000 || 1000;
-  const barW = data.length <= 6 ? 32 : 24;
-  const gap = (plotW - barW * data.length) / (data.length - 1 + 2);
-
-  const isDark = document.documentElement.classList.contains('dark');
-  const gridColor = isDark ? '#54331C' : '#F3E1CC';
-  const tickColor = isDark ? '#B98247' : '#B98247';
-  const labelColor = isDark ? '#D2A66B' : '#8B5A2B';
-
-  let gridSvg = '';
-  const ticks = 4;
-  for (let i = 0; i <= ticks; i++) {
-    const val = (niceMax / ticks) * i;
-    const y = padT + plotH - (val / niceMax) * plotH;
-    gridSvg += `<line x1="${padL}" y1="${y}" x2="${W - 6}" y2="${y}" stroke="${gridColor}" stroke-width="1"/>`;
-    gridSvg += `<text x="${padL - 8}" y="${y + 4}" font-size="10" fill="${tickColor}" text-anchor="end">${val >= 1000 ? (val/1000) + 'k' : val}</text>`;
-  }
-
-  let barsSvg = '';
-  data.forEach((d, i) => {
-    const x = padL + gap + i * (barW + gap);
-    const barH = (d.v / niceMax) * plotH;
-    const y = padT + plotH - barH;
-    barsSvg += `
-      <rect data-i="${i}" x="${x}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="#D4941F" class="chart-bar" style="cursor:pointer"/>
-      <text x="${x + barW/2}" y="${H - 8}" font-size="11" fill="${labelColor}" text-anchor="middle" font-weight="600">${d.label}</text>
-    `;
-  });
-
-  svg.innerHTML = gridSvg + barsSvg;
-
-  const tooltip = document.getElementById('bar-tooltip');
-  svg.querySelectorAll('.chart-bar').forEach(bar => {
-    bar.addEventListener('mouseenter', () => {
-      const i = +bar.dataset.i;
-      const d = data[i];
-      tooltip.textContent = `${d.label}: ${peso(d.v)}`;
-      tooltip.classList.remove('hidden');
-      const rect = bar.getBoundingClientRect();
-      const wrapRect = document.getElementById('chart-wrap').getBoundingClientRect();
-      tooltip.style.left = (rect.left - wrapRect.left + rect.width / 2) + 'px';
-      tooltip.style.top = (rect.top - wrapRect.top) + 'px';
-    });
-    bar.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
-  });
-}
-
 // ---------- Period switching (Daily / Weekly / Monthly reporting) ----------
+// All computed live from the real `orders` array — no mock numbers. Each
+// period is compared to the equivalent period right before it (today vs
+// yesterday, last 7 days vs the 7 before that, this month vs last).
 function fmtDelta(n) {
   if (n === 0) return { text: '— 0.0%', color: '#8B5A2B' };
   const arrow = n > 0 ? '↑' : '↓';
   const color = n > 0 ? '#059669' : '#DC2626';
   return { text: `${arrow} ${Math.abs(n).toFixed(1)}%`, color };
 }
+function pctDelta(curr, prev) {
+  if (prev === 0) return curr === 0 ? 0 : 100;
+  return ((curr - prev) / prev) * 100;
+}
+function periodBounds(period) {
+  const now = new Date();
+  if (period === 'daily') {
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfYesterday = new Date(startOfToday); startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+    return { currentStart: startOfToday, currentEnd: now, prevStart: startOfYesterday, prevEnd: startOfToday };
+  }
+  if (period === 'weekly') {
+    const currentStart = new Date(now); currentStart.setDate(currentStart.getDate() - 7);
+    const prevStart = new Date(now); prevStart.setDate(prevStart.getDate() - 14);
+    return { currentStart, currentEnd: now, prevStart, prevEnd: currentStart };
+  }
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  return { currentStart: startOfMonth, currentEnd: now, prevStart: startOfLastMonth, prevEnd: startOfMonth };
+}
 function applyPeriod(period) {
   currentPeriod = period;
-  const p = PERIODS[period];
+  const meta = PERIOD_META[period];
+  document.getElementById('home-subtitle').textContent = meta.subtitle;
 
-  document.getElementById('home-subtitle').textContent = p.subtitle;
-  document.getElementById('chart-title').textContent = p.chart.title;
-  document.getElementById('chart-note').textContent = p.chart.note;
+  const { currentStart, currentEnd, prevStart, prevEnd } = periodBounds(period);
+  const paid = orders.filter(o => o.status === 'Paid' && o.dateRaw);
+  const inRange = (o, start, end) => { const d = new Date(o.dateRaw); return d >= start && d < end; };
+  const current = paid.filter(o => inRange(o, currentStart, currentEnd));
+  const prev = paid.filter(o => inRange(o, prevStart, prevEnd));
+
+  const sum = (arr, key) => arr.reduce((s, o) => s + (o[key] || 0), 0);
+  const uniqueCustomers = (arr) => new Set(arr.map(o => o.email)).size;
+
+  const stats = {
+    revenue:   { value: sum(current, 'total'),    delta: pctDelta(sum(current, 'total'), sum(prev, 'total')) },
+    orders:    { value: current.length,           delta: pctDelta(current.length, prev.length) },
+    customers: { value: uniqueCustomers(current), delta: pctDelta(uniqueCustomers(current), uniqueCustomers(prev)) },
+    boxes:     { value: sum(current, 'boxes'),    delta: pctDelta(sum(current, 'boxes'), sum(prev, 'boxes')) },
+  };
 
   const statMap = { revenue: 'stat-revenue', orders: 'stat-orders', customers: 'stat-customers', boxes: 'stat-boxes' };
   Object.entries(statMap).forEach(([key, idPrefix]) => {
-    const s = p.stats[key];
-    const valueEl = document.getElementById(idPrefix);
-    valueEl.textContent = key === 'revenue' ? peso(s.value) : s.value.toLocaleString('en-PH');
+    const s = stats[key];
+    document.getElementById(idPrefix).textContent = key === 'revenue' ? peso(s.value) : s.value.toLocaleString('en-PH');
     const deltaEl = document.getElementById(idPrefix + '-delta');
     const { text, color } = fmtDelta(s.delta);
     deltaEl.textContent = text;
     deltaEl.style.color = color;
-    document.getElementById(idPrefix + '-period').textContent = p.periodLabel;
+    document.getElementById(idPrefix + '-period').textContent = meta.periodLabel;
   });
 
   document.querySelectorAll('#period-filter .period-btn').forEach(b => b.classList.toggle('active', b.dataset.period === period));
-  renderChart(p.chart.data);
 }
 document.querySelectorAll('#period-filter .period-btn').forEach(btn => {
   btn.addEventListener('click', () => applyPeriod(btn.dataset.period));
 });
+
+// ---------- Best sellers (Home) — real products, ranked by real units sold ----------
+function renderBestSellers() {
+  const top = [...products].filter(p => p.sold > 0).sort((a, b) => b.sold - a.sold).slice(0, 3);
+  const list = document.getElementById('best-sellers-list');
+  list.innerHTML = top.map(p => `
+    <div class="flex items-center gap-3">
+      <img src="${p.img}" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="${p.name}">
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-coffee-900 truncate">${p.name}${p.sub ? ' – ' + p.sub : ''}</p>
+        <p class="text-xs text-coffee-400">${p.sold.toLocaleString('en-PH')} sold</p>
+      </div>
+      <p class="text-sm font-bold text-coffee-900">${peso(p.price)}</p>
+    </div>`).join('');
+  document.getElementById('best-sellers-empty').classList.toggle('hidden', top.length > 0);
+}
 
 // ---------- Nav switching ----------
 const navBtns = document.querySelectorAll('.nav-btn[data-view]');
@@ -1399,17 +1334,16 @@ document.querySelectorAll('[data-goto]').forEach(btn => {
 
 // ---------- Theme (Light / Dark) ----------
 const THEME_KEY = 'kopify-admin-theme';
-function applyTheme(mode, opts = {}) {
+function applyTheme(mode) {
   document.documentElement.classList.toggle('dark', mode === 'dark');
   localStorage.setItem(THEME_KEY, mode);
   document.getElementById('theme-icon-sun').classList.toggle('hidden', mode === 'dark');
   document.getElementById('theme-icon-moon').classList.toggle('hidden', mode !== 'dark');
   document.querySelectorAll('.theme-choice-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === mode));
-  if (!opts.skipChartRedraw && PERIODS[currentPeriod]) renderChart(PERIODS[currentPeriod].chart.data);
 }
 const storedTheme = localStorage.getItem(THEME_KEY);
 const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-applyTheme(storedTheme || (systemPrefersDark ? 'dark' : 'light'), { skipChartRedraw: true });
+applyTheme(storedTheme || (systemPrefersDark ? 'dark' : 'light'));
 document.getElementById('theme-toggle-btn').addEventListener('click', () => {
   applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
 });
@@ -1427,7 +1361,8 @@ renderVouchers();
 renderRefunds();
 renderAffiliates();
 applyPeriod('monthly');
-document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
+renderBestSellers();
+document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Paid').length;
 document.getElementById('dist-nav-count').textContent = distributors.length;
 
 // ---------- Logout ----------
