@@ -11,11 +11,49 @@ const SB_HEADERS = {
   'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
 };
 
+function money(pesos) {
+  return '₱' + Number(pesos || 0).toLocaleString('en-PH');
+}
+
+async function sendConfirmationEmail(order, orderNumber) {
+  if (!process.env.RESEND_API_KEY || !order.customer_email) return;
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'Kopify PH <orders@kopify.ph>',
+        to: order.customer_email,
+        subject: `Order ${orderNumber} confirmed — Kopify PH`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #2b2118;">
+            <h2 style="color: #b8860b;">Thank you for your order, ${order.customer_name || 'there'}!</h2>
+            <p>We've received your payment and your order is now being prepared.</p>
+            <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+              <tr><td style="padding: 8px 0; color: #6b6459;">Order number</td><td style="padding: 8px 0; text-align: right;"><strong>${orderNumber}</strong></td></tr>
+              <tr><td style="padding: 8px 0; color: #6b6459;">Item</td><td style="padding: 8px 0; text-align: right;">${order.pack} × ${order.boxes}</td></tr>
+              <tr><td style="padding: 8px 0; color: #6b6459;">Total paid</td><td style="padding: 8px 0; text-align: right;"><strong>${money(order.total)}</strong></td></tr>
+            </table>
+            <p>We'll let you know once it's shipped. Salamat sa pag-order sa Kopify PH! ☕</p>
+          </div>
+        `,
+      }),
+    });
+    if (!res.ok) console.error('Resend email failed:', res.status, await res.text());
+  } catch (err) {
+    // Email is a nice-to-have — never let it block the paid/stock update above.
+    console.error('Resend email error:', err);
+  }
+}
+
 async function markPaidAndDeductStock(orderNumber) {
   // Idempotency guard — Xendit retries (and we've manually clicked "Resend"
   // plenty ourselves) could otherwise deduct stock twice for one order.
   const getRes = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/orders?order_number=eq.${encodeURIComponent(orderNumber)}&select=status,pack,boxes`,
+    `${process.env.SUPABASE_URL}/rest/v1/orders?order_number=eq.${encodeURIComponent(orderNumber)}&select=status,pack,boxes,customer_name,customer_email,total`,
     { headers: SB_HEADERS }
   );
   const rows = await getRes.json();
@@ -27,6 +65,8 @@ async function markPaidAndDeductStock(orderNumber) {
     { method: 'PATCH', headers: { ...SB_HEADERS, Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'Paid' }) }
   );
   if (!patchRes.ok) throw new Error('Could not update order: ' + await patchRes.text());
+
+  await sendConfirmationEmail(order, orderNumber);
 
   const prodRes = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/products?name=eq.${encodeURIComponent(order.pack)}&select=stock,units_sold`,
