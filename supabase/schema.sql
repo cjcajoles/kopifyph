@@ -249,7 +249,7 @@ create policy "Admins manage refunds" on public.refunds
 -- ============================================================================
 insert into public.products (name, subtitle, price, stock, units_sold, status, image_path)
 values
-  ('1 Box', '10 Sachets Inside', 399, 340, 0, 'Published', './assets/pack-1box.jpg'),
-  ('3 Boxes', 'Family Pack', 1097, 128, 0, 'Published', './assets/pack-3boxes.jpg'),
-  ('10 Boxes', 'Kopifyholic Bundle', 3790, 22, 0, 'Published', './assets/pack-10boxes.jpg')
+  ('1 Box', '10 Sachets Inside', 415, 340, 0, 'Published', './assets/pack-1box.jpg'),
+  ('3 Boxes', 'Family Pack', 1145, 128, 0, 'Published', './assets/pack-3boxes.jpg'),
+  ('10 Boxes', 'Kopifyholic Bundle', 3940, 22, 0, 'Published', './assets/pack-10boxes.jpg')
 on conflict do nothing;
