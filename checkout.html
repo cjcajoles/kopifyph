@@ -133,18 +133,10 @@
         </div>
 
         <div class="bg-white rounded-3xl shadow-card p-6 sm:p-7">
-          <h2 class="font-extrabold text-lg text-coffee-900 mb-4">Payment Method</h2>
-          <div class="space-y-3">
-            <label class="pay-option">
-              <input type="radio" name="payment" value="GCash" checked class="accent-gold-500 w-4 h-4">
-              <span class="text-sm font-semibold flex-1">GCash</span>
-              <span class="text-xs text-coffee-400">Instant e-wallet</span>
-            </label>
-            <label class="pay-option">
-              <input type="radio" name="payment" value="Bank Transfer" class="accent-gold-500 w-4 h-4">
-              <span class="text-sm font-semibold flex-1">Bank Transfer</span>
-              <span class="text-xs text-coffee-400">BPI / BDO / UnionBank</span>
-            </label>
+          <h2 class="font-extrabold text-lg text-coffee-900 mb-4">Payment</h2>
+          <div class="flex items-start gap-3 bg-coffee-50 rounded-2xl p-4">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-coffee-500 shrink-0 mt-0.5"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/></svg>
+            <p class="text-sm text-coffee-700">Please prepare your payment details now — after you place your order, you'll be directed to <strong>Xendit</strong>, our secure payment provider, to complete payment (GCash, cards, bank transfer, and more).</p>
           </div>
         </div>
 
@@ -176,10 +168,21 @@
               <span>Shipping</span>
               <span id="summary-shipping">&#8369;80</span>
             </div>
+            <div id="summary-discount-row" class="hidden justify-between text-emerald-600 font-semibold">
+              <span>Discount (<span id="summary-voucher-code"></span>)</span>
+              <span id="summary-discount">&#8369;0</span>
+            </div>
+          </div>
+          <div class="py-4 border-b border-coffee-100">
+            <div class="flex gap-2">
+              <input id="voucher-input" type="text" placeholder="Voucher code" class="flex-1 min-w-0 border border-coffee-100 rounded-xl px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-gold-400">
+              <button id="voucher-apply-btn" type="button" class="shrink-0 bg-coffee-100 hover:bg-coffee-200 text-coffee-800 text-sm font-bold px-4 py-2 rounded-xl">Apply</button>
+            </div>
+            <p id="voucher-message" class="hidden text-xs font-semibold mt-2"></p>
           </div>
           <div class="flex justify-between items-center pt-4">
             <span class="font-bold text-coffee-900">Total</span>
-            <span id="summary-total" class="text-2xl font-extrabold text-coffee-900">&#8369;479</span>
+            <span id="summary-total" class="text-2xl font-extrabold text-coffee-900">&#8369;495</span>
           </div>
           <p id="summary-ref" class="hidden mt-3 text-xs font-semibold text-gold-600 bg-gold-100 rounded-lg px-3 py-2" style="background-color:#FBF0DC"></p>
         </div>
@@ -381,6 +384,54 @@
     errorEl.classList.remove('hidden');
   }
 
+  // ===== Voucher =====
+  // Applied client-side for an instant price preview, but the server
+  // (api/create-invoice.js) independently re-validates the code and computes
+  // the real discount before ever creating a Xendit invoice — so a shopper
+  // editing this in devtools can't actually change what they're charged.
+  let appliedVoucher = null;
+  const voucherInput = document.getElementById('voucher-input');
+  const voucherMsg = document.getElementById('voucher-message');
+
+  function showVoucherMessage(msg, ok) {
+    voucherMsg.textContent = msg;
+    voucherMsg.className = `text-xs font-semibold mt-2 ${ok ? 'text-emerald-600' : 'text-red-600'}`;
+  }
+
+  function refreshTotals() {
+    const discount = appliedVoucher ? appliedVoucher.discount : 0;
+    const total = Math.max(0, pack.price + SHIPPING_FEE - discount);
+    document.getElementById('summary-total').textContent = peso(total);
+    const row = document.getElementById('summary-discount-row');
+    if (appliedVoucher) {
+      document.getElementById('summary-voucher-code').textContent = appliedVoucher.code;
+      document.getElementById('summary-discount').textContent = '−' + peso(discount);
+      row.classList.remove('hidden');
+      row.classList.add('flex');
+    } else {
+      row.classList.add('hidden');
+      row.classList.remove('flex');
+    }
+  }
+
+  document.getElementById('voucher-apply-btn').addEventListener('click', async () => {
+    const code = voucherInput.value.trim().toUpperCase();
+    if (!code) { showVoucherMessage('Enter a code first.', false); return; }
+
+    const { data: v, error } = await sb.from('vouchers').select('*').eq('code', code).single();
+    if (error || !v) { showVoucherMessage('Invalid voucher code.', false); return; }
+
+    const today = new Date().toISOString().slice(0, 10);
+    if (today < v.valid_from || today > v.valid_until) { showVoucherMessage('This voucher has expired or isn’t active yet.', false); return; }
+    if (v.used_count >= v.usage_limit) { showVoucherMessage('This voucher has reached its usage limit.', false); return; }
+    if (pack.price < v.min_spend) { showVoucherMessage(`This code needs a minimum order of ${peso(v.min_spend)}.`, false); return; }
+
+    const discount = v.type === 'Percentage' ? Math.round(pack.price * v.amount / 100) : Math.min(v.amount, pack.price + SHIPPING_FEE);
+    appliedVoucher = { code: v.code, discount };
+    refreshTotals();
+    showVoucherMessage(`Applied! You saved ${peso(discount)}.`, true);
+  });
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -403,12 +454,16 @@
     const name = form.name.value.trim();
     const email = form.email.value.trim();
     const orderId = '#KPY' + Math.floor(10000 + Math.random() * 89999);
-    const paymentMethod = form.querySelector('input[name="payment"]:checked').value;
+    const discount = appliedVoucher ? appliedVoucher.discount : 0;
+    const total = Math.max(0, pack.price + SHIPPING_FEE - discount);
 
-    // Customer row is keyed on unique email — ignoreDuplicates means repeat
-    // buyers don't need an UPDATE policy (anon key can only insert/find).
-    const { error: customerError } = await sb.from('customers')
-      .upsert({ name, email }, { onConflict: 'email', ignoreDuplicates: true });
+    // Customer row is keyed on unique email. A plain insert (not upsert) is
+    // used deliberately — Supabase's upsert-with-ignoreDuplicates path hits a
+    // row-level-security quirk on tables where anon has no SELECT policy, so
+    // a duplicate email (code 23505) is treated as an expected, ignorable
+    // outcome rather than routing through ON CONFLICT.
+    const { error: customerError } = await sb.from('customers').insert({ name, email });
+    const customerOk = !customerError || customerError.code === '23505';
 
     const { error: orderError } = await sb.from('orders').insert({
       order_number: orderId,
@@ -417,8 +472,8 @@
       customer_mobile: form.mobile.value.trim(),
       pack: DB_PACK_LABEL[packKey],
       boxes: BOXES_IN_PACK[packKey],
-      total: pack.price + SHIPPING_FEE,
-      payment_method: paymentMethod,
+      total,
+      payment_method: 'Xendit',
       address_line: form.address.value.trim(),
       region: selectedLabel(regionSel),
       province: provinceLabel,
@@ -426,9 +481,11 @@
       barangay: barangaySel.value,
       zip_code: form.zip ? form.zip.value.trim() : null,
       affiliate_code: activeRefCode || null,
+      voucher_code: appliedVoucher ? appliedVoucher.code : null,
+      discount,
     });
 
-    if (customerError || orderError) {
+    if (!customerOk || orderError) {
       console.error(customerError || orderError);
       showCheckoutError("Sorry, we couldn't place your order. Please try again in a moment.");
       submitBtn.disabled = false;
@@ -439,7 +496,6 @@
     // Order is saved — stash what the confirmation screen needs so it can be
     // restored once Xendit redirects the shopper back here after payment.
     const fullAddress = `${form.address.value.trim()}, Brgy. ${barangaySel.value}, ${selectedLabel(citySel)}, ${provinceLabel}`;
-    const total = pack.price + SHIPPING_FEE;
     localStorage.setItem('kopify-pending-order', JSON.stringify({
       orderId, firstName: name.split(' ')[0], address: fullAddress,
       packLabel: pack.label, total, refCode: activeRefCode || null,
@@ -455,7 +511,9 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderNumber: orderId,
-          amount: total,
+          amount: pack.price + SHIPPING_FEE,
+          subtotal: pack.price,
+          voucherCode: appliedVoucher ? appliedVoucher.code : null,
           payerEmail: email,
           payerName: name,
           successUrl: `${returnBase}?paid=1&order=${orderIdParam}`,

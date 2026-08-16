@@ -724,13 +724,9 @@ const distributors = [
   { name: 'Precious Del Rosario', address: 'Lapu-Lapu City, Cebu',                 email: 'precious.delrosario@gmail.com', mobile: '0919 556 3312', channel: 'TikTok', region: 'Region VII', applied: 'Jul 30, 2026' },
 ];
 
-let vouchers = [
-  { code: 'KOPIFY10',      type: 'Percentage', amount: 10,  minSpend: 500,  used: 84,  limit: 200, validFrom: '2026-08-01', validUntil: '2026-08-31' },
-  { code: 'WELCOME50',     type: 'Fixed',      amount: 50,  minSpend: 399,  used: 312, limit: 500, validFrom: '2026-07-01', validUntil: '2026-12-31' },
-  { code: 'FLASH20',       type: 'Percentage', amount: 20,  minSpend: 0,    used: 0,   limit: 100, validFrom: '2026-08-20', validUntil: '2026-08-22' },
-  { code: 'FAMILYPACK100', type: 'Fixed',      amount: 100, minSpend: 1097, used: 156, limit: 300, validFrom: '2026-06-01', validUntil: '2026-07-31' },
-  { code: 'BOXHOLIC15',    type: 'Percentage', amount: 15,  minSpend: 500,  used: 22,  limit: 150, validFrom: '2026-08-10', validUntil: '2026-09-10' },
-];
+// Real vouchers — fetched from Supabase (see loadVouchers()), since checkout
+// validates codes against this same table server-side.
+let vouchers = [];
 
 let refunds = [
   { orderId: '#KPY10225', customer: 'Paulo Dela Cruz', pack: '1 Box',   amount: 399,  reason: 'Changed mind before it shipped',        requested: 'Aug 12, 2026', status: 'Refunded' },
@@ -960,6 +956,7 @@ async function loadRealData() {
   renderProducts();
   renderCustomers();
   document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Pending').length;
+  await loadVouchers();
 }
 
 // ---------- Render: distributor applications ----------
@@ -1069,28 +1066,45 @@ document.querySelectorAll('#vouchers-status-filter .voucher-filter-btn').forEach
   });
 });
 
-// ---------- Create voucher (modal, in-memory only) ----------
-document.getElementById('voucher-create-btn').addEventListener('click', () => {
+// ---------- Vouchers: real reads + creation ----------
+async function loadVouchers() {
+  const { data, error } = await sb.from('vouchers')
+    .select('code, type, amount, min_spend, usage_limit, used_count, valid_from, valid_until')
+    .order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  vouchers = data.map(v => ({
+    code: v.code, type: v.type, amount: v.amount, minSpend: v.min_spend,
+    used: v.used_count, limit: v.usage_limit, validFrom: v.valid_from, validUntil: v.valid_until,
+  }));
+  renderVouchers();
+}
+
+document.getElementById('voucher-create-btn').addEventListener('click', async () => {
   const code = prompt('Voucher code (e.g. HOLIDAY15):');
   if (!code || !code.trim()) return;
   const amountStr = prompt('Discount amount — a plain number.\nEnter a percent like 15 for 15% off, or a peso amount like 100 for ₱100 off:');
   const amount = parseFloat(amountStr);
   if (!amountStr || isNaN(amount) || amount <= 0) { alert('Enter a valid discount amount.'); return; }
   const isPercent = confirm('Click OK for a Percentage discount, or Cancel for a Fixed ₱ amount off.');
+  const minSpendStr = prompt('Minimum order subtotal to use this code (in ₱ — enter 0 for no minimum):', '0');
+  const minSpend = parseInt(minSpendStr, 10) || 0;
+  const limitStr = prompt('How many times can this code be used in total?', '100');
+  const limit = parseInt(limitStr, 10) || 100;
   const today = new Date().toISOString().slice(0, 10);
   const untilDate = new Date();
   untilDate.setDate(untilDate.getDate() + 14);
-  vouchers.unshift({
+
+  const { error } = await sb.from('vouchers').insert({
     code: code.trim().toUpperCase(),
     type: isPercent ? 'Percentage' : 'Fixed',
     amount,
-    minSpend: 0,
-    used: 0,
-    limit: 100,
-    validFrom: today,
-    validUntil: untilDate.toISOString().slice(0, 10),
+    min_spend: minSpend,
+    usage_limit: limit,
+    valid_from: today,
+    valid_until: untilDate.toISOString().slice(0, 10),
   });
-  renderVouchers();
+  if (error) { console.error(error); alert("Couldn't create that voucher — the code might already be taken."); return; }
+  await loadVouchers();
 });
 
 // ---------- Render: refunds & cancelled orders ----------
