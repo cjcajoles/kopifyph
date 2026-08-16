@@ -89,6 +89,25 @@ create policy "Admins manage products" on public.products
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- ----------------------------------------------------------------------------
+-- stock_movements — audit trail of every inventory change: manual deliveries/
+-- distributor shipments entered by an admin, and automatic deductions when an
+-- ecommerce/affiliate order is marked Paid (see api/xendit-webhook.js).
+-- ----------------------------------------------------------------------------
+create table if not exists public.stock_movements (
+  id uuid primary key default gen_random_uuid(),
+  product_name text not null,
+  delta integer not null,
+  reason text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.stock_movements enable row level security;
+
+drop policy if exists "Admins manage stock movements" on public.stock_movements;
+create policy "Admins manage stock movements" on public.stock_movements
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- ----------------------------------------------------------------------------
 -- customers
 -- ----------------------------------------------------------------------------
 create table if not exists public.customers (

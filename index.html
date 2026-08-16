@@ -6,6 +6,9 @@
 <title>Kopify PH | 20-in-1 Organic Coffee — No Palpitations, No Acid Reflux</title>
 <meta name="description" content="A rich, organic coffee without the worry of palpitations or acid reflux. WITHOUT Junk Sugar, Low Calorie, 100% Organic!">
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="./supabase-config.js"></script>
+
 <!-- PWA -->
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#3B2114">
@@ -536,7 +539,7 @@
           <input id="dist-address" name="address" type="text" required
                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gold-400">
         </div>
-        <div class="mb-5">
+        <div class="mb-4">
           <label for="dist-channel" class="block text-sm font-semibold text-coffee-700 mb-1">Where do you plan to sell?*</label>
           <select id="dist-channel" name="channel" required
                   class="w-full rounded-xl border border-coffee-200 px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-gold-400">
@@ -547,14 +550,40 @@
             <option value="Offline">Offline</option>
           </select>
         </div>
+        <div class="mb-5">
+          <label for="dist-region" class="block text-sm font-semibold text-coffee-700 mb-1">Region*</label>
+          <select id="dist-region" name="region" required
+                  class="w-full rounded-xl border border-coffee-200 px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-gold-400">
+            <option value="" disabled selected>Select your region</option>
+            <option>NCR</option>
+            <option>CAR</option>
+            <option>Region I</option>
+            <option>Region II</option>
+            <option>Region III</option>
+            <option>Region IV-A</option>
+            <option>MIMAROPA</option>
+            <option>Region V</option>
+            <option>Region VI</option>
+            <option>Region VII</option>
+            <option>Region VIII</option>
+            <option>Region IX</option>
+            <option>Region X</option>
+            <option>Region XI</option>
+            <option>Region XII</option>
+            <option>Region XIII</option>
+            <option>BARMM</option>
+            <option>NIR</option>
+          </select>
+        </div>
 
+        <p id="distributor-error" class="hidden text-sm text-red-600 font-semibold text-center mb-3"></p>
         <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 active:scale-[0.98] transition rounded-full text-white font-bold py-3.5">
           Send my application &rarr;
         </button>
         <p class="text-xs text-coffee-400 text-center mt-3">By submitting, you agree to be contacted about your application.</p>
 
         <p id="distributor-confirmation" class="hidden text-center text-coffee-700 font-semibold mt-4 bg-coffee-50 rounded-xl p-4">
-          Salamat! Check your email app to send your application.
+          Salamat! Your application has been received &mdash; we'll reach out soon.
         </p>
       </form>
     </div>
@@ -808,11 +837,13 @@
     }
   });
 
-  // ===== Distributor form: client-side validation + mailto =====
+  // ===== Distributor form: real submission to Supabase =====
   const distForm = document.getElementById('distributor-form');
   const distConfirmation = document.getElementById('distributor-confirmation');
+  const distError = document.getElementById('distributor-error');
+  const distSubmitBtn = distForm.querySelector('button[type="submit"]');
 
-  distForm.addEventListener('submit', (e) => {
+  distForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const name = distForm.name.value.trim();
@@ -820,9 +851,10 @@
     const email = distForm.email.value.trim();
     const address = distForm.address.value.trim();
     const channel = distForm.channel.value;
+    const region = distForm.region.value;
 
     let valid = true;
-    [distForm.name, distForm.mobile, distForm.email, distForm.address, distForm.channel].forEach((field) => {
+    [distForm.name, distForm.mobile, distForm.email, distForm.address, distForm.channel, distForm.region].forEach((field) => {
       if (!field.value.trim()) {
         valid = false;
         field.classList.add('ring-2', 'ring-red-400');
@@ -833,12 +865,22 @@
 
     if (!valid) return;
 
-    const subject = encodeURIComponent('Kopify Distributor Application');
-    const body = encodeURIComponent(
-      `Full Name: ${name}\nCell Number: ${mobile}\nEmail: ${email}\nAddress: ${address}\nWhere they plan to sell: ${channel}`
-    );
-    window.location.href = `mailto:support@kopify.ph?subject=${subject}&body=${body}`;
+    distError.classList.add('hidden');
+    distSubmitBtn.disabled = true;
+    distSubmitBtn.textContent = 'Sending…';
 
+    const { error } = await sb.from('distributors').insert({ name, mobile, email, address, channel, region });
+
+    if (error) {
+      console.error(error);
+      distError.textContent = "Sorry, we couldn't send your application. Please try again in a moment.";
+      distError.classList.remove('hidden');
+      distSubmitBtn.disabled = false;
+      distSubmitBtn.textContent = 'Send my application →';
+      return;
+    }
+
+    distForm.classList.add('hidden');
     distConfirmation.classList.remove('hidden');
   });
 </script>
