@@ -11,7 +11,10 @@
 --   - customers     (one row per unique buyer email)
 --   - orders        (every checkout — real ones will land here once the
 --                     checkout page is wired up)
---   - distributors  (submissions from the "Become a Distributor" form)
+--   - distributors  (Applications tab — submissions from the "Become a
+--                     Distributor" form)
+--   - distributor_accounts (Distributors tab — real, onboarded distributors)
+--   - inventory     (single shared stock count, in boxes)
 --   - vouchers      (promo codes)
 --   - affiliates    (public roster info — profiles.affiliate_code links a
 --                     login to a row here)
@@ -71,7 +74,6 @@ create table if not exists public.products (
   name text not null,
   subtitle text,
   price integer not null,
-  stock integer not null default 0,
   units_sold integer not null default 0,
   status text not null default 'Published' check (status in ('Published', 'Draft')),
   image_path text,
@@ -89,15 +91,60 @@ create policy "Admins manage products" on public.products
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- ----------------------------------------------------------------------------
--- stock_movements — audit trail of every inventory change: manual deliveries/
--- distributor shipments entered by an admin, and automatic deductions when an
+-- inventory — a single shared stock count (in boxes). Kopify sells one coffee
+-- product in different pack sizes (1/3/10 boxes), so unlike a normal store
+-- there's one physical pool, not separate per-pack stock. Every paid order —
+-- whatever pack it's for — deducts from this same number. Singleton row
+-- (id is always 1).
+-- ----------------------------------------------------------------------------
+create table if not exists public.inventory (
+  id integer primary key default 1 check (id = 1),
+  current_stock integer not null default 0,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.inventory enable row level security;
+
+drop policy if exists "Admins manage inventory" on public.inventory;
+create policy "Admins manage inventory" on public.inventory
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+insert into public.inventory (id, current_stock) values (1, 490) on conflict (id) do nothing;
+
+-- ----------------------------------------------------------------------------
+-- distributor_accounts — real, onboarded distributors (different from
+-- affiliates: distributors hold their own stock on hand and resell it
+-- themselves, vs. affiliates whose orders Kopify packs and ships directly).
+-- ----------------------------------------------------------------------------
+create table if not exists public.distributor_accounts (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  phone text not null,
+  address text not null,
+  shopee_link text,
+  tiktok_link text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.distributor_accounts enable row level security;
+
+drop policy if exists "Admins manage distributor accounts" on public.distributor_accounts;
+create policy "Admins manage distributor accounts" on public.distributor_accounts
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- ----------------------------------------------------------------------------
+-- stock_movements — audit trail of every inventory change: manual deliveries,
+-- stock allocated to a distributor, and automatic deductions when an
 -- ecommerce/affiliate order is marked Paid (see api/xendit-webhook.js).
+-- distributor_id is set only for movements that allocated stock to a
+-- distributor, so their allocation history ("their orders") can be filtered.
 -- ----------------------------------------------------------------------------
 create table if not exists public.stock_movements (
   id uuid primary key default gen_random_uuid(),
   product_name text not null,
   delta integer not null,
   reason text not null,
+  distributor_id uuid references public.distributor_accounts(id) on delete set null,
   created_at timestamptz not null default now()
 );
 
@@ -172,7 +219,7 @@ create policy "Admins update orders" on public.orders
   for update to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- ----------------------------------------------------------------------------
--- distributors
+-- distributors — "Become a Distributor" applications (Applications tab)
 -- ----------------------------------------------------------------------------
 create table if not exists public.distributors (
   id uuid primary key default gen_random_uuid(),
@@ -268,9 +315,9 @@ create policy "Admins manage refunds" on public.refunds
 -- affiliates, vouchers, refunds) starts empty — the admin dashboard's mock
 -- rows were only ever placeholders and won't be migrated in.
 -- ============================================================================
-insert into public.products (name, subtitle, price, stock, units_sold, status, image_path)
+insert into public.products (name, subtitle, price, units_sold, status, image_path)
 values
-  ('1 Box', '10 Sachets Inside', 415, 340, 0, 'Published', './assets/pack-1box.jpg'),
-  ('3 Boxes', 'Family Pack', 1145, 128, 0, 'Published', './assets/pack-3boxes.jpg'),
-  ('10 Boxes', 'Kopifyholic Bundle', 3940, 22, 0, 'Published', './assets/pack-10boxes.jpg')
+  ('1 Box', '10 Sachets Inside', 415, 0, 'Published', './assets/pack-1box.jpg'),
+  ('3 Boxes', 'Family Pack', 1145, 0, 'Published', './assets/pack-3boxes.jpg'),
+  ('10 Boxes', 'Kopifyholic Bundle', 3940, 0, 'Published', './assets/pack-10boxes.jpg')
 on conflict do nothing;

@@ -156,10 +156,15 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8.5" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M15.2 5.7a3.2 3.2 0 0 1 0 6.2M17.5 14.3c2.3.4 4 2.7 4 5.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Customers
       </button>
+      <button class="nav-btn" data-view="applications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 3.5h8l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19V5A1.5 1.5 0 0 1 6.5 3.5H7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 3.5V8h4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.5 12.5h7M8.5 15.5h7M8.5 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Applications
+        <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center" id="applications-nav-count">0</span>
+      </button>
       <button class="nav-btn" data-view="distributors">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="9.5" width="17" height="11" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 9.5V7a4.5 4.5 0 0 1 9 0v2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 13.5v3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Distributors
-        <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center" id="dist-nav-count">2</span>
+        <span class="ml-auto bg-gold-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center" id="dist-nav-count">0</span>
       </button>
       <button class="nav-btn" data-view="vouchers">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3.5 9.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v1.2a1.7 1.7 0 0 0 0 3.2v1.6a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-1.6a1.7 1.7 0 0 0 0-3.2V9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14.5 8v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="1.6 1.8"/></svg>
@@ -373,8 +378,19 @@
         <div class="flex items-center justify-between mb-6">
           <div>
             <h1 class="text-2xl font-extrabold text-coffee-900">Products</h1>
-            <p class="text-coffee-500 text-sm mt-1">Manage Kopify's pricing and stock.</p>
+            <p class="text-coffee-500 text-sm mt-1">Manage Kopify's pricing and shared inventory.</p>
           </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5 mb-4 flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Current Inventory</span>
+            <p class="text-3xl font-extrabold text-coffee-900 mt-1"><span id="inventory-count">0</span> <span class="text-base font-semibold text-coffee-400">boxes</span></p>
+            <p class="text-xs text-coffee-400 mt-1">Shared across all pack sizes &mdash; one product, one stock count.</p>
+          </div>
+          <button id="inventory-adjust-btn" class="flex items-center gap-1.5 bg-gold-500 hover:bg-gold-600 transition text-white text-sm font-bold px-4 py-2.5 rounded-full">
+            Adjust Inventory
+          </button>
         </div>
 
         <div class="flex flex-wrap items-center gap-3 mb-4">
@@ -387,7 +403,7 @@
         <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden mb-4">
           <div class="overflow-x-auto">
             <table class="w-full" id="products-table">
-              <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Units sold</th><th>Status</th><th></th></tr></thead>
+              <thead><tr><th>Product</th><th>Price</th><th>Units sold</th><th>Status</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -434,8 +450,8 @@
         </div>
       </section>
 
-      <!-- ================= DISTRIBUTORS ================= -->
-      <section id="view-distributors" class="hidden">
+      <!-- ================= APPLICATIONS ================= -->
+      <section id="view-applications" class="hidden">
         <div class="flex items-center justify-between mb-6">
           <div>
             <h1 class="text-2xl font-extrabold text-coffee-900">Distributor Applications</h1>
@@ -446,9 +462,9 @@
         <div class="flex flex-wrap items-center gap-3 mb-4">
           <div class="relative flex-1 min-w-[220px] max-w-sm">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            <input id="distributors-search" type="text" placeholder="Search by name, email, or address" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+            <input id="applications-search" type="text" placeholder="Search by name, email, or address" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
           </div>
-          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="distributors-channel-filter">
+          <div class="flex gap-1.5 bg-white border border-coffee-100 rounded-full p-1" id="applications-channel-filter">
             <button data-channel="all" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-coffee-800 text-white">All</button>
             <button data-channel="Lazada" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Lazada</button>
             <button data-channel="Shopee" class="channel-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-coffee-500">Shopee</button>
@@ -459,17 +475,48 @@
 
         <div class="flex flex-wrap items-center gap-2 mb-4">
           <span class="text-xs font-bold uppercase tracking-wide text-coffee-400 mr-1">By region</span>
-          <div class="flex flex-wrap gap-1.5" id="distributors-region-filter"></div>
+          <div class="flex flex-wrap gap-1.5" id="applications-region-filter"></div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full" id="distributors-table">
+            <table class="w-full" id="applications-table">
               <thead><tr><th>Applicant</th><th>Contact</th><th>Address</th><th>Region</th><th>Plans to sell on</th><th>Applied</th><th></th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
-          <p id="distributors-empty" class="hidden text-center text-sm text-coffee-400 py-10">No applications match your search.</p>
+          <p id="applications-empty" class="hidden text-center text-sm text-coffee-400 py-10">No applications match your search.</p>
+        </div>
+      </section>
+
+      <!-- ================= DISTRIBUTORS (real, onboarded) ================= -->
+      <section id="view-distributors" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-coffee-900">Distributors</h1>
+            <p class="text-coffee-500 text-sm mt-1">Onboarded distributors who hold their own stock on hand and resell it themselves.</p>
+          </div>
+          <button id="distributor-create-btn" class="flex items-center gap-1.5 bg-gold-500 hover:bg-gold-600 transition text-white text-sm font-bold px-4 py-2.5 rounded-full">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Add distributor
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="relative flex-1 min-w-[220px] max-w-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-coffee-300"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="dist-search" type="text" placeholder="Search by name, phone, or address" class="w-full bg-white border border-coffee-100 rounded-full pl-9 pr-4 py-2.5 text-sm placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-gold-400">
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="dist-table">
+              <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Shopee</th><th>TikTok</th><th>Added</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="dist-empty" class="hidden text-center text-sm text-coffee-400 py-10">No distributors yet &mdash; add the first one.</p>
         </div>
       </section>
 
@@ -677,8 +724,8 @@ const PH_REGIONS = [
   'Region XI', 'Region XII', 'Region XIII', 'BARMM', 'NIR',
 ];
 
-// Real distributor applications — fetched from Supabase (see loadDistributors()).
-let distributors = [];
+// Real distributor applications — fetched from Supabase (see loadApplications()).
+let applications = [];
 
 // Real vouchers — fetched from Supabase (see loadVouchers()), since checkout
 // validates codes against this same table server-side.
@@ -879,38 +926,38 @@ function renderProducts() {
         </div>
       </td>
       <td class="font-semibold">${peso(p.price)}</td>
-      <td>${p.stock.toLocaleString('en-PH')}</td>
       <td class="text-coffee-500">${p.sold.toLocaleString('en-PH')}</td>
       <td>${statusPill(p.status)}</td>
-      <td><button data-adjust-stock="${p.name.replace(/"/g, '&quot;')}" class="text-xs font-bold text-gold-600 hover:text-gold-500">Adjust Stock</button></td>
     </tr>`).join('');
-  document.querySelectorAll('[data-adjust-stock]').forEach(btn => {
-    btn.addEventListener('click', () => adjustStock(btn.dataset.adjustStock));
-  });
 }
 document.getElementById('products-search').addEventListener('input', renderProducts);
 
-// ---------- Inventory: manual adjustments + audit log ----------
-async function adjustStock(productName) {
-  const deltaStr = prompt(`Adjust stock for "${productName}".\nEnter a positive number for a new delivery (e.g. 5000), or negative for stock leaving (e.g. -200 for a distributor shipment):`);
+// ---------- Inventory: single shared stock pool (in boxes) ----------
+let currentInventory = 0;
+async function loadInventory() {
+  const { data, error } = await sb.from('inventory').select('current_stock').eq('id', 1).single();
+  if (error) { console.error(error); return; }
+  currentInventory = data.current_stock;
+  document.getElementById('inventory-count').textContent = currentInventory.toLocaleString('en-PH');
+}
+async function adjustInventory() {
+  const deltaStr = prompt(`Adjust the shared inventory (currently ${currentInventory.toLocaleString('en-PH')} boxes).\nEnter a positive number for a new delivery (e.g. 5000), or negative for stock leaving (e.g. -200):`);
   if (!deltaStr) return;
   const delta = parseInt(deltaStr, 10);
   if (isNaN(delta) || delta === 0) { alert('Enter a non-zero whole number.'); return; }
-  const reason = prompt('Reason (e.g. "New delivery from supplier" or "Shipped to Distributor: Jasmine Uy"):');
+  const reason = prompt('Reason (e.g. "New delivery from supplier"):');
   if (!reason || !reason.trim()) return;
 
-  const product = products.find(p => p.name === productName);
-  if (!product) return;
-  const newStock = Math.max(0, product.stock + delta);
+  const newStock = Math.max(0, currentInventory + delta);
+  const { error: updateError } = await sb.from('inventory').update({ current_stock: newStock, updated_at: new Date().toISOString() }).eq('id', 1);
+  if (updateError) { console.error(updateError); alert("Couldn't update inventory."); return; }
 
-  const { error: updateError } = await sb.from('products').update({ stock: newStock }).eq('name', productName);
-  if (updateError) { console.error(updateError); alert("Couldn't update stock."); return; }
-
-  const { error: logError } = await sb.from('stock_movements').insert({ product_name: productName, delta, reason: reason.trim() });
+  const { error: logError } = await sb.from('stock_movements').insert({ product_name: 'Kopify Coffee', delta, reason: reason.trim() });
   if (logError) console.error(logError);
 
   await loadRealData();
 }
+document.getElementById('inventory-adjust-btn').addEventListener('click', adjustInventory);
 
 async function loadStockMovements() {
   const { data, error } = await sb.from('stock_movements')
@@ -997,7 +1044,7 @@ async function loadRealData() {
 
   const { data: productRows, error: productsError } = await sb
     .from('products')
-    .select('name, subtitle, price, stock, units_sold, status, image_path');
+    .select('name, subtitle, price, units_sold, status, image_path');
 
   if (productsError) {
     console.error(productsError);
@@ -1007,7 +1054,6 @@ async function loadRealData() {
       sub: p.subtitle,
       img: p.image_path,
       price: p.price,
-      stock: p.stock,
       sold: p.units_sold,
       status: p.status,
     }));
@@ -1023,19 +1069,21 @@ async function loadRealData() {
   // Badge = orders that need action from here (paid, waiting to be shipped) —
   // not "Pending" (those are just waiting on the customer to pay).
   document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Paid').length;
+  await loadInventory();
   await loadVouchers();
-  await loadDistributors();
+  await loadApplications();
+  await loadDistributorAccounts();
   await loadStockMovements();
 }
 
 // ---------- Render: distributor applications ----------
-let distributorsChannelFilter = 'all';
-let distributorsRegionFilter = 'all';
-function renderDistributors() {
-  const q = document.getElementById('distributors-search').value.trim().toLowerCase();
-  const rows = distributors.filter(d =>
-    (distributorsChannelFilter === 'all' || d.channel === distributorsChannelFilter) &&
-    (distributorsRegionFilter === 'all' || d.region === distributorsRegionFilter) &&
+let applicationsChannelFilter = 'all';
+let applicationsRegionFilter = 'all';
+function renderApplications() {
+  const q = document.getElementById('applications-search').value.trim().toLowerCase();
+  const rows = applications.filter(d =>
+    (applicationsChannelFilter === 'all' || d.channel === applicationsChannelFilter) &&
+    (applicationsRegionFilter === 'all' || d.region === applicationsRegionFilter) &&
     (d.name.toLowerCase().includes(q) || d.email.toLowerCase().includes(q) || d.address.toLowerCase().includes(q))
   );
   const channelStyle = {
@@ -1044,7 +1092,7 @@ function renderDistributors() {
     TikTok:  { bg: '#E9E9EA', text: '#18181B' },
     Offline: { bg: '#F3E1CC', text: '#6F4423' },
   };
-  const tbody = document.querySelector('#distributors-table tbody');
+  const tbody = document.querySelector('#applications-table tbody');
   tbody.innerHTML = rows.map(d => {
     const c = channelStyle[d.channel] || channelStyle.Offline;
     return `
@@ -1065,25 +1113,130 @@ function renderDistributors() {
       </td>
     </tr>`;
   }).join('');
-  document.getElementById('distributors-empty').classList.toggle('hidden', rows.length > 0);
-  renderRegionPills('distributors-region-filter', distributors, distributorsRegionFilter, (region) => {
-    distributorsRegionFilter = region;
-    renderDistributors();
+  document.getElementById('applications-empty').classList.toggle('hidden', rows.length > 0);
+  renderRegionPills('applications-region-filter', applications, applicationsRegionFilter, (region) => {
+    applicationsRegionFilter = region;
+    renderApplications();
   });
 }
-document.getElementById('distributors-search').addEventListener('input', renderDistributors);
-document.querySelectorAll('#distributors-channel-filter .channel-filter-btn').forEach(btn => {
+document.getElementById('applications-search').addEventListener('input', renderApplications);
+document.querySelectorAll('#applications-channel-filter .channel-filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    distributorsChannelFilter = btn.dataset.channel;
-    document.querySelectorAll('#distributors-channel-filter .channel-filter-btn').forEach(b => {
+    applicationsChannelFilter = btn.dataset.channel;
+    document.querySelectorAll('#applications-channel-filter .channel-filter-btn').forEach(b => {
       b.classList.remove('bg-coffee-800', 'text-white');
       b.classList.add('text-coffee-500');
     });
     btn.classList.add('bg-coffee-800', 'text-white');
     btn.classList.remove('text-coffee-500');
-    renderDistributors();
+    renderApplications();
   });
 });
+
+// ---------- Render: distributors (real, onboarded) ----------
+let distributorAccounts = [];
+function renderDistributorAccounts() {
+  const q = document.getElementById('dist-search').value.trim().toLowerCase();
+  const rows = distributorAccounts.filter(d =>
+    d.name.toLowerCase().includes(q) || d.phone.toLowerCase().includes(q) || d.address.toLowerCase().includes(q)
+  );
+  const tbody = document.querySelector('#dist-table tbody');
+  tbody.innerHTML = rows.map(d => `
+    <tr>
+      <td class="font-semibold text-coffee-900">${d.name}</td>
+      <td class="text-coffee-500">${d.phone}</td>
+      <td class="text-coffee-500">${d.address}</td>
+      <td>${d.shopeeLink ? `<a href="${d.shopeeLink}" target="_blank" rel="noopener" class="text-gold-600 hover:text-gold-500 font-semibold text-xs">Shopee &rarr;</a>` : '&mdash;'}</td>
+      <td>${d.tiktokLink ? `<a href="${d.tiktokLink}" target="_blank" rel="noopener" class="text-gold-600 hover:text-gold-500 font-semibold text-xs">TikTok &rarr;</a>` : '&mdash;'}</td>
+      <td class="text-coffee-500">${d.added}</td>
+      <td>
+        <div class="flex gap-3">
+          <button data-dist-allocate="${d.id}" class="text-xs font-bold text-gold-600 hover:text-gold-500">Allocate stock</button>
+          <button data-dist-history="${d.id}" class="text-xs font-bold text-coffee-500 hover:text-coffee-700">View orders</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  document.getElementById('dist-empty').classList.toggle('hidden', rows.length > 0);
+  document.getElementById('dist-nav-count').textContent = distributorAccounts.length;
+
+  document.querySelectorAll('[data-dist-allocate]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = distributorAccounts.find(x => x.id === btn.dataset.distAllocate);
+      if (d) allocateStockToDistributor(d.id, d.name);
+    });
+  });
+  document.querySelectorAll('[data-dist-history]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = distributorAccounts.find(x => x.id === btn.dataset.distHistory);
+      if (d) viewDistributorHistory(d.id, d.name);
+    });
+  });
+}
+document.getElementById('dist-search').addEventListener('input', renderDistributorAccounts);
+
+document.getElementById('distributor-create-btn').addEventListener('click', async () => {
+  const name = prompt('Distributor name:');
+  if (!name || !name.trim()) return;
+  const phone = prompt('Phone number:');
+  if (!phone || !phone.trim()) return;
+  const address = prompt('Address:');
+  if (!address || !address.trim()) return;
+  const shopeeLink = prompt('Shopee store link (leave blank if none):') || '';
+  const tiktokLink = prompt('TikTok store link (leave blank if none):') || '';
+
+  const { error } = await sb.from('distributor_accounts').insert({
+    name: name.trim(), phone: phone.trim(), address: address.trim(),
+    shopee_link: shopeeLink.trim() || null, tiktok_link: tiktokLink.trim() || null,
+  });
+  if (error) { console.error(error); alert("Couldn't add that distributor."); return; }
+  await loadDistributorAccounts();
+});
+
+// Stock a distributor holds on hand is deducted from the same shared
+// inventory pool as ecommerce orders — distributors get physical boxes,
+// affiliates get orders packed and shipped by Kopify instead.
+async function allocateStockToDistributor(distId, distName) {
+  const amtStr = prompt(`How many boxes are you sending to "${distName}"?\nEnter a positive number.`);
+  if (!amtStr) return;
+  const amt = parseInt(amtStr, 10);
+  if (isNaN(amt) || amt <= 0) { alert('Enter a positive whole number.'); return; }
+
+  const newStock = Math.max(0, currentInventory - amt);
+  const { error: invError } = await sb.from('inventory').update({ current_stock: newStock, updated_at: new Date().toISOString() }).eq('id', 1);
+  if (invError) { console.error(invError); alert("Couldn't update inventory."); return; }
+
+  const { error: logError } = await sb.from('stock_movements').insert({
+    product_name: 'Kopify Coffee', delta: -amt, reason: `Allocated to distributor: ${distName}`, distributor_id: distId,
+  });
+  if (logError) console.error(logError);
+
+  await loadRealData();
+}
+
+// A distributor's "orders" are their stock allocation history — they hold
+// boxes on hand and resell them, rather than placing checkout orders.
+async function viewDistributorHistory(distId, distName) {
+  const { data, error } = await sb.from('stock_movements')
+    .select('delta, reason, created_at')
+    .eq('distributor_id', distId)
+    .order('created_at', { ascending: false });
+  if (error) { console.error(error); alert("Couldn't load that distributor's history."); return; }
+  if (!data.length) { alert(`No stock allocated to ${distName} yet.`); return; }
+  const lines = data.map(m => `${fmtAdminDate(m.created_at)}  —  ${m.delta > 0 ? '+' : ''}${m.delta} boxes  —  ${m.reason}`);
+  alert(`Stock history for ${distName}:\n\n${lines.join('\n')}`);
+}
+
+async function loadDistributorAccounts() {
+  const { data, error } = await sb.from('distributor_accounts')
+    .select('id, name, phone, address, shopee_link, tiktok_link, created_at')
+    .order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  distributorAccounts = data.map(d => ({
+    id: d.id, name: d.name, phone: d.phone, address: d.address,
+    shopeeLink: d.shopee_link, tiktokLink: d.tiktok_link, added: fmtAdminDate(d.created_at),
+  }));
+  renderDistributorAccounts();
+}
 
 // ---------- Render: vouchers ----------
 function voucherStatus(v) {
@@ -1135,18 +1288,18 @@ document.querySelectorAll('#vouchers-status-filter .voucher-filter-btn').forEach
   });
 });
 
-// ---------- Vouchers: real reads + creation ----------
-async function loadDistributors() {
+// ---------- Applications: real reads ----------
+async function loadApplications() {
   const { data, error } = await sb.from('distributors')
     .select('name, address, region, email, mobile, channel, applied_at')
     .order('applied_at', { ascending: false });
   if (error) { console.error(error); return; }
-  distributors = data.map(d => ({
+  applications = data.map(d => ({
     name: d.name, address: d.address, region: d.region, email: d.email,
     mobile: d.mobile, channel: d.channel, applied: fmtAdminDate(d.applied_at),
   }));
-  renderDistributors();
-  document.getElementById('dist-nav-count').textContent = distributors.length;
+  renderApplications();
+  document.getElementById('applications-nav-count').textContent = applications.length;
 }
 
 async function loadVouchers() {
@@ -1410,6 +1563,7 @@ const views = {
   orders: document.getElementById('view-orders'),
   products: document.getElementById('view-products'),
   customers: document.getElementById('view-customers'),
+  applications: document.getElementById('view-applications'),
   distributors: document.getElementById('view-distributors'),
   vouchers: document.getElementById('view-vouchers'),
   refunds: document.getElementById('view-refunds'),
@@ -1454,14 +1608,15 @@ renderRecentOrders();
 renderOrders();
 renderProducts();
 renderCustomers();
-renderDistributors();
+renderApplications();
+renderDistributorAccounts();
 renderVouchers();
 renderRefunds();
 renderAffiliates();
 applyPeriod('monthly');
 renderBestSellers();
 document.getElementById('orders-nav-count').textContent = orders.filter(o => o.status === 'Paid').length;
-document.getElementById('dist-nav-count').textContent = distributors.length;
+document.getElementById('applications-nav-count').textContent = applications.length;
 
 // ---------- Logout ----------
 document.getElementById('logout-btn').addEventListener('click', async () => {

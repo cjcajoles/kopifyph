@@ -68,20 +68,37 @@ async function markPaidAndDeductStock(orderNumber) {
 
   await sendConfirmationEmail(order, orderNumber);
 
+  // Kopify sells one product in different pack sizes — stock is one shared
+  // pool (in boxes), not per-pack. units_sold stays per-pack, purely for
+  // "best sellers" reporting.
+  const invRes = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/inventory?id=eq.1&select=current_stock`,
+    { headers: SB_HEADERS }
+  );
+  const invRows = await invRes.json();
+  const inv = invRows[0];
+  if (inv) {
+    const newStock = Math.max(0, inv.current_stock - order.boxes);
+    await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/inventory?id=eq.1`,
+      { method: 'PATCH', headers: { ...SB_HEADERS, Prefer: 'return=minimal' }, body: JSON.stringify({ current_stock: newStock, updated_at: new Date().toISOString() }) }
+    );
+  }
+
   const prodRes = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/products?name=eq.${encodeURIComponent(order.pack)}&select=stock,units_sold`,
+    `${process.env.SUPABASE_URL}/rest/v1/products?name=eq.${encodeURIComponent(order.pack)}&select=units_sold`,
     { headers: SB_HEADERS }
   );
   const products = await prodRes.json();
   const product = products[0];
-  if (!product) return; // pack name didn't match a known product — nothing to deduct
+  if (product) {
+    const newUnitsSold = (product.units_sold || 0) + order.boxes;
+    await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/products?name=eq.${encodeURIComponent(order.pack)}`,
+      { method: 'PATCH', headers: { ...SB_HEADERS, Prefer: 'return=minimal' }, body: JSON.stringify({ units_sold: newUnitsSold }) }
+    );
+  }
 
-  const newStock = Math.max(0, product.stock - order.boxes);
-  const newUnitsSold = (product.units_sold || 0) + order.boxes;
-  await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/products?name=eq.${encodeURIComponent(order.pack)}`,
-    { method: 'PATCH', headers: { ...SB_HEADERS, Prefer: 'return=minimal' }, body: JSON.stringify({ stock: newStock, units_sold: newUnitsSold }) }
-  );
   await fetch(`${process.env.SUPABASE_URL}/rest/v1/stock_movements`, {
     method: 'POST',
     headers: { ...SB_HEADERS, Prefer: 'return=minimal' },
