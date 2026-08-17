@@ -14,6 +14,8 @@
 --   - distributors  (Applications tab — submissions from the "Become a
 --                     Distributor" form)
 --   - distributor_accounts (Distributors tab — real, onboarded distributors)
+--   - distributor_orders (each distributor's own order log — date, boxes,
+--                     amount paid, shipped status)
 --   - inventory     (single shared stock count, in boxes)
 --   - vouchers      (promo codes)
 --   - affiliates    (public roster info — profiles.affiliate_code links a
@@ -130,6 +132,28 @@ alter table public.distributor_accounts enable row level security;
 
 drop policy if exists "Admins manage distributor accounts" on public.distributor_accounts;
 create policy "Admins manage distributor accounts" on public.distributor_accounts
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- ----------------------------------------------------------------------------
+-- distributor_orders — a distributor's own order log (Distributors tab ->
+-- "Orders"): date ordered, boxes, amount paid, and whether it's shipped yet.
+-- Separate from the ecommerce `orders` table since these are manually
+-- entered by the admin, not placed through checkout/Xendit.
+-- ----------------------------------------------------------------------------
+create table if not exists public.distributor_orders (
+  id uuid primary key default gen_random_uuid(),
+  distributor_id uuid not null references public.distributor_accounts(id) on delete cascade,
+  order_date date not null,
+  boxes integer not null,
+  amount_paid integer not null default 0,
+  shipped boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+alter table public.distributor_orders enable row level security;
+
+drop policy if exists "Admins manage distributor orders" on public.distributor_orders;
+create policy "Admins manage distributor orders" on public.distributor_orders
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- ----------------------------------------------------------------------------

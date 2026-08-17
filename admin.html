@@ -1149,26 +1149,35 @@ function renderDistributorAccounts() {
       <td>${d.shopeeLink ? `<a href="${d.shopeeLink}" target="_blank" rel="noopener" class="text-gold-600 hover:text-gold-500 font-semibold text-xs">Shopee &rarr;</a>` : '&mdash;'}</td>
       <td>${d.tiktokLink ? `<a href="${d.tiktokLink}" target="_blank" rel="noopener" class="text-gold-600 hover:text-gold-500 font-semibold text-xs">TikTok &rarr;</a>` : '&mdash;'}</td>
       <td class="text-coffee-500">${d.added}</td>
-      <td>
-        <div class="flex gap-3">
-          <button data-dist-allocate="${d.id}" class="text-xs font-bold text-gold-600 hover:text-gold-500">Allocate stock</button>
-          <button data-dist-history="${d.id}" class="text-xs font-bold text-coffee-500 hover:text-coffee-700">View orders</button>
+      <td><button data-dist-orders-toggle="${d.id}" class="text-xs font-bold text-gold-600 hover:text-gold-500">Orders</button></td>
+    </tr>
+    <tr class="hidden" data-dist-orders-panel="${d.id}">
+      <td colspan="7" class="bg-coffee-50">
+        <div class="p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-coffee-900 text-sm">Orders &mdash; ${d.name}</h3>
+            <button data-dist-add-order="${d.id}" class="text-xs font-bold bg-gold-500 hover:bg-gold-600 text-white px-3 py-1.5 rounded-full">+ Add order</button>
+          </div>
+          <div class="overflow-x-auto bg-white rounded-xl border border-coffee-100">
+            <table class="w-full" data-dist-orders-table="${d.id}">
+              <thead><tr><th>Date</th><th>Boxes</th><th>Amount paid</th><th>Shipped</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="hidden text-center text-xs text-coffee-400 py-6" data-dist-orders-empty="${d.id}">No orders logged yet.</p>
         </div>
       </td>
     </tr>`).join('');
   document.getElementById('dist-empty').classList.toggle('hidden', rows.length > 0);
   document.getElementById('dist-nav-count').textContent = distributorAccounts.length;
 
-  document.querySelectorAll('[data-dist-allocate]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const d = distributorAccounts.find(x => x.id === btn.dataset.distAllocate);
-      if (d) allocateStockToDistributor(d.id, d.name);
-    });
+  document.querySelectorAll('[data-dist-orders-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => toggleDistributorOrders(btn.dataset.distOrdersToggle));
   });
-  document.querySelectorAll('[data-dist-history]').forEach(btn => {
+  document.querySelectorAll('[data-dist-add-order]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const d = distributorAccounts.find(x => x.id === btn.dataset.distHistory);
-      if (d) viewDistributorHistory(d.id, d.name);
+      const d = distributorAccounts.find(x => x.id === btn.dataset.distAddOrder);
+      if (d) addDistributorOrder(d.id, d.name);
     });
   });
 }
@@ -1192,38 +1201,95 @@ document.getElementById('distributor-create-btn').addEventListener('click', asyn
   await loadDistributorAccounts();
 });
 
-// Stock a distributor holds on hand is deducted from the same shared
-// inventory pool as ecommerce orders — distributors get physical boxes,
-// affiliates get orders packed and shipped by Kopify instead.
-async function allocateStockToDistributor(distId, distName) {
-  const amtStr = prompt(`How many boxes are you sending to "${distName}"?\nEnter a positive number.`);
-  if (!amtStr) return;
-  const amt = parseInt(amtStr, 10);
-  if (isNaN(amt) || amt <= 0) { alert('Enter a positive whole number.'); return; }
+// ---------- Distributor orders — each distributor's own log: date ordered,
+// boxes, amount paid, and whether it's shipped yet. Boxes still come out of
+// the one shared inventory pool (same as ecommerce orders), since it's
+// physically the same stock — distributors just hold it on hand instead of
+// Kopify packing and shipping it directly like affiliate orders.
+let distributorOrdersCache = {};
 
-  const newStock = Math.max(0, currentInventory - amt);
+function renderDistributorOrdersPanel(distId) {
+  const rows = distributorOrdersCache[distId] || [];
+  const table = document.querySelector(`[data-dist-orders-table="${distId}"]`);
+  if (!table) return;
+  table.querySelector('tbody').innerHTML = rows.map(o => `
+    <tr>
+      <td class="text-coffee-500">${fmtAdminDate(o.order_date)}</td>
+      <td>${o.boxes}</td>
+      <td class="font-semibold">${peso(o.amount_paid)}</td>
+      <td>
+        <button data-dist-order-shipped="${o.id}" class="status-pill" style="background:${o.shipped ? '#DBEAFE' : '#FEF3C7'};color:${o.shipped ? '#1D4ED8' : '#B45309'};border:none;cursor:pointer;">
+          ${o.shipped ? 'Shipped' : 'Not shipped'}
+        </button>
+      </td>
+    </tr>`).join('');
+  const emptyEl = document.querySelector(`[data-dist-orders-empty="${distId}"]`);
+  if (emptyEl) emptyEl.classList.toggle('hidden', rows.length > 0);
+
+  table.querySelectorAll('[data-dist-order-shipped]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const order = rows.find(o => o.id === btn.dataset.distOrderShipped);
+      if (!order) return;
+      btn.disabled = true;
+      const { error } = await sb.from('distributor_orders').update({ shipped: !order.shipped }).eq('id', order.id);
+      if (error) { console.error(error); alert("Couldn't update shipped status."); btn.disabled = false; return; }
+      await loadDistributorOrders(distId);
+    });
+  });
+}
+
+async function loadDistributorOrders(distId) {
+  const { data, error } = await sb.from('distributor_orders')
+    .select('id, order_date, boxes, amount_paid, shipped')
+    .eq('distributor_id', distId)
+    .order('order_date', { ascending: false });
+  if (error) { console.error(error); return; }
+  distributorOrdersCache[distId] = data;
+  renderDistributorOrdersPanel(distId);
+}
+
+function toggleDistributorOrders(distId) {
+  const panel = document.querySelector(`[data-dist-orders-panel="${distId}"]`);
+  if (!panel) return;
+  const wasHidden = panel.classList.contains('hidden');
+  document.querySelectorAll('[data-dist-orders-panel]').forEach(p => p.classList.add('hidden'));
+  if (wasHidden) {
+    panel.classList.remove('hidden');
+    loadDistributorOrders(distId);
+  }
+}
+
+async function addDistributorOrder(distId, distName) {
+  const dateStr = (prompt('Order date (YYYY-MM-DD):', new Date().toISOString().slice(0, 10)) || '').trim();
+  if (!dateStr) return;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) { alert('Enter the date as YYYY-MM-DD.'); return; }
+
+  const boxesStr = prompt(`How many boxes did "${distName}" order?`);
+  const boxes = parseInt(boxesStr, 10);
+  if (!boxesStr || isNaN(boxes) || boxes <= 0) { alert('Enter a positive whole number of boxes.'); return; }
+
+  const amountStr = prompt('Amount paid (₱):');
+  const amountPaid = parseInt(amountStr, 10);
+  if (!amountStr || isNaN(amountPaid) || amountPaid < 0) { alert('Enter a valid peso amount.'); return; }
+
+  const shipped = confirm('Has this order already been shipped?\nClick OK for Shipped, Cancel for Not shipped yet.');
+
+  const { error: orderError } = await sb.from('distributor_orders').insert({
+    distributor_id: distId, order_date: dateStr, boxes, amount_paid: amountPaid, shipped,
+  });
+  if (orderError) { console.error(orderError); alert("Couldn't save that order."); return; }
+
+  const newStock = Math.max(0, currentInventory - boxes);
   const { error: invError } = await sb.from('inventory').update({ current_stock: newStock, updated_at: new Date().toISOString() }).eq('id', 1);
-  if (invError) { console.error(invError); alert("Couldn't update inventory."); return; }
-
+  if (invError) console.error(invError);
   const { error: logError } = await sb.from('stock_movements').insert({
-    product_name: 'Kopify Coffee', delta: -amt, reason: `Allocated to distributor: ${distName}`, distributor_id: distId,
+    product_name: 'Kopify Coffee', delta: -boxes, reason: `Order for distributor: ${distName}`, distributor_id: distId,
   });
   if (logError) console.error(logError);
 
-  await loadRealData();
-}
-
-// A distributor's "orders" are their stock allocation history — they hold
-// boxes on hand and resell them, rather than placing checkout orders.
-async function viewDistributorHistory(distId, distName) {
-  const { data, error } = await sb.from('stock_movements')
-    .select('delta, reason, created_at')
-    .eq('distributor_id', distId)
-    .order('created_at', { ascending: false });
-  if (error) { console.error(error); alert("Couldn't load that distributor's history."); return; }
-  if (!data.length) { alert(`No stock allocated to ${distName} yet.`); return; }
-  const lines = data.map(m => `${fmtAdminDate(m.created_at)}  —  ${m.delta > 0 ? '+' : ''}${m.delta} boxes  —  ${m.reason}`);
-  alert(`Stock history for ${distName}:\n\n${lines.join('\n')}`);
+  await loadDistributorOrders(distId);
+  await loadInventory();
+  await loadStockMovements();
 }
 
 async function loadDistributorAccounts() {
