@@ -78,6 +78,12 @@
   .theme-choice-btn { color:#8B5A2B; transition:background .15s,color .15s,box-shadow .15s; }
   .theme-choice-btn.active { background:#fff; color:#3B2114; box-shadow:0 1px 2px 0 rgba(42,23,13,.08); }
 
+  /* Form modal — replaces browser prompt() chains for real data entry (Add
+     distributor, Add affiliate) with an actual in-page form. */
+  .field-label { display:block; font-size:.8125rem; font-weight:600; color:#54331C; margin-bottom:.25rem; }
+  .field-input { width:100%; border-radius:.75rem; border:1px solid #E4C79E; padding:.65rem 1rem; font-size:.875rem; background:#fff; }
+  .field-input:focus { outline:none; box-shadow:0 0 0 2px #E8B35C; border-color:#E8B35C; }
+
   /* ============ DARK MODE ============
      Re-targets the same Tailwind-generated classes used everywhere in this file (both
      static HTML and JS-rendered table rows) rather than adding dark: variants to every
@@ -110,6 +116,8 @@
   html.dark .nav-btn svg { color:#B98247; }
   html.dark .period-btn, html.dark .theme-choice-btn, html.dark .orders-view-btn { color:#E8B35C; }
   html.dark .period-btn.active, html.dark .theme-choice-btn.active, html.dark .orders-view-btn.active-view { background:#54331C; color:#FBF3EA; }
+  html.dark .field-label { color:#E4C79E; }
+  html.dark .field-input { background:#3B2114; border-color:#54331C; color:#FBF3EA; }
   /* Hidden until the async auth check (bottom of page) confirms an admin session,
      so a signed-out visitor never sees a flash of dashboard content before the
      redirect to admin-login.html kicks in. */
@@ -678,6 +686,25 @@
   </div>
 </div>
 
+<!-- ============ FORM MODAL ============
+     A real in-page form (not a browser prompt() chain) for entering
+     structured data — Add distributor, Add affiliate. Opened/configured via
+     openFormModal() in the script below. -->
+<div id="form-modal-overlay" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+    <h2 class="font-extrabold text-lg text-coffee-900 mb-1" id="form-modal-title">&nbsp;</h2>
+    <p class="text-sm text-coffee-500 mb-4 hidden" id="form-modal-subtitle"></p>
+    <form id="form-modal-form" class="space-y-4" novalidate>
+      <div id="form-modal-fields" class="space-y-4"></div>
+      <p id="form-modal-error" class="hidden text-sm text-red-600 font-semibold"></p>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" id="form-modal-cancel" class="px-4 py-2.5 rounded-full text-sm font-bold text-coffee-600 hover:bg-coffee-50 transition">Cancel</button>
+        <button type="submit" id="form-modal-submit" class="px-5 py-2.5 rounded-full text-sm font-bold text-white bg-gold-500 hover:bg-gold-600 transition">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
 // ---------- Auth guard ----------
 // Real gate: must have a Supabase session AND a profiles.role of 'admin'. Runs first;
@@ -781,6 +808,84 @@ function renderRegionPills(containerId, list, activeRegion, onSelect) {
     btn.addEventListener('click', () => onSelect(btn.dataset.region));
   });
 }
+
+// ---------- Form modal ----------
+// A real in-page form for entering structured data (Add distributor, Add
+// affiliate), instead of a chain of browser prompt() dialogs. Fields:
+// [{ id, label, type: 'text'|'email'|'tel'|'url'|'date'|'number', required, value }]
+// onSubmit(values) does the actual save — return { error: 'message' } to show
+// a validation error inline and keep the modal open, or return nothing/undefined
+// on success to close it.
+const formModalOverlay = document.getElementById('form-modal-overlay');
+const formModalForm = document.getElementById('form-modal-form');
+const formModalFields = document.getElementById('form-modal-fields');
+const formModalError = document.getElementById('form-modal-error');
+let formModalOnSubmit = null;
+
+function fieldInputHtml(f) {
+  const optional = f.required === false;
+  const labelHtml = `<label class="field-label" for="fm-${f.id}">${f.label}${optional ? ' <span class="text-coffee-300 font-normal">(optional)</span>' : ''}</label>`;
+  if (f.type === 'select') {
+    return `
+    <div>
+      ${labelHtml}
+      <select id="fm-${f.id}" ${optional ? '' : 'required'} class="field-input">
+        <option value="" disabled ${f.value ? '' : 'selected'}>${f.placeholder || 'Select…'}</option>
+        ${(f.options || []).map(o => `<option value="${o}" ${o === f.value ? 'selected' : ''}>${o}</option>`).join('')}
+      </select>
+    </div>`;
+  }
+  return `
+    <div>
+      ${labelHtml}
+      <input id="fm-${f.id}" type="${f.type || 'text'}" ${optional ? '' : 'required'} ${f.placeholder ? `placeholder="${f.placeholder}"` : ''} value="${f.value ?? ''}" class="field-input">
+    </div>`;
+}
+
+function openFormModal({ title, subtitle, fields, submitLabel, onSubmit }) {
+  document.getElementById('form-modal-title').textContent = title;
+  const subEl = document.getElementById('form-modal-subtitle');
+  subEl.textContent = subtitle || '';
+  subEl.classList.toggle('hidden', !subtitle);
+  formModalFields.innerHTML = fields.map(fieldInputHtml).join('');
+  document.getElementById('form-modal-submit').textContent = submitLabel || 'Save';
+  formModalError.classList.add('hidden');
+  formModalOnSubmit = async () => {
+    const values = {};
+    fields.forEach(f => { values[f.id] = document.getElementById(`fm-${f.id}`).value.trim(); });
+    return onSubmit(values);
+  };
+  formModalOverlay.classList.remove('hidden');
+  const firstInput = formModalFields.querySelector('input');
+  if (firstInput) setTimeout(() => firstInput.focus(), 10);
+}
+function closeFormModal() {
+  formModalOverlay.classList.add('hidden');
+  formModalOnSubmit = null;
+}
+document.getElementById('form-modal-cancel').addEventListener('click', closeFormModal);
+formModalOverlay.addEventListener('click', (e) => { if (e.target === formModalOverlay) closeFormModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !formModalOverlay.classList.contains('hidden')) closeFormModal(); });
+formModalForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!formModalForm.reportValidity() || !formModalOnSubmit) return;
+  const submitBtn = document.getElementById('form-modal-submit');
+  submitBtn.disabled = true;
+  try {
+    const result = await formModalOnSubmit();
+    if (result && result.error) {
+      formModalError.textContent = result.error;
+      formModalError.classList.remove('hidden');
+    } else {
+      closeFormModal();
+    }
+  } catch (err) {
+    console.error(err);
+    formModalError.textContent = 'Something went wrong. Please try again.';
+    formModalError.classList.remove('hidden');
+  }
+  submitBtn.disabled = false;
+});
 
 // ---------- Render: recent orders (Home) ----------
 function renderRecentOrders() {
@@ -1183,22 +1288,27 @@ function renderDistributorAccounts() {
 }
 document.getElementById('dist-search').addEventListener('input', renderDistributorAccounts);
 
-document.getElementById('distributor-create-btn').addEventListener('click', async () => {
-  const name = prompt('Distributor name:');
-  if (!name || !name.trim()) return;
-  const phone = prompt('Phone number:');
-  if (!phone || !phone.trim()) return;
-  const address = prompt('Address:');
-  if (!address || !address.trim()) return;
-  const shopeeLink = prompt('Shopee store link (leave blank if none):') || '';
-  const tiktokLink = prompt('TikTok store link (leave blank if none):') || '';
-
-  const { error } = await sb.from('distributor_accounts').insert({
-    name: name.trim(), phone: phone.trim(), address: address.trim(),
-    shopee_link: shopeeLink.trim() || null, tiktok_link: tiktokLink.trim() || null,
+document.getElementById('distributor-create-btn').addEventListener('click', () => {
+  openFormModal({
+    title: 'Add distributor',
+    subtitle: 'They hold their own stock on hand and resell it themselves.',
+    fields: [
+      { id: 'name', label: 'Name' },
+      { id: 'phone', label: 'Phone number', type: 'tel' },
+      { id: 'address', label: 'Address' },
+      { id: 'shopee', label: 'Shopee store link', type: 'url', required: false, placeholder: 'https://shopee.ph/...' },
+      { id: 'tiktok', label: 'TikTok store link', type: 'url', required: false, placeholder: 'https://tiktok.com/...' },
+    ],
+    submitLabel: 'Add distributor',
+    onSubmit: async (v) => {
+      const { error } = await sb.from('distributor_accounts').insert({
+        name: v.name, phone: v.phone, address: v.address,
+        shopee_link: v.shopee || null, tiktok_link: v.tiktok || null,
+      });
+      if (error) { console.error(error); return { error: "Couldn't add that distributor. Please try again." }; }
+      await loadDistributorAccounts();
+    },
   });
-  if (error) { console.error(error); alert("Couldn't add that distributor."); return; }
-  await loadDistributorAccounts();
 });
 
 // ---------- Distributor orders — each distributor's own log: date ordered,
@@ -1527,15 +1637,20 @@ function renderAffiliates() {
 }
 document.getElementById('affiliates-search').addEventListener('input', renderAffiliates);
 document.getElementById('affiliate-create-btn').addEventListener('click', () => {
-  const name = prompt('Affiliate name:');
-  if (!name || !name.trim()) return;
-  const email = prompt('Affiliate email:');
-  if (!email || !email.trim()) return;
-  const region = prompt('Region (e.g. NCR, Region IV-A):');
-  if (!region || !region.trim()) return;
-  const code = (name.trim().split(' ')[0] + Math.floor(Math.random() * 90 + 10)).toUpperCase();
-  affiliates.unshift({ name: name.trim(), email: email.trim(), code, status: 'Active', region: region.trim(), joined: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), orders: [] });
-  renderAffiliates();
+  openFormModal({
+    title: 'Add affiliate',
+    fields: [
+      { id: 'name', label: 'Name' },
+      { id: 'email', label: 'Email', type: 'email' },
+      { id: 'region', label: 'Region', type: 'select', options: PH_REGIONS, placeholder: 'Select a region' },
+    ],
+    submitLabel: 'Add affiliate',
+    onSubmit: (v) => {
+      const code = (v.name.split(' ')[0] + Math.floor(Math.random() * 90 + 10)).toUpperCase();
+      affiliates.unshift({ name: v.name, email: v.email, code, status: 'Active', region: v.region, joined: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), orders: [] });
+      renderAffiliates();
+    },
+  });
 });
 
 // ---------- Period switching (Daily / Weekly / Monthly reporting) ----------
