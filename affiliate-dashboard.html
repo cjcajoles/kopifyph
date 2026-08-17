@@ -38,6 +38,12 @@
   body { font-family: 'Inter', sans-serif; letter-spacing: -0.01em; }
   th { font-size:.6875rem; text-transform:uppercase; letter-spacing:.04em; color:#B98247; font-weight:600; text-align:left; padding:.75rem 1rem; }
   td { padding:1rem; font-size:.875rem; border-top:1px solid #F3E1CC; }
+  .status-pill { display:inline-flex; align-items:center; gap:.375rem; font-size:.75rem; font-weight:600; padding:.25rem .625rem; border-radius:9999px; }
+  .field-label { display:block; font-size:.8125rem; font-weight:600; color:#54331C; margin-bottom:.25rem; }
+  .field-input { width:100%; border-radius:.75rem; border:1px solid #E4C79E; padding:.65rem 1rem; font-size:.875rem; background:#fff; }
+  .field-input:focus { outline:none; box-shadow:0 0 0 2px #E8B35C; border-color:#E8B35C; }
+  .period-btn { padding:.5rem 1rem; border-radius:9999px; font-size:.8125rem; font-weight:600; color:#8B5A2B; transition:background .15s,color .15s,box-shadow .15s; }
+  .period-btn.active { background:#fff; color:#3B2114; box-shadow:0 1px 2px 0 rgba(42,23,13,.08); }
 
   html.dark body { background:#2A170D; color:#FBF3EA; }
   html.dark .bg-white { background-color:#3B2114 !important; }
@@ -50,6 +56,10 @@
   html.dark .text-coffee-400 { color:#B98247 !important; }
   html.dark th { color:#E8B35C; }
   html.dark td { border-top-color:#54331C; }
+  html.dark .field-label { color:#E4C79E; }
+  html.dark .field-input { background:#3B2114; border-color:#54331C; color:#FBF3EA; }
+  html.dark .period-btn { color:#E8B35C; }
+  html.dark .period-btn.active { background:#54331C; color:#FBF3EA; }
   body:not([data-auth-checked]) > * { display:none !important; }
 </style>
 </head>
@@ -78,7 +88,27 @@
 </header>
 
 <main class="max-w-4xl mx-auto px-4 py-8">
-  <h1 class="text-2xl font-extrabold text-coffee-900 mb-1">Hi, <span id="aff-name">there</span>! &#128075;</h1>
+
+  <!-- Cha-ching! payout banner — shown once per new payout, see checkForNewPayout() -->
+  <div id="chaching-banner" class="hidden mb-4 bg-gradient-to-r from-gold-500 to-gold-400 text-white rounded-2xl shadow-card p-5 flex items-center justify-between gap-4">
+    <div>
+      <p class="font-extrabold text-lg">&#127881; CHA-CHING! Your commission has been paid.</p>
+      <p class="text-sm text-white/90 mt-0.5" id="chaching-detail"></p>
+    </div>
+    <button id="chaching-dismiss" class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/20 transition" aria-label="Dismiss">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-1">
+    <h1 class="text-2xl font-extrabold text-coffee-900">Hi, <span id="aff-name">there</span>! &#128075;</h1>
+    <div class="flex gap-1 bg-coffee-100 rounded-full p-1" id="aff-period-filter">
+      <button data-period="all" class="period-btn active">All time</button>
+      <button data-period="daily" class="period-btn">Daily</button>
+      <button data-period="weekly" class="period-btn">Weekly</button>
+      <button data-period="monthly" class="period-btn">Monthly</button>
+    </div>
+  </div>
   <p class="text-coffee-500 text-sm mb-6">Here's how your Kopify referrals are doing.</p>
 
   <!-- Referral link -->
@@ -95,42 +125,151 @@
   </div>
 
   <!-- Stats -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
     <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
-      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Orders Referred</span>
+      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400" id="aff-stat-orders-label">Orders Referred</span>
       <p class="text-2xl font-extrabold text-coffee-900 mt-2" id="aff-stat-orders">0</p>
     </div>
     <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
-      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Boxes Sold</span>
+      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400" id="aff-stat-boxes-label">Boxes Sold</span>
       <p class="text-2xl font-extrabold text-coffee-900 mt-2" id="aff-stat-boxes">0</p>
     </div>
     <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
-      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Total Commission</span>
+      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400" id="aff-stat-commission-label">Commission</span>
       <p class="text-2xl font-extrabold text-coffee-900 mt-2" id="aff-stat-commission">&#8369;0</p>
       <p class="text-xs text-coffee-400 mt-1">&#8369;60 per box sold</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-5">
+      <span class="text-xs font-bold uppercase tracking-wide text-coffee-400">Unpaid</span>
+      <p class="text-2xl font-extrabold text-coffee-900 mt-2" id="aff-stat-unpaid">&#8369;0</p>
+      <p class="text-xs text-coffee-400 mt-1" id="aff-last-paid">Paid out every Tuesday</p>
     </div>
   </div>
 
   <!-- Orders -->
-  <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden">
+  <div class="bg-white rounded-2xl shadow-card border border-coffee-100 overflow-hidden mb-4">
     <div class="px-5 pt-5 pb-2">
       <h2 class="font-bold text-coffee-900">Your referred orders</h2>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full" id="aff-orders-table">
-        <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Date</th><th>Commission</th></tr></thead>
+        <thead><tr><th>Order</th><th>Customer</th><th>Pack</th><th>Date</th><th>Commission</th><th>Payout</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
     <p id="aff-orders-empty" class="hidden text-center text-sm text-coffee-400 py-10">No referred orders yet &mdash; share your link to get started!</p>
   </div>
+
+  <!-- Payout details (self-service) -->
+  <div class="bg-white rounded-2xl shadow-card border border-coffee-100 p-6">
+    <h2 class="font-bold text-coffee-900 mb-1">Payout details</h2>
+    <p class="text-sm text-coffee-500 mb-4">Where we send your commission every Tuesday.</p>
+    <form id="payout-form" class="space-y-4">
+      <div>
+        <label class="field-label" for="payout-bank-name">Bank / e-wallet name</label>
+        <input id="payout-bank-name" type="text" placeholder="e.g. BDO, GCash" class="field-input">
+      </div>
+      <div>
+        <label class="field-label" for="payout-account-name">Account name</label>
+        <input id="payout-account-name" type="text" class="field-input">
+      </div>
+      <div>
+        <label class="field-label" for="payout-account-number">Account number</label>
+        <input id="payout-account-number" type="text" class="field-input">
+      </div>
+      <p id="payout-saved-msg" class="hidden text-sm text-emerald-600 font-semibold">Saved!</p>
+      <p id="payout-error-msg" class="hidden text-sm text-red-600 font-semibold">Couldn't save — please try again.</p>
+      <button type="submit" class="bg-gold-500 hover:bg-gold-600 transition text-white text-sm font-bold px-5 py-2.5 rounded-full">Save payout details</button>
+    </form>
+  </div>
 </main>
 
 <script>
   const COMMISSION_PER_BOX = 60;
-  const boxesInPack = { '1 Box': 1, '3 Boxes': 3, '10 Boxes': 10 };
+  // An order counts as a completed sale once it's Paid, and stays counted as
+  // it moves through fulfillment — Fulfilled/Shipped are the same successful
+  // order further along, not a different one.
+  const SUCCESSFUL_STATUSES = ['Paid', 'Fulfilled', 'Shipped'];
   const peso = n => '₱' + n.toLocaleString('en-PH');
   const fmtDate = iso => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+  const PERIOD_LABELS = { all: 'All time', daily: 'Today', weekly: 'This week', monthly: 'This month' };
+
+  function periodBounds(period) {
+    const now = new Date();
+    if (period === 'daily') return { start: new Date(now.getFullYear(), now.getMonth(), now.getDate()), end: now };
+    if (period === 'weekly') { const start = new Date(now); start.setDate(start.getDate() - 7); return { start, end: now }; }
+    if (period === 'monthly') return { start: new Date(now.getFullYear(), now.getMonth(), 1), end: now };
+    return null; // 'all'
+  }
+
+  let myOrders = [];
+  let myCode = '';
+  let currentPeriod = 'all';
+
+  function renderStats() {
+    const bounds = periodBounds(currentPeriod);
+    const inPeriod = bounds ? myOrders.filter(o => { const d = new Date(o.created_at); return d >= bounds.start && d < bounds.end; }) : myOrders;
+    const successful = inPeriod.filter(o => SUCCESSFUL_STATUSES.includes(o.status));
+    const boxes = successful.reduce((sum, o) => sum + (o.boxes || 0), 0);
+
+    const label = PERIOD_LABELS[currentPeriod];
+    document.getElementById('aff-stat-orders-label').textContent = `Orders Referred (${label})`;
+    document.getElementById('aff-stat-boxes-label').textContent = `Boxes Sold (${label})`;
+    document.getElementById('aff-stat-commission-label').textContent = `Commission (${label})`;
+    document.getElementById('aff-stat-orders').textContent = successful.length;
+    document.getElementById('aff-stat-boxes').textContent = boxes;
+    document.getElementById('aff-stat-commission').textContent = peso(boxes * COMMISSION_PER_BOX);
+
+    // Unpaid is always all-time — it's what you're actually owed right now,
+    // regardless of which date range you're looking at above.
+    const unpaidBoxes = myOrders
+      .filter(o => SUCCESSFUL_STATUSES.includes(o.status) && !o.commission_paid)
+      .reduce((sum, o) => sum + (o.boxes || 0), 0);
+    document.getElementById('aff-stat-unpaid').textContent = peso(unpaidBoxes * COMMISSION_PER_BOX);
+
+    const tbody = document.querySelector('#aff-orders-table tbody');
+    tbody.innerHTML = inPeriod.map(o => {
+      const counted = SUCCESSFUL_STATUSES.includes(o.status);
+      const payoutCell = !counted
+        ? '<span class="text-coffee-300 text-xs">Not yet paid by customer</span>'
+        : (o.commission_paid
+          ? '<span class="status-pill" style="background:#DCFCE7;color:#15803D;">Paid</span>'
+          : '<span class="status-pill" style="background:#FEF3C7;color:#B45309;">Unpaid</span>');
+      return `
+      <tr>
+        <td class="font-semibold text-coffee-800">${o.order_number}</td>
+        <td>${o.customer_name}</td>
+        <td class="text-coffee-500">${o.pack}</td>
+        <td class="text-coffee-500">${fmtDate(o.created_at)}</td>
+        <td class="font-semibold">${counted ? peso((o.boxes || 0) * COMMISSION_PER_BOX) : '&mdash;'}</td>
+        <td>${payoutCell}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('aff-orders-empty').classList.toggle('hidden', inPeriod.length > 0);
+  }
+
+  document.querySelectorAll('#aff-period-filter .period-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentPeriod = btn.dataset.period;
+      document.querySelectorAll('#aff-period-filter .period-btn').forEach(b => b.classList.toggle('active', b.dataset.period === currentPeriod));
+      renderStats();
+    });
+  });
+
+  // Shows a one-time celebration banner whenever the admin's last payout to
+  // this affiliate is newer than the last one they've seen on this device.
+  function checkForNewPayout(affiliate) {
+    if (!affiliate.last_payout_at) return;
+    const seenKey = `kopify-aff-seen-payout-${myCode}`;
+    if (localStorage.getItem(seenKey) === affiliate.last_payout_at) return;
+    localStorage.setItem(seenKey, affiliate.last_payout_at);
+    document.getElementById('chaching-detail').textContent =
+      `${peso(affiliate.last_payout_amount || 0)} was paid out on ${fmtDate(affiliate.last_payout_at)}.`;
+    document.getElementById('chaching-banner').classList.remove('hidden');
+  }
+  document.getElementById('chaching-dismiss').addEventListener('click', () => {
+    document.getElementById('chaching-banner').classList.add('hidden');
+  });
 
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
@@ -143,8 +282,10 @@
       return;
     }
 
-    const myCode = profile.affiliate_code;
-    const { data: affiliate } = await sb.from('affiliates').select('name, status').eq('code', myCode).single();
+    myCode = profile.affiliate_code;
+    const { data: affiliate } = await sb.from('affiliates')
+      .select('name, status, bank_name, bank_account_name, bank_account_number, last_payout_at, last_payout_amount')
+      .eq('code', myCode).single();
     if (affiliate?.status !== 'Active') {
       await sb.auth.signOut();
       window.location.replace('affiliate-login.html');
@@ -155,31 +296,23 @@
     const fullLink = `kopify.ph/?ref=${myCode}`;
     document.getElementById('aff-link').textContent = fullLink;
 
+    if (affiliate.bank_name) document.getElementById('payout-bank-name').value = affiliate.bank_name;
+    if (affiliate.bank_account_name) document.getElementById('payout-account-name').value = affiliate.bank_account_name;
+    if (affiliate.bank_account_number) document.getElementById('payout-account-number').value = affiliate.bank_account_number;
+    if (affiliate.last_payout_at) document.getElementById('aff-last-paid').textContent = `Last paid ${fmtDate(affiliate.last_payout_at)}`;
+
+    checkForNewPayout(affiliate);
+
     // RLS on the orders table already restricts this to rows where
     // affiliate_code = my_affiliate_code() — this can't see anyone else's orders.
-    const { data: myOrders, error: ordersError } = await sb
+    const { data: orderRows, error: ordersError } = await sb
       .from('orders')
-      .select('order_number, customer_name, pack, created_at')
+      .select('order_number, customer_name, pack, boxes, status, commission_paid, created_at')
       .eq('affiliate_code', myCode)
       .order('created_at', { ascending: false });
 
-    const orders = ordersError ? [] : myOrders;
-    const boxes = orders.reduce((sum, o) => sum + (boxesInPack[o.pack] || 0), 0);
-    const commission = boxes * COMMISSION_PER_BOX;
-    document.getElementById('aff-stat-orders').textContent = orders.length;
-    document.getElementById('aff-stat-boxes').textContent = boxes;
-    document.getElementById('aff-stat-commission').textContent = peso(commission);
-
-    const tbody = document.querySelector('#aff-orders-table tbody');
-    tbody.innerHTML = orders.map(o => `
-      <tr>
-        <td class="font-semibold text-coffee-800">${o.order_number}</td>
-        <td>${o.customer_name}</td>
-        <td class="text-coffee-500">${o.pack}</td>
-        <td class="text-coffee-500">${fmtDate(o.created_at)}</td>
-        <td class="font-semibold">${peso((boxesInPack[o.pack] || 0) * COMMISSION_PER_BOX)}</td>
-      </tr>`).join('');
-    document.getElementById('aff-orders-empty').classList.toggle('hidden', orders.length > 0);
+    myOrders = ordersError ? [] : orderRows;
+    renderStats();
 
     document.getElementById('copy-link-btn').addEventListener('click', () => {
       const url = `https://${fullLink}`;
@@ -187,6 +320,19 @@
       const label = document.getElementById('copy-link-label');
       label.textContent = 'Copied!';
       setTimeout(() => { label.textContent = 'Copy Link'; }, 1200);
+    });
+
+    document.getElementById('payout-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      document.getElementById('payout-saved-msg').classList.add('hidden');
+      document.getElementById('payout-error-msg').classList.add('hidden');
+      const { error } = await sb.from('affiliates').update({
+        bank_name: document.getElementById('payout-bank-name').value.trim(),
+        bank_account_name: document.getElementById('payout-account-name').value.trim(),
+        bank_account_number: document.getElementById('payout-account-number').value.trim(),
+      }).eq('code', myCode);
+      document.getElementById(error ? 'payout-error-msg' : 'payout-saved-msg').classList.remove('hidden');
+      if (error) console.error(error);
     });
 
     document.body.setAttribute('data-auth-checked', '1');
