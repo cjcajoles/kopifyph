@@ -125,6 +125,7 @@ create table if not exists public.distributor_accounts (
   address text not null,
   shopee_link text,
   tiktok_link text,
+  facebook_link text,
   created_at timestamptz not null default now()
 );
 
@@ -221,6 +222,7 @@ create table if not exists public.orders (
   affiliate_code text,
   voucher_code text,
   discount integer not null default 0,
+  commission_paid boolean not null default false,
   created_at timestamptz not null default now()
 );
 
@@ -302,6 +304,13 @@ create table if not exists public.affiliates (
   code text not null unique,
   status text not null default 'Active' check (status in ('Active', 'Inactive')),
   region text,
+  address text,
+  facebook_link text,
+  bank_name text,
+  bank_account_name text,
+  bank_account_number text,
+  last_payout_at timestamptz,
+  last_payout_amount integer,
   joined_at timestamptz not null default now()
 );
 
@@ -314,6 +323,12 @@ create policy "Admins manage affiliates" on public.affiliates
 drop policy if exists "Affiliates view their own row" on public.affiliates;
 create policy "Affiliates view their own row" on public.affiliates
   for select to authenticated using (code = public.my_affiliate_code());
+
+-- Lets an affiliate submit their own bank/payout details from their
+-- dashboard, without needing the admin to relay them manually.
+drop policy if exists "Affiliates update their own row" on public.affiliates;
+create policy "Affiliates update their own row" on public.affiliates
+  for update to authenticated using (code = public.my_affiliate_code()) with check (code = public.my_affiliate_code());
 
 -- ----------------------------------------------------------------------------
 -- refunds
